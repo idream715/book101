@@ -41,6 +41,7 @@ export default new Vuex.Store({
           let data = res.data
           commit('SET_TOTALS_INDEXS', data.nitems)
           commit('SET_INDEXS', data.items)
+          console.log(data.items)
         })
         .catch(err => console.log(err))
     }
