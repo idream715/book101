@@ -49,7 +49,7 @@ export default new Vuex.Store({
     getTotalbooks(state){
       return state.totalsBooks
     },
-    getbooks(state){
+    getBooks(state){
       return state.books
     },
     getTotalIndexs(state){
