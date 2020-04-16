@@ -33,6 +33,12 @@
         <span class="mr-2">Home</span>
       </v-btn>
       <v-btn
+        router-link to="/indexs"
+        text
+      >
+        <span class="mr-2">indexs</span>
+      </v-btn>
+      <v-btn
         router-link to="/Books"
         text
       >

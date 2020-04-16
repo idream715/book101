@@ -32,17 +32,15 @@ export default {
   components: {
     sarabun
   },
-   created(){
-    this.$store.dispatch('getBookFromApi')
+  created(){
+    if(this.books.length === 0 ){
+      this.$store.dispatch('getBookFromApi')
+    }
   },
   computed:{
     books(){
-      return this.$store.getters.getbooks
-    },
-    Totalbooks(){
-      return this.$store.getters.getTotalbooks
-    },
-
+      return this.$store.getters.getBooks
+    }
   }
 }
 </script>
