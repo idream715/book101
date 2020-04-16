@@ -1,18 +1,19 @@
 <template>
   <div class="about">
       <v-container>
-        <v-row no-gutters="">
+        <v-row no-gutters>
           <v-col 
-          v-for="n in 47"
+          v-for="n in books"
           :key="n"
-          
+          xs="3"
+          md="2"
           >
-            <v-card class="mx-auto mt-3 mb-5" max-width="180">
-              <v-img src="https://book.rgtcenter.com/cover/052-01.jpg" height="250px"></v-img>
+            <v-card class="mx-auto mt-3 mb-5" max-width="160">
+              <v-img :src="n.book_link_jpg" height="200px" width="500px"></v-img>
               <v-card-title>
-                <v-title class="text-truncate">
-                  ที่นี่มีคำตอบ ที่นี่มีคำตอบ
-                </v-title>
+                <v-text class="text-truncate subtitle-2">
+                  {{n.book_name}}
+                </v-text>
               </v-card-title>
             </v-card>
           </v-col>
@@ -33,6 +34,16 @@ export default {
   },
    created(){
     this.$store.dispatch('getBookFromApi')
+  },
+  computed:{
+    books(){
+      return this.$store.getters.getbooks
+    },
+    Totalbooks(){
+      return this.$store.getters.getTotalbooks
+    },
+
   }
 }
 </script>
+
