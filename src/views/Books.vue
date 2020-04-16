@@ -11,7 +11,7 @@
             <v-card class="mx-auto mt-3 mb-5" max-width="160">
               <v-img :src="n.book_link_jpg" height="200px" width="500px"></v-img>
               <v-card-title>
-                <v-text class="text-truncate subtitle-2">
+                <v-text class="text-truncate subtitle-1">
                   {{n.book_name}}
                 </v-text>
               </v-card-title>
