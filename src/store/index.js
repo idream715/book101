@@ -10,7 +10,9 @@ export default new Vuex.Store({
     books:[],
     totalsIndexs:0,
     indexs:[],
-    bookSelected:[]
+    bookSelected:{},
+    sarabunSelected:[],
+    totalsSarabun:0,
   },
   mutations: {
     SET_BOOKS(state, payload){
@@ -22,12 +24,19 @@ export default new Vuex.Store({
     SET_INDEXS(state, payload){
       state.indexs = payload
     },
+    SET_SARABUN_TOTAL(state, payload){
+      state.totalsSarabun = payload
+    },
+    SET_SARABUN(state, payload){
+      state.sarabunSelected = payload
+    },
     SET_TOTALS_INDEXS(state, payload){
       state.totalsIndexs = payload
     },
     SET_BOOK_SELECTED(state, payload){
       state.bookSelected = payload
-    }
+    },
+    
   },
   actions: {
     getBookFromApi({ commit }){
@@ -51,6 +60,23 @@ export default new Vuex.Store({
     },
     setBookSelected({commit}, selected){
       commit('SET_BOOK_SELECTED', selected)
+      let name_book = selected.book_name
+      console.log(name_book)
+      callApi.getData(`
+        ?path=/indexs
+        &limit=50
+        &offset=0
+        &query={
+          "search_heading" : "${name_book}"
+        }
+      `)
+        .then(res=>{
+          let data = res.data
+          // commit('SET_SARABUN_TOTAL', data.nitems)
+          // commit('SET_SARABUN', data.items)
+          console.log(data)
+        })
+        .catch(err => console.log(err))
     }
   },
   getters: {
@@ -68,6 +94,9 @@ export default new Vuex.Store({
     },
     getBookSelected(state){
       return state.bookSelected
+    },
+    getSarabun(state){
+      return state.sarabunSelected
     },
   }
 })

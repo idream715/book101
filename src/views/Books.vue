@@ -35,7 +35,7 @@
           </v-col>
         </v-row>
       </v-container>
-    <Sarabun/>
+    <Sarabun @emitFalse="setOpenDialog" :dialog="openDialog" />
   </div>
 </template>
 
@@ -46,6 +46,11 @@ import Sarabun from '@/components/Sarabun.vue'
 export default {
   components: {
     Sarabun
+  },
+  data() {
+    return {
+      openDialog : false
+    }
   },
   created(){
     if(this.books.length === 0 ){
@@ -60,6 +65,10 @@ export default {
   methods: {
     bookSelect(selected){
       this.$store.dispatch('setBookSelected', selected)
+      this.openDialog = !this.openDialog
+    },
+    setOpenDialog(val){
+      this.openDialog = val
     }
   }
 }
