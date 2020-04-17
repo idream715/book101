@@ -10,6 +10,7 @@ export default new Vuex.Store({
     books:[],
     totalsIndexs:0,
     indexs:[],
+    bookSelected:[]
   },
   mutations: {
     SET_BOOKS(state, payload){
@@ -23,6 +24,9 @@ export default new Vuex.Store({
     },
     SET_TOTALS_INDEXS(state, payload){
       state.totalsIndexs = payload
+    },
+    SET_BOOK_SELECTED(state, payload){
+      state.bookSelected = payload
     }
   },
   actions: {
@@ -44,6 +48,9 @@ export default new Vuex.Store({
           console.log(data.items)
         })
         .catch(err => console.log(err))
+    },
+    setBookSelected({commit}, selected){
+      commit('SET_BOOK_SELECTED', selected)
     }
   },
   getters: {
@@ -58,6 +65,9 @@ export default new Vuex.Store({
     },
     getIndexs(state){
       return state.indexs
+    },
+    getBookSelected(state){
+      return state.bookSelected
     },
   }
 })

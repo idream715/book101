@@ -3,34 +3,49 @@
       <v-container>
         <v-row no-gutters>
           <v-col 
-          v-for="n in books"
-          :key="n"
-          xs="3"
-          md="2"
+            v-for="n in books"
+            :key="n.book_name"
+            cols="6"
+            sm="4"
+            md="3"
+            lg="2"
+            xl="1"
           >
-            <v-card class="mx-auto mt-3 mb-5" max-width="160">
-              <v-img :src="n.book_link_jpg" height="200px" width="500px"></v-img>
-              <v-card-title>
-                <v-text class="text-truncate subtitle-1">
-                  {{n.book_name}}
-                </v-text>
-              </v-card-title>
+            <v-card 
+              class="mx-auto ma-5 " 
+              max-width="160"
+              @click="bookSelect(n)"
+            >
+              <v-img 
+                :src="n.book_link_jpg" 
+                height="200px" 
+                width="500px"
+              >
+              </v-img>
+              <v-card-text 
+                class="
+                  text-truncate 
+                  caption
+                "
+              >
+                {{n.book_name}}
+              </v-card-text>
             </v-card>
+          
           </v-col>
         </v-row>
       </v-container>
-    <sarabun msg="Welcome to Your Vue.js App"/>
+    <Sarabun/>
   </div>
 </template>
 
 <script>
 // @ is an alias to /src
-import sarabun from '@/components/Sarabun.vue'
+import Sarabun from '@/components/Sarabun.vue'
 
 export default {
-  name: 'Home',
   components: {
-    sarabun
+    Sarabun
   },
   created(){
     if(this.books.length === 0 ){
@@ -40,6 +55,11 @@ export default {
   computed:{
     books(){
       return this.$store.getters.getBooks
+    }
+  },
+  methods: {
+    bookSelect(selected){
+      this.$store.dispatch('setBookSelected', selected)
     }
   }
 }

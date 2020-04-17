@@ -11,7 +11,6 @@ export default {
       this.$store.dispatch('getFirstIndexsFromApi')
     }
   },
-
   computed:{
     indexs(){
       return this.$store.getters.getIndexs
