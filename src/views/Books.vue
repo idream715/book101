@@ -1,6 +1,24 @@
 <template>
   <div class="about">
-    <h1>This is an books page</h1>
+      <v-container>
+        <v-row no-gutters>
+          <v-col 
+          v-for="n in books"
+          :key="n"
+          xs="3"
+          md="2"
+          >
+            <v-card class="mx-auto mt-3 mb-5" max-width="160">
+              <v-img :src="n.book_link_jpg" height="200px" width="500px"></v-img>
+              <v-card-title>
+                <v-text class="text-truncate subtitle-1">
+                  {{n.book_name}}
+                </v-text>
+              </v-card-title>
+            </v-card>
+          </v-col>
+        </v-row>
+      </v-container>
     <sarabun msg="Welcome to Your Vue.js App"/>
   </div>
 </template>
@@ -26,3 +44,4 @@ export default {
   }
 }
 </script>
+
