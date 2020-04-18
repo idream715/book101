@@ -7,6 +7,7 @@
           v-model="dialog" 
           max-width="100%" 
           style="margin:0;"
+          persistent
           >
           <v-card>
             <v-row class="headline" justify="center">{{bookSelected.book_name}}</v-row>
@@ -39,7 +40,7 @@
 
             <v-card-actions>
               <v-spacer></v-spacer>
-              <v-btn color="green darken-1" text @click="$emit('emitFalse',false)">กลับ</v-btn>
+              <v-btn color="green darken-1" text @click="closeDialog">กลับ</v-btn>
             </v-card-actions>
           </v-card>
         </v-dialog>
@@ -66,7 +67,8 @@
     },
     methods: {
       closeDialog(){
-        // return $emit('emitFalse',false)
+        this.$emit('emitFalse',false)
+        this.$store.dispatch('setBookSelected', [])
       },
     },
     computed: {

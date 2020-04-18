@@ -54,27 +54,18 @@ export default new Vuex.Store({
           let data = res.data
           commit('SET_TOTALS_INDEXS', data.nitems)
           commit('SET_INDEXS', data.items)
-          console.log(data.items)
+          // console.log(data.items)
         })
         .catch(err => console.log(err))
     },
     setBookSelected({commit}, selected){
       commit('SET_BOOK_SELECTED', selected)
       let name_book = selected.book_name
-      console.log(name_book)
-      callApi.getData(`
-        ?path=/indexs
-        &limit=50
-        &offset=0
-        &query={
-          "search_heading" : "${name_book}"
-        }
-      `)
+      callApi.getData(`?path=/indexs&limit=50&offset=0&query={"search_heading":"${name_book}"}`)
         .then(res=>{
           let data = res.data
-          // commit('SET_SARABUN_TOTAL', data.nitems)
-          // commit('SET_SARABUN', data.items)
-          console.log(data)
+          commit('SET_SARABUN_TOTAL', data.nitems)
+          commit('SET_SARABUN', data.items)
         })
         .catch(err => console.log(err))
     }
@@ -96,7 +87,13 @@ export default new Vuex.Store({
       return state.bookSelected
     },
     getSarabun(state){
-      return state.sarabunSelected
+      // return state.sarabunSelected
+      let sarabuns = Array.from(new Set(state.sarabunSelected.map(book => book.search_index)))
+      .map(nameSarabun => {
+        return state.sarabunSelected.find(book => book.search_index === nameSarabun)
+      })
+      console.log(sarabuns)
+      return sarabuns
     },
   }
 })
