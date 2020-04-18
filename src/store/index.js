@@ -10,6 +10,7 @@ export default new Vuex.Store({
     books:[],
     totalsIndexs:0,
     indexs:[],
+    overlay:false
   },
   mutations: {
     SET_BOOKS(state, payload){
@@ -23,6 +24,9 @@ export default new Vuex.Store({
     },
     SET_TOTALS_INDEXS(state, payload){
       state.totalsIndexs = payload
+    },
+    SET_OVERLAY(state,payload){
+      state.overlay  = payload
     }
   },
   actions: {
@@ -35,12 +39,16 @@ export default new Vuex.Store({
         })
         .catch(err => console.log(err))
     },
-    getFirstIndexsFromApi({ commit }){
-      callApi.getData(`?path=/indexs&limit=20`)
-        .then(res=>{
-          let data = res.data
-          commit('SET_TOTALS_INDEXS', data.nitems)
-          commit('SET_INDEXS', data.items)
+    getFirstIndexsFromApi({ commit },words){
+      let t = true
+      let f = false
+      commit('SET_OVERLAY', t)
+      callApi.getData(`?path=/indexs&limit=20&query={"$and":[${words}]} `)
+      .then(res=>{
+        let data = res.data
+        commit('SET_OVERLAY', f)
+        commit('SET_TOTALS_INDEXS', data.nitems)
+        commit('SET_INDEXS', data.items)
           console.log(data.items)
         })
         .catch(err => console.log(err))
@@ -59,5 +67,8 @@ export default new Vuex.Store({
     getIndexs(state){
       return state.indexs
     },
+    getoverlay(state){
+      return state.overlay
+    }
   }
 })
