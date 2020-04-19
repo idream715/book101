@@ -48,7 +48,7 @@ export default {
 
   created(){
     if(!(this.indexs.length===0)){
-      this.$store.dispatch('setFirstIndexsFromApi',[])
+      this.$store.dispatch('clear')
     }
   },
   computed:{

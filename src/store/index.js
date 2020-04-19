@@ -11,6 +11,7 @@ export default new Vuex.Store({
     totalsIndexs:0,
     indexs:[],
     overlay:false,
+    notfound:false,
     marks:[],
     words_search:[]
   },
@@ -28,7 +29,10 @@ export default new Vuex.Store({
       state.totalsIndexs = payload
     },
     SET_OVERLAY(state,payload){
-      state.overlay  = payload
+      state.overlay = payload
+    },
+    SET_NOTFOUND(state,payload){
+      state.notfound = payload
     },
     SET_MARKS(state,payload){
       state.marks = payload
@@ -54,7 +58,7 @@ export default new Vuex.Store({
       commit('SET_WORDS_SEARCH',words)
       let tags = []
       words.forEach(element => {
-        let tag = `{"search_index":{"$regex":"${element}"}}`
+        let tag = `{"search_details":{"$regex":"${element}"}}`
         tags.push(tag)
       });
 
@@ -62,23 +66,46 @@ export default new Vuex.Store({
       callApi.getData(`?path=/indexs&limit=20&query={"$and":[${tags}]} `)
       .then(res=>{
         let data = res.data
+        console.log(data.items.length)
+        if(data.items.length===0){
+          commit('SET_NOTFOUND', true)
+        }else{
+          commit('SET_NOTFOUND', false)
+        }
         commit('SET_OVERLAY', false)
         commit('SET_TOTALS_INDEXS', data.nitems)
-        commit('SET_INDEXS', data.items)
-        
-        let details = data.items.map(x=>x.search_index)
-        let marks = []
-        details.forEach(index => {
-          let render = index
-          words.forEach(word=>{
-            render = render.replace(word,`<mark>${word}</mark>`)
-          })
+        let details = data.items.map(x=>x.search_details)
+        let index = data.items.map(x=>x.search_index)
+        function marks(array){        
+          let marks = []
+          array.forEach(index => {
+            let render = index
+            words.forEach(word=>{
+              render = render.replace(word,`<mark>${word}</mark>`)
+            })
             marks.push(render)
           })
-        commit('SET_MARKS',marks)
+          return marks
+        }
+        let indexmarked =  marks(index)
+        let detailsmarked = marks(details) 
+          
+        data.items.forEach((item,i) =>{
+          item["mark_index"]= indexmarked[i]
+          item["mark_details"]= detailsmarked[i]
+        })
+        commit('SET_INDEXS', data.items)
+       
+
           console.log(data.items)
         })
         .catch(err => console.log(err))
+    },
+    clear({commit}){
+      commit('SET_TOTALS_INDEXS', 0)
+      commit('SET_INDEXS', [])
+      commit('SET_MARKS', [])
+      commit('SET_WORDS_SEARCH', [])
     }
   },
   getters: {
@@ -95,8 +122,10 @@ export default new Vuex.Store({
       return state.indexs
     },
     getoverlay(state){
-      console.log(state.overlay)
       return state.overlay
+    },
+    getnotfound(state){
+      return state.notfound
     },
     getmarks(state){
       return state.marks

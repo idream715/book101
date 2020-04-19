@@ -36,6 +36,27 @@
           </v-row>
        </v-row>
        <v-row>
+          <v-card
+            class="mx-auto"
+            max-width="344"
+            flat
+            v-if="notfound===true"
+          >
+            <v-card-text>
+              <div>การค้นหาของคุณ</div>
+              <p class="display-1 text--primary">
+                {{getwords}}
+              </p>
+              <div>ไม่ตรงกับเอกสารใดๆ</div>
+              <div class="text--primary">
+                คำแนะนำ :<br>
+                -ลองใชคำอื่นๆ<br>
+                -ลองใช้คำที่กว้างขึ้น
+              </div>
+            </v-card-text>
+          </v-card>
+       </v-row>
+       <v-row>
         <v-col cols="12">
 
           <div v-for="(index,i) in indexs" :key="i" :value="index">
@@ -44,9 +65,9 @@
               <v-card-title>
                 <v-col cols="12">
                   <v-card-item-content >
-                    <v-list-item-title class="headline" v-html="marks[i]"></v-list-item-title>
+                    <v-list-item-title class="headline" v-html="text_render(index.mark_index)"></v-list-item-title>
                     <v-list-item-title class="grey--text">Book {{index.search_heading}}</v-list-item-title>
-                    <p>{{text_render(index.search_details)}}</p>
+                    <p v-html="text_render(index.mark_details)"></p>
                   </v-card-item-content>
                 </v-col>
                 <v-col cols="12">
@@ -103,6 +124,9 @@ export default {
       }
     },
   computed:{
+    notfound(){
+      return this.$store.getters.getnotfound
+    },
     setoverlay(){
       return this.$store.getters.getoverlay
       },
@@ -113,7 +137,8 @@ export default {
       return this.$store.getters.getmarks
     },
     getwords(){
-      return this.$store.getters.getwords_search
+      let word =  [...this.$store.getters.getwords_search]
+      return `${word}`
     },
     search__pageindex: {
 			get: function() {
