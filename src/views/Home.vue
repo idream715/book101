@@ -1,48 +1,39 @@
 <template>
 
   <div class="home">
-    <h1>this is a home page</h1>
-    <h1>this is a home page</h1>
-    <h1>this is a home page</h1>
-    <h1>this is a home page</h1>
-    <h1>this is a home page</h1>
-    <h1>this is a home page</h1>
-    <h1>this is a home page</h1>
-    <h1>this is a home page</h1>
-    <h1>this is a home page</h1>
-    <h1>this is a home page</h1>
-    <h1>this is a home page</h1>
-    <h1>this is a home page</h1>
-    <h1>this is a home page</h1>
-    <h1>this is a home page</h1>
-    <h1>this is a home page</h1>
-    <h1>this is a home page</h1>
-    <h1>this is a home page</h1>
-    <h1>this is a home page</h1>
-    <h1>this is a home page</h1>
-    <h1>this is a home page</h1>
-    <h1>this is a home page</h1>
-    <h1>this is a home page</h1>
-    <h1>this is a home page</h1>
-    <h1>this is a home page</h1>
-    <h1>this is a home page</h1>
-    <h1>this is a home page</h1>
-    <h1>this is a home page</h1>
-    <h1>this is a home page</h1>
-    <h1>this is a home page</h1>
-    <h1>this is a home page</h1>
-    <h1>this is a home page</h1>
-    <h1>this is a home page</h1>
-    <h1>this is a home page</h1>
-    <h1>this is a home page</h1>
-    <h1>this is a home page</h1>
-    <h1>this is a home page</h1>
-    <h1>this is a home page</h1>
-    <h1>this is a home page</h1>
-    <h1>this is a home page</h1>
-    <h1>this is a home page</h1>
-    <h1>this is a home page</h1>
-    <h1>this is a home page</h1>
+    <!-- <div class="img">
+      <h1>this home page.</h1>
+      <h1>this home page.</h1>
+      <h1>this home page.</h1>
+      <h1>this home page.</h1>
+      <h1>this home page.</h1>
+      <h1>this home page.</h1>
+      <h1>this home page.</h1>
+      <h1>this home page.</h1>
+      <h1>this home page.</h1>
+      <h1>this home page.</h1>
+      <h1>this home page.</h1>
+      <h1>this home page.</h1>
+      <h1>this home page.</h1>
+      <h1>this home page.</h1>
+      <h1>this home page.</h1>
+      <h1>this home page.</h1>
+      <h1>this home page.</h1>
+      <h1>this home page.</h1>
+      <h1>this home page.</h1>
+      <h1>this home page.</h1>
+      <h1>this home page.</h1>
+      <h1>this home page.</h1>
+      <h1>this home page.</h1>
+      <h1>this home page.</h1>
+      <h1>this home page.</h1>
+      <h1>this home page.</h1>
+      <h1>this home page.</h1>
+      <h1>this home page.</h1>
+      <h1>this home page.</h1>
+      <h1>this home page.</h1>
+      <h1>this home page.</h1>
+    </div> -->
   </div>
 </template>
 
