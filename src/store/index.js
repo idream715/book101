@@ -54,7 +54,6 @@ export default new Vuex.Store({
           let data = res.data
           commit('SET_TOTALS_INDEXS', data.nitems)
           commit('SET_INDEXS', data.items)
-          // console.log(data.items)
         })
         .catch(err => console.log(err))
     },
@@ -86,13 +85,15 @@ export default new Vuex.Store({
     getBookSelected(state){
       return state.bookSelected
     },
+    getTotalSarabun(state){
+      return state.totalsSarabun
+    },
     getSarabun(state){
       // return state.sarabunSelected
       let sarabuns = Array.from(new Set(state.sarabunSelected.map(book => book.search_index)))
       .map(nameSarabun => {
         return state.sarabunSelected.find(book => book.search_index === nameSarabun)
       })
-      console.log(sarabuns)
       return sarabuns
     },
   }

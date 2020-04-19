@@ -13,29 +13,62 @@
             <v-row class="headline" justify="center">{{bookSelected.book_name}}</v-row>
             <v-row justify="center"><img :src="bookSelected.book_link_jpg" alt=""></v-row>               
             <v-row class="btn" justify="center">
-              <v-btn color="primary" :href="bookSelected.book_link_pdf">ดาวน์โหลดPDF</v-btn>
-              <!-- <v-btn margin-left="10px" color="primary"><v-icon>mdi-share-variant</v-icon></v-btn> -->
+              <v-btn color="primary" :href="bookSelected.book_link_pdf">
+                อ่านทั้งเล่มแบบ PDF
+                <v-icon>mdi-file-pdf</v-icon>
+              </v-btn>
+              <v-btn margin-left="10px" color="primary">TEXT<v-icon>mdi-format-text</v-icon></v-btn>
             </v-row>
             
             <v-card-text>
-              <v-simple-table>
-                  <thead>
-                    <tr>
-                      <th>ที่</th>
-                      <th>ชื่อสารบัญ</th>
-                      <th>pdf</th>
-                      <th>text</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr v-for="(item,i) in sarabunSelected" :key="i">
-                      <td>{{ i+1 }}</td>
-                      <td>{{ item.search_index }}</td>
-                      <td><a :href="item.link_pdf"><v-icon>mdi-file-pdf</v-icon></a></td>
-                      <td><a :href="item.search_details"><v-icon>mdi-format-text</v-icon></a></td>
-                    </tr>
-                  </tbody>
-              </v-simple-table>
+              <div>
+                <v-data-table
+                  :headers="headers"
+                  :items="sarabunSelected"
+                  :page.sync="page"
+                  :items-per-page="itemsPerPage"
+                  hide-default-footer
+                  class="elevation-1"
+                  @page-count="pageCount = $event"
+                  >
+
+                  <template v-slot:item.actions="{ item }">
+                    <v-btn :href="item.link_pdf">
+                      <v-icon
+                        color="red"
+                        :href="item.link_pdf"
+                      >
+                        mdi-file-pdf
+                      </v-icon>
+                    </v-btn>
+                    <v-btn :href="item.search_details">
+                      <v-icon
+                        color="blue"
+                        @click="deleteItem(item)"
+                      >
+                        mdi-format-text
+                      </v-icon>
+                    </v-btn>
+                  </template>
+                  <template v-slot:item.search_heading="{ item }">
+                    <div class="title">
+                      {{indexOn(item)}}                     
+                    </div>
+                  </template>
+
+                </v-data-table>
+                <div class="text-center pt-2">
+                  <v-pagination v-model="page" :length="pages"></v-pagination>
+                  <!-- <v-text-field
+                    :value="itemsPerPage"
+                    label="กำหนดจำนวนสารัญต่อหน้า"
+                    type="number"
+                    min="-1"
+                    max="50"
+                    @input="itemsPerPage = parseInt($event, 10)"
+                  ></v-text-field> -->
+                </div>
+              </div>
             </v-card-text>
 
             <v-card-actions>
@@ -62,7 +95,19 @@
     },
     data(){
       return {
-       
+        page: 1,
+        pageCount: 0,
+        itemsPerPage: 50,
+        headers: [
+          {
+            text: 'ที่',
+            align: 'start',
+            value: 'search_heading',
+          },
+          { text: 'ชื่อสารบัญ', value: 'search_index' },
+          { text: 'อ่าน', value: 'actions'},
+          
+        ],
       }
     },
     methods: {
@@ -70,6 +115,10 @@
         this.$emit('emitFalse',false)
         this.$store.dispatch('setBookSelected', [])
       },
+      indexOn(obj){
+        let no =  obj[" "]
+        return this.sarabunSelected.map(x=> x[" "]).indexOf(no)+1
+      }
     },
     computed: {
       bookSelected(){
@@ -77,7 +126,14 @@
       },
       sarabunSelected(){
         return this.$store.getters.getSarabun
+      },
+      sarabunTotal(){
+        return this.$store.getters.getTotalSarabun
+      },
+      pages(){
+        return Math.ceil(this.sarabunTotal/this.itemsPerPage)
       }
+      
     },
   }
 </script>
