@@ -10,7 +10,9 @@ export default new Vuex.Store({
     books:[],
     totalsIndexs:0,
     indexs:[],
-    overlay:false
+    overlay:false,
+    marks:[],
+    words_search:[]
   },
   mutations: {
     SET_BOOKS(state, payload){
@@ -27,6 +29,12 @@ export default new Vuex.Store({
     },
     SET_OVERLAY(state,payload){
       state.overlay  = payload
+    },
+    SET_MARKS(state,payload){
+      state.marks = payload
+    },
+    SET_WORDS_SEARCH(state,payload){
+      state.words_search = payload
     }
   },
   actions: {
@@ -39,16 +47,35 @@ export default new Vuex.Store({
         })
         .catch(err => console.log(err))
     },
-    getFirstIndexsFromApi({ commit },words){
-      let t = true
-      let f = false
-      commit('SET_OVERLAY', t)
-      callApi.getData(`?path=/indexs&limit=20&query={"$and":[${words}]} `)
+    setwordssearch({commit},words){
+      commit('SET_WORDS_SEARCH',words)
+    },
+    setFirstIndexsFromApi({ commit },words){
+      commit('SET_WORDS_SEARCH',words)
+      let tags = []
+      words.forEach(element => {
+        let tag = `{"search_index":{"$regex":"${element}"}}`
+        tags.push(tag)
+      });
+
+      commit('SET_OVERLAY', true)
+      callApi.getData(`?path=/indexs&limit=20&query={"$and":[${tags}]} `)
       .then(res=>{
         let data = res.data
-        commit('SET_OVERLAY', f)
+        commit('SET_OVERLAY', false)
         commit('SET_TOTALS_INDEXS', data.nitems)
         commit('SET_INDEXS', data.items)
+        
+        let details = data.items.map(x=>x.search_index)
+        let marks = []
+        details.forEach(index => {
+          let render = index
+          words.forEach(word=>{
+            render = render.replace(word,`<mark>${word}</mark>`)
+          })
+            marks.push(render)
+          })
+        commit('SET_MARKS',marks)
           console.log(data.items)
         })
         .catch(err => console.log(err))
@@ -68,7 +95,14 @@ export default new Vuex.Store({
       return state.indexs
     },
     getoverlay(state){
+      console.log(state.overlay)
       return state.overlay
+    },
+    getmarks(state){
+      return state.marks
+    },
+    getwords_search(state){
+      return state.words_search
     }
   }
 })

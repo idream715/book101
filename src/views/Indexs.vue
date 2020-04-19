@@ -2,14 +2,49 @@
   <div class="indexs">
      <v-container fluid >
        <v-row>
+         <v-row class="row" align="center" justify="center">
+           
+              <v-col cols="10" class="mb-12">
+                <v-combobox
+                  v-model="search__pageindex"
+                  :items="items"
+                  :search-input.sync="search"
+                  hide-selected
+                  hint="Maximum of 5 tags"
+                  label="Add some tags"
+                  multiple
+                  persistent-hint
+                  small-chips
+                >
+                  <template v-slot:no-data>
+                    <v-list-item>
+                      <v-list-item-content>
+                        <v-list-item-title>
+                          No results matching "<strong>{{ search }}</strong>". Press <kbd>enter</kbd> to create a new one
+                        </v-list-item-title>
+                      </v-list-item-content>
+                    </v-list-item>
+                  </template>
+                </v-combobox>
+              </v-col>
+              <v-col cols="2" class="mb-10">
+                <v-btn icon @click="clicksearch(getwords)">
+                  <v-icon>mdi-magnify</v-icon>
+                </v-btn>
+              </v-col>
+            
+          </v-row>
+       </v-row>
+       <v-row>
         <v-col cols="12">
-          <div v-for="(index,i) in indexs" :key="i" :value="index">
-            <v-card height="" flat>
 
+          <div v-for="(index,i) in indexs" :key="i" :value="index">
+
+            <v-card height="" flat>
               <v-card-title>
                 <v-col cols="12">
                   <v-card-item-content >
-                    <v-list-item-title class="headline" v-text="index.search_index"></v-list-item-title>
+                    <v-list-item-title class="headline" v-html="marks[i]"></v-list-item-title>
                     <v-list-item-title class="grey--text">Book {{index.search_heading}}</v-list-item-title>
                     <p>{{text_render(index.search_details)}}</p>
                   </v-card-item-content>
@@ -21,9 +56,10 @@
                   </v-card-item-action>
                 </v-col>
               </v-card-title><hr>
-
             </v-card>
+
           </div>
+
           <v-dialog v-model="dialog" width="600">
             <v-card>
               <v-card-title class="headline grey lighten-2" primary-title>{{head_content}}</v-card-title>
@@ -37,9 +73,11 @@
               </v-card-actions>
             </v-card>
           </v-dialog>
-          <v-overlay :value="overlay">
+
+          <v-overlay v-model="setoverlay">
             <v-progress-circular indeterminate size="64"></v-progress-circular>
           </v-overlay>
+
         </v-col>
       </v-row><br>
     </v-container>
@@ -59,15 +97,32 @@ export default {
         dialog: false,
         content:"",
         head_content:"",
-        overlay: false,
+        searchs:"",
+
+        
       }
     },
   computed:{
     setoverlay(){
-     return this.overlay === this.$store.getters.getoverlay
-    },
+      return this.$store.getters.getoverlay
+      },
     indexs(){
       return this.$store.getters.getIndexs
+    },
+    marks(){
+      return this.$store.getters.getmarks
+    },
+    getwords(){
+      return this.$store.getters.getwords_search
+    },
+    search__pageindex: {
+			get: function() {
+				let words = this.$store.getters.getwords_search
+				return words
+			},
+			set: function(value) {
+        this.$store.dispatch('setwordssearch',value)
+      },
     }
   },
   methods:{
@@ -83,16 +138,24 @@ export default {
     },
     text_render(input){
        let text = input.split("html")
-
        if(text.length>1){
          return input.split("html").slice(1).join(' ')
        }else{
          return input
        }
-       
+    },
+     clicksearch(input){
+      this.$store.dispatch('setFirstIndexsFromApi',input)
     }
 
-  }
+  },
+   watch: {
+    search__pageindex (val) {
+      if (val.length > 5) {
+        this.$nextTick(() => this.model.pop())
+      }
+    },
+  },  
   
 }
 </script>

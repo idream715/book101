@@ -4,16 +4,29 @@
         <div>
 
           <div class="search">
-          <v-text-field
-            label="Search เนื้อหาธรรม"
-            outlined
-            dense
-            rounded
-            class="search"
-            v-model="searchs"
-            height="15"
-          ></v-text-field>
-          <v-btn icon @click="search(searchs)">
+            <v-combobox
+              v-model="model"
+              :items="items"
+              :search-input.sync="search"
+              hide-selected
+              hint="Maximum of 5 tags"
+              label="Add some tags"
+              multiple
+              persistent-hint
+              small-chips
+            >
+              <template v-slot:no-data>
+                <v-list-item>
+                  <v-list-item-content>
+                    <v-list-item-title>
+                      No results matching "<strong>{{ search }}</strong>". Press <kbd>enter</kbd> to create a new one
+                    </v-list-item-title>
+                  </v-list-item-content>
+                </v-list-item>
+              </template>
+            </v-combobox>
+
+            <v-btn  icon @click="clicksearch">
               <v-icon>mdi-magnify</v-icon>
             </v-btn>
           </div>
@@ -28,38 +41,34 @@
 export default {
   data () {
       return {
-        searchs:"",
+         items: ['บุญ', 'วิชชา', 'Vue', 'Vuetify'],
+         search: null,
       }
     },
 
   created(){
     if(!(this.indexs.length===0)){
-      let non = "non"
-      this.$store.dispatch('getFirstIndexsFromApi',non)
+      this.$store.dispatch('setFirstIndexsFromApi',[])
     }
   },
-
-
   computed:{
     indexs(){
       return this.$store.getters.getIndexs
     }
   },
   methods:{
-    search(input){
-      let words = input.split(" ")
-      let words_search = []
-      words.forEach(element => {
-        let tag = `{"search_index":{"$regex":"${element}"}}`
-        words_search.push(tag)
-      });
-      this.$store.dispatch('getFirstIndexsFromApi',words_search)
+    clicksearch(){
+      this.$store.dispatch('setFirstIndexsFromApi',this.model)
       this.$router.push('/Indexs')
-
     }
-  }
- 
-  
+  },
+   watch: {
+    model (val) {
+      if (val.length > 5) {
+        this.$nextTick(() => this.model.pop())
+      }
+    },
+  },  
 }
 </script>
 
@@ -80,7 +89,7 @@ export default {
 }
 .search{
   width: 1000px;
-  background-color: azure;
+  /* background-color: azure; */
   padding: 5px;
   padding-bottom: 0;
   scale: 50px;
