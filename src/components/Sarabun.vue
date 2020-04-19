@@ -115,6 +115,10 @@
         this.$emit('emitFalse',false)
         this.$store.dispatch('setBookSelected', [])
       },
+      changePage(){
+        let oofset = this.page*50
+        this.$store.dispatch('setBookSelected', oofset)
+      },
       indexOn(obj){
         let no =  obj[" "]
         return this.sarabunSelected.map(x=> x[" "]).indexOf(no)+1
