@@ -1,6 +1,6 @@
 <template>
   <div class="indexs">
-     <v-container fluid >
+     <v-container  >
        <v-row>
          <v-row class="row" align="center" justify="center">
            
@@ -137,8 +137,7 @@ export default {
       return this.$store.getters.getmarks
     },
     getwords(){
-      let word =  [...this.$store.getters.getwords_search]
-      return `${word}`
+      return this.$store.getters.getwords_search
     },
     search__pageindex: {
 			get: function() {

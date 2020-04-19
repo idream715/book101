@@ -61,17 +61,12 @@ export default new Vuex.Store({
         let tag = `{"search_details":{"$regex":"${element}"}}`
         tags.push(tag)
       });
-
       commit('SET_OVERLAY', true)
       callApi.getData(`?path=/indexs&limit=20&query={"$and":[${tags}]} `)
       .then(res=>{
         let data = res.data
         console.log(data.items.length)
-        if(data.items.length===0){
-          commit('SET_NOTFOUND', true)
-        }else{
-          commit('SET_NOTFOUND', false)
-        }
+        if(data.items.length===0){commit('SET_NOTFOUND', true)}else{commit('SET_NOTFOUND', false)}
         commit('SET_OVERLAY', false)
         commit('SET_TOTALS_INDEXS', data.nitems)
         let details = data.items.map(x=>x.search_details)
@@ -95,9 +90,6 @@ export default new Vuex.Store({
           item["mark_details"]= detailsmarked[i]
         })
         commit('SET_INDEXS', data.items)
-       
-
-          console.log(data.items)
         })
         .catch(err => console.log(err))
     },
@@ -106,6 +98,7 @@ export default new Vuex.Store({
       commit('SET_INDEXS', [])
       commit('SET_MARKS', [])
       commit('SET_WORDS_SEARCH', [])
+      commit('SET_NOTFOUND', false)
     }
   },
   getters: {

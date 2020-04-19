@@ -1,10 +1,12 @@
 <template>
   <v-app>
     <navbar></navbar>
-
+    
     <v-content id="app">
       <router-view/>
+     
     </v-content>
+    
   </v-app>
 </template>
 
@@ -18,5 +20,6 @@ export default {
   data: () => ({
     //
   }),
+  
 };
 </script>

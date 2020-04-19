@@ -47,9 +47,7 @@ export default {
     },
 
   created(){
-    if(!(this.indexs.length===0)){
       this.$store.dispatch('clear')
-    }
   },
   computed:{
     indexs(){
