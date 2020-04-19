@@ -5,7 +5,7 @@
     </v-system-bar> -->
 
     <!-- หน้า Home -->
-    <div v-if="!on" class="homep d-flex" align="center">
+    <div v-if="on" class="homep d-flex" align="center">
       <v-row align="center" justify="center">
         <v-col cols="12" sm="1" md="1"></v-col>
         <v-col cols="12" sm="1" md="1"></v-col>
@@ -42,7 +42,7 @@
     </div>
     
     <!-- แถบ app-bar -->
-    <div v-if="on">
+    <div v-if="!on">
       <v-app-bar app color="primary" dark hide-on-scroll
         src="https://images.unsplash.com/photo-1503455637927-730bce8583c0?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1950&q=80"
         width="100%">
@@ -51,8 +51,7 @@
           <div class="d-flex align-center">
             <v-img alt="logo" class=" mt-2 hidden-sm" contain min-width="45"
               src="@/assets/logo1.png" width="45" />
-            <v-img alt="Vuetify Name" class="shrink mt-1 hidden-sm-and-down mr-5" contain min-width="100"
-              src="https://cdn.vuetifyjs.com/images/logos/vuetify-name-dark.png" width="100" />
+             <h1 style="color:white;font-size:24px;">101'S DOCTINE</h1>
           </div>
         </v-toolbar-title>
 
@@ -62,9 +61,6 @@
         </v-btn>
         <v-btn icon router-link to="/Books" text >
           <v-icon>mdi-book-open-variant</v-icon>
-        </v-btn>
-        <v-btn icon router-link to="/Page" text >
-          <v-icon>mdi-bat</v-icon>
         </v-btn>
       </v-app-bar>
 
