@@ -1,7 +1,7 @@
 <template>
   <div class="about">
       <v-container>
-        <v-row no-gutters>
+        <v-row>
           <v-col 
             v-for="n in books"
             :key="n.book_name"

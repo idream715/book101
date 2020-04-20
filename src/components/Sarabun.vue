@@ -1,25 +1,59 @@
 <template>
   <div>
     <v-container>
-      <!-- <h1>this is sarabun modal</h1> -->
       <v-row justify="center">
         <v-dialog 
           v-model="dialog" 
-          max-width="100%" 
-          style="margin:0;"
-          persistent
+          fullscreen
+          hide-overlay
+          transition="dialog-bottom-transition"
           >
-          <v-card>
-            <v-row class="headline" justify="center">{{bookSelected.book_name}}</v-row>
-            <v-row justify="center"><img :src="bookSelected.book_link_jpg" alt=""></v-row>               
-            <v-row class="btn" justify="center">
-              <v-btn color="primary" :href="bookSelected.book_link_pdf">
-                อ่านทั้งเล่มแบบ PDF
-                <v-icon>mdi-file-pdf</v-icon>
+          <v-card tile>
+            <v-toolbar
+              flat
+              dark
+              color="primary"
+              height="200px"
+              
+              >
+              <v-btn
+                icon
+                dark
+                @click="closeDialog"
+                >
+                <v-icon>mdi-close</v-icon>
               </v-btn>
-              <v-btn margin-left="10px" color="primary">TEXT<v-icon>mdi-format-text</v-icon></v-btn>
-            </v-row>
-            
+                <div class="mr-5" v-if="$vuetify.breakpoint.mdAndUp">
+                  <v-img :src="bookSelected.book_link_jpg" max-width="125"></v-img>
+                </div>
+                <v-toolbar-title>
+                  {{bookSelected.book_name}} : 
+                  <span class="caption">({{sarabunTotal}}) สารบัญ</span> 
+                </v-toolbar-title>
+                <v-spacer></v-spacer>
+                <span>อ่านทั้งเล่ม</span>
+                <v-toolbar-items>
+                  <v-btn
+                    dark
+                    text
+                    :href="bookSelected.book_link_pdf"
+                    target="_blank"
+                  >
+                    PDF
+                    <v-icon>mdi-file-pdf</v-icon>
+                  </v-btn>
+                  <v-btn
+                    dark
+                    text
+                    :href="bookSelected.book_link_text"
+                    target="_blank"
+                  >
+                    TEXT
+                    <v-icon>mdi-format-text</v-icon>
+                  </v-btn>
+                </v-toolbar-items>
+            </v-toolbar>
+
             <v-card-text>
               <div>
                 <v-data-table
@@ -33,21 +67,20 @@
                   >
 
                   <template v-slot:item.actions="{ item }">
-                    <v-btn :href="item.link_pdf">
-                      <v-icon
-                        color="red"
-                        :href="item.link_pdf"
-                      >
+                    <v-btn :href="item.link_pdf" target="_blank" text>
+                      <v-icon color="red">
                         mdi-file-pdf
                       </v-icon>
+                      <span>PDF</span>
                     </v-btn>
-                    <v-btn :href="item.search_details">
-                      <v-icon
-                        color="blue"
-                        @click="deleteItem(item)"
+                    <v-btn
+                      @click="readText(item.search_index,item.search_details)"
+                      text
                       >
+                      <v-icon color="blue">
                         mdi-format-text
                       </v-icon>
+                      <span>TEXT</span>
                     </v-btn>
                   </template>
                   <template v-slot:item.search_heading="{ item }">
@@ -73,7 +106,35 @@
 
             <v-card-actions>
               <v-spacer></v-spacer>
-              <v-btn color="green darken-1" text @click="closeDialog">กลับ</v-btn>
+              <v-btn color="primary" text @click="closeDialog"><div class="title">กลับ</div> </v-btn>
+            </v-card-actions>
+
+          </v-card>
+        </v-dialog>
+        <v-dialog
+          v-model="dialogReadText"
+        >
+          <v-card>
+            <v-card-title>
+              {{textSarabun}}
+            </v-card-title>
+            <v-card-text>
+              {{textDetail}}
+            </v-card-text>
+            <v-card-actions>
+              <v-btn
+                color="primary"
+                text
+              >
+                copy
+              </v-btn>
+              <v-btn
+                color="primary"
+                text
+                @click="dialogReadText = false"
+              >
+                Close
+              </v-btn>
             </v-card-actions>
           </v-card>
         </v-dialog>
@@ -95,6 +156,7 @@
     },
     data(){
       return {
+        dialogReadText: false,
         page: 1,
         pageCount: 0,
         itemsPerPage: 50,
@@ -103,11 +165,14 @@
             text: 'ที่',
             align: 'start',
             value: 'search_heading',
+            sortable: false,
           },
           { text: 'ชื่อสารบัญ', value: 'search_index' },
-          { text: 'อ่าน', value: 'actions'},
+          { text: 'อ่าน', value: 'actions',sortable: false,},
           
         ],
+        textSarabun:"",
+        textDetail:""
       }
     },
     methods: {
@@ -122,7 +187,15 @@
       indexOn(obj){
         let no =  obj[" "]
         return this.sarabunSelected.map(x=> x[" "]).indexOf(no)+1
+      },
+      readText(sarabun,detail){
+        this.dialogReadText = !this.dialogReadText
+        this.textSarabun = sarabun
+        this.textDetail = detail
       }
+    },
+    mounted () {
+      console.log(this.$vuetify.breakpoint)
     },
     computed: {
       bookSelected(){
@@ -132,29 +205,32 @@
         return this.$store.getters.getSarabun
       },
       sarabunTotal(){
-        return this.$store.getters.getTotalSarabun
+        return this.$store.getters.getTotalSarabun     
       },
       pages(){
         return Math.ceil(this.sarabunTotal/this.itemsPerPage)
-      }
-      
-    },
+      },
+      // imageHeight(){
+      //   switch(this.$vuetify.breakpoint.name){
+      //     case 'xs': return '22px'
+      //     case 'sm': return '40px'
+      //     case 'md': return '50px'
+      //     case 'lg': return '60px'
+      //     case 'xl': return '80px'
+      //   }
+      // },
+    }
   }
 </script>
 
 <style scoped>
-  .v-simple-table thead tr th {
-    /* font-size: "subtitle-1"; */
+  /* .v-simple-table thead tr th {
     font-weight: bold;
   }
 
   img {
     max-width: 20%;
   }
- 
-  /* .headline {
-    text-align: center;
-  } */
 
   tr a {
     text-decoration: none;
@@ -163,5 +239,5 @@
   .btn {
     padding-top: 15px;
     padding-bottom: 20px;
-  }
+  } */
 </style>
