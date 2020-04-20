@@ -7,6 +7,7 @@
           fullscreen
           hide-overlay
           transition="dialog-bottom-transition"
+          @keydown.esc="closeDialog"
           >
           <v-card tile>
             <v-toolbar
@@ -111,6 +112,7 @@
 
           </v-card>
         </v-dialog>
+        
         <v-dialog
           v-model="dialogReadText"
         >
@@ -181,8 +183,8 @@
         this.$store.dispatch('setBookSelected', [])
       },
       changePage(){
-        let oofset = this.page*50
-        this.$store.dispatch('setBookSelected', oofset)
+        let offset = this.page*50
+        this.$store.dispatch('setPagenation', offset)
       },
       indexOn(obj){
         let no =  obj[" "]
@@ -193,9 +195,6 @@
         this.textSarabun = sarabun
         this.textDetail = detail
       }
-    },
-    mounted () {
-      console.log(this.$vuetify.breakpoint)
     },
     computed: {
       bookSelected(){

@@ -13,6 +13,7 @@ export default new Vuex.Store({
     bookSelected:{},
     sarabunSelected:[],
     totalsSarabun:0,
+    offset:0,
   },
   mutations: {
     SET_BOOKS(state, payload){
@@ -36,6 +37,9 @@ export default new Vuex.Store({
     SET_BOOK_SELECTED(state, payload){
       state.bookSelected = payload
     },
+    SET_PAGENATION(state, payload){
+      state.offset = payload
+    },
     
   },
   actions: {
@@ -57,16 +61,19 @@ export default new Vuex.Store({
         })
         .catch(err => console.log(err))
     },
-    setBookSelected({commit}, selected){
+    setBookSelected({commit, state}, selected){
       commit('SET_BOOK_SELECTED', selected)
       let name_book = selected.book_name
-      callApi.getData(`?path=/indexs&limit=50&offset=0&query={"search_heading":"${name_book}"}`)
+      callApi.getData(`?path=/indexs&limit=50&offset=${state.offset}&query={"search_heading":"${name_book}"}`)
         .then(res=>{
           let data = res.data
           commit('SET_SARABUN_TOTAL', data.nitems)
           commit('SET_SARABUN', data.items)
         })
         .catch(err => console.log(err))
+    },
+    setPagenation({commit}, offset){
+      commit('SET_PAGENATION', offset)
     }
   },
   getters: {
