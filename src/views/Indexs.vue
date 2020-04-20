@@ -6,6 +6,7 @@
            
               <v-col cols="10" class="mb-12">
                 <v-combobox
+                  id="search_index"
                   v-model="search__pageindex"
                   :items="items"
                   :search-input.sync="search"
@@ -28,13 +29,14 @@
                 </v-combobox>
               </v-col>
               <v-col cols="2" class="mb-10">
-                <v-btn icon @click="clicksearch(getwords)">
-                  <v-icon>mdi-magnify</v-icon>
+                <v-btn color="primary" outlined @click="clicksearch(getwords)" align="center" justify="center">
+                  <v-icon class="mb-2" >mdi-magnify</v-icon> <p class="mt-2">Search</p>
                 </v-btn>
               </v-col>
             
           </v-row>
        </v-row>
+
        <v-row>
           <v-card
             class="mx-auto"
@@ -56,38 +58,34 @@
             </v-card-text>
           </v-card>
        </v-row>
-       <v-row>
+
+       <v-row id="top"> 
         <v-col cols="12">
 
           <div v-for="(index,i) in indexs" :key="i" :value="index">
-
-            <v-card height="" flat>
+            <v-card  height="" flat>
               <v-card-title>
                 <v-col cols="12">
-                  <v-card-item-content >
+                  <v-card-content >
                     <v-list-item-title class="headline" v-html="text_render(index.mark_index)"></v-list-item-title>
-                    <v-list-item-title class="grey--text">Book {{index.search_heading}}</v-list-item-title>
+                    <v-list-item-title class="grey--text">จากหนังสือ:{{index.search_heading}}</v-list-item-title>
                     <p v-html="text_render(index.mark_details)"></p>
-                  </v-card-item-content>
+                  </v-card-content>
                 </v-col>
                 <v-col cols="12">
-                  <v-card-item-action class="d-flex justify-end">
-                     <v-btn flat color="orange" style="margin-right:10px;" target="_blank" :href="index.link_pdf">PDF</v-btn>
-                     <v-btn color="red lighten-2" @click="dialogs(index.search_heading,index.search_details)">Read All</v-btn>
-                  </v-card-item-action>
+                  <v-card-action class="d-flex justify-end">
+                     <v-btn text color="orange" style="margin-right:10px;" target="_blank" :href="index.link_pdf">PDF</v-btn>
+                     <v-btn text color="red lighten-2" @click="dialogs(index.search_index,index.search_details)">Read All</v-btn>
+                  </v-card-action>
                 </v-col>
-              </v-card-title><hr>
-            </v-card>
-
+              </v-card-title>
+            </v-card><hr>
           </div>
 
-          <v-dialog v-model="dialog" width="600">
+          <v-dialog v-model="dialog" width="1000"  >
             <v-card>
               <v-card-title class="headline grey lighten-2" primary-title>{{head_content}}</v-card-title>
-                <v-card-text>{{content}}</v-card-text>
-    
-                <v-divider></v-divider>
-    
+                <v-card-text style="font-size: 17px;">{{content}}</v-card-text>
               <v-card-actions>
                 <v-spacer></v-spacer>
                 <v-btn color="primary" text @click="closs">ออก</v-btn>
@@ -99,10 +97,20 @@
             <v-progress-circular indeterminate size="64"></v-progress-circular>
           </v-overlay>
 
+         
+
+    
+          <v-pagination
+            v-model ="page"
+            class="my-4"
+            :length ="pages"
+            total-visible="7"
+            
+           ></v-pagination>
+     
         </v-col>
       </v-row><br>
     </v-container>
-
   </div>
 </template>
 
@@ -118,9 +126,10 @@ export default {
         dialog: false,
         content:"",
         head_content:"",
-        searchs:"",
-
-        
+        search:"",
+        page:1,
+        items: ['บุญ', 'วิชชา'],
+ 
       }
     },
   computed:{
@@ -138,6 +147,12 @@ export default {
     },
     getwords(){
       return this.$store.getters.getwords_search
+    },
+    getTotalIndexs(){
+      return this.$store.getters.getTotalIndexs
+    },
+    pages(){ 
+      return Math.ceil(this.getTotalIndexs/10)
     },
     search__pageindex: {
 			get: function() {
@@ -168,10 +183,10 @@ export default {
          return input
        }
     },
-     clicksearch(input){
-      this.$store.dispatch('setFirstIndexsFromApi',input)
+    clicksearch(input){
+      this.page = 1
+      this.$store.dispatch('setFirstIndexsFromApi',{words:input,page:0})
     }
-
   },
    watch: {
     search__pageindex (val) {
@@ -179,8 +194,13 @@ export default {
         this.$nextTick(() => this.model.pop())
       }
     },
-  },  
-  
+    page(val){
+      let remitcards = 10
+      let pageoffset = (remitcards*(val-1))
+      console.log(pageoffset)
+      this.$store.dispatch('setFirstIndexsFromApi',{words:this.getwords,page:pageoffset})
+    },
+  },   
 }
 </script>
 <style>

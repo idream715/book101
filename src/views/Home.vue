@@ -41,7 +41,7 @@
 export default {
   data () {
       return {
-         items: ['บุญ', 'วิชชา', 'Vue', 'Vuetify'],
+         items: ['บุญ', 'วิชชา'],
          search: null,
       }
     },
@@ -56,7 +56,7 @@ export default {
   },
   methods:{
     clicksearch(){
-      this.$store.dispatch('setFirstIndexsFromApi',this.model)
+      this.$store.dispatch('setFirstIndexsFromApi',{words:this.model,page:"0"})
       this.$router.push('/Indexs')
     }
   },

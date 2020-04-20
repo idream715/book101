@@ -66,8 +66,7 @@
 
       <v-btn v-scroll="onScroll"  v-show="fab" fab fixed bottom right >
         <!-- <v-icon>mdi-magnify</v-icon>  -->
-        <v-speed-dial v-model="fab" :top="top" :bottom="bottom" :right="right" :left="left"
-          :direction="direction" :open-on-hover="hover" :transition="transition">
+        <v-speed-dial v-model="fab" >
           
           <template v-slot:activator v-scroll="onScroll"  v-show="fab">
             <v-btn v-model="fab" color="blue darken-3" dark fab>
@@ -75,7 +74,7 @@
               <v-icon v-else>mdi-account-circle</v-icon>
             </v-btn>
           </template>
-          <v-btn fab dark small color="blue darken-1">
+          <v-btn fab dark small color="blue darken-1" @click="$vuetify.goTo('#search_index')">
             <v-icon>mdi-magnify</v-icon>
           </v-btn>
           <v-btn fab dark small color="blue lighten-2" router-link to="/Books">

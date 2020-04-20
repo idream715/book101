@@ -54,7 +54,7 @@ export default new Vuex.Store({
     setwordssearch({commit},words){
       commit('SET_WORDS_SEARCH',words)
     },
-    setFirstIndexsFromApi({ commit },words){
+    setFirstIndexsFromApi({ commit },{words,page}){
       commit('SET_WORDS_SEARCH',words)
       let tags = []
       words.forEach(element => {
@@ -62,7 +62,8 @@ export default new Vuex.Store({
         tags.push(tag)
       });
       commit('SET_OVERLAY', true)
-      callApi.getData(`?path=/indexs&limit=20&query={"$and":[${tags}]} `)
+
+      callApi.getData(`?path=/indexs&limit=10&offset=${page}&query={"$and":[${tags}]} `)
       .then(res=>{
         let data = res.data
         console.log(data.items.length)
