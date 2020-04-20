@@ -1,47 +1,32 @@
 <template>
 
   <div class="home">
-    <!-- <div class="img">
-      <h1>this home page.</h1>
-      <h1>this home page.</h1>
-      <h1>this home page.</h1>
-      <h1>this home page.</h1>
-      <h1>this home page.</h1>
-      <h1>this home page.</h1>
-      <h1>this home page.</h1>
-      <h1>this home page.</h1>
-      <h1>this home page.</h1>
-      <h1>this home page.</h1>
-      <h1>this home page.</h1>
-      <h1>this home page.</h1>
-      <h1>this home page.</h1>
-      <h1>this home page.</h1>
-      <h1>this home page.</h1>
-      <h1>this home page.</h1>
-      <h1>this home page.</h1>
-      <h1>this home page.</h1>
-      <h1>this home page.</h1>
-      <h1>this home page.</h1>
-      <h1>this home page.</h1>
-      <h1>this home page.</h1>
-      <h1>this home page.</h1>
-      <h1>this home page.</h1>
-      <h1>this home page.</h1>
-      <h1>this home page.</h1>
-      <h1>this home page.</h1>
-      <h1>this home page.</h1>
-      <h1>this home page.</h1>
-      <h1>this home page.</h1>
-      <h1>this home page.</h1>
-    </div> -->
+    <h1>this is home</h1>
   </div>
 </template>
 
 <script>
 export default {
-  created(){
-    this.$store.dispatch('getFirstIndexsFromApi')
-  }
+  mounted(){
+    if(this.indexs.length === 0 ){
+      this.$store.dispatch('getFirstIndexsFromApi')
+    }
+  },
+  computed:{
+    indexs(){
+      return this.$store.getters.getIndexs
+    }
+  },
+ 
+  
 }
 </script>
+<style>
+/* @media (min-width: 320px) {
+  h5.heading {
+    font-size: 0.8em;
+  }
+} */
+
+</style>
 
