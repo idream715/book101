@@ -13,7 +13,11 @@ export default new Vuex.Store({
     overlay:false,
     notfound:false,
     marks:[],
-    words_search:[]
+    words_search:[],
+    bookSelected:{},
+    sarabunSelected:[],
+    totalsSarabun:0,
+    offset:0,
   },
   mutations: {
     SET_BOOKS(state, payload){
@@ -24,6 +28,12 @@ export default new Vuex.Store({
     },
     SET_INDEXS(state, payload){
       state.indexs = payload
+    },
+    SET_SARABUN_TOTAL(state, payload){
+      state.totalsSarabun = payload
+    },
+    SET_SARABUN(state, payload){
+      state.sarabunSelected = payload
     },
     SET_TOTALS_INDEXS(state, payload){
       state.totalsIndexs = payload
@@ -39,7 +49,14 @@ export default new Vuex.Store({
     },
     SET_WORDS_SEARCH(state,payload){
       state.words_search = payload
-    }
+    },
+    SET_BOOK_SELECTED(state, payload){
+      state.bookSelected = payload
+    },
+    SET_PAGENATION(state, payload){
+      state.offset = payload
+    },
+    
   },
   actions: {
     getBookFromApi({ commit }){
@@ -100,6 +117,20 @@ export default new Vuex.Store({
       commit('SET_MARKS', [])
       commit('SET_WORDS_SEARCH', [])
       commit('SET_NOTFOUND', false)
+    },
+    setBookSelected({commit, state}, selected){
+      commit('SET_BOOK_SELECTED', selected)
+      let name_book = selected.book_name
+      callApi.getData(`?path=/indexs&limit=50&offset=${state.offset}&query={"search_heading":"${name_book}"}`)
+        .then(res=>{
+          let data = res.data
+          commit('SET_SARABUN_TOTAL', data.nitems)
+          commit('SET_SARABUN', data.items)
+        })
+        .catch(err => console.log(err))
+    },
+    setPagenation({commit}, offset){
+      commit('SET_PAGENATION', offset)
     }
   },
   getters: {
@@ -126,6 +157,20 @@ export default new Vuex.Store({
     },
     getwords_search(state){
       return state.words_search
-    }
+    },
+    getBookSelected(state){
+      return state.bookSelected
+    },
+    getTotalSarabun(state){
+      return state.totalsSarabun
+    },
+    getSarabun(state){
+      // return state.sarabunSelected
+      let sarabuns = Array.from(new Set(state.sarabunSelected.map(book => book.search_index)))
+      .map(nameSarabun => {
+        return state.sarabunSelected.find(book => book.search_index === nameSarabun)
+      })
+      return sarabuns
+    },
   }
 })

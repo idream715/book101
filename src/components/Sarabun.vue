@@ -1,16 +1,242 @@
 <template>
-  <v-container>
-    <h1>this is sarabun modal</h1>
-  </v-container>
-    
+  <div>
+    <v-container>
+      <v-row justify="center">
+        <v-dialog 
+          v-model="dialog" 
+          fullscreen
+          hide-overlay
+          transition="dialog-bottom-transition"
+          @keydown.esc="closeDialog"
+          >
+          <v-card tile>
+            <v-toolbar
+              flat
+              dark
+              color="primary"
+              height="200px"
+              
+              >
+              <v-btn
+                icon
+                dark
+                @click="closeDialog"
+                >
+                <v-icon>mdi-close</v-icon>
+              </v-btn>
+                <div class="mr-5" v-if="$vuetify.breakpoint.mdAndUp">
+                  <v-img :src="bookSelected.book_link_jpg" max-width="125"></v-img>
+                </div>
+                <v-toolbar-title>
+                  {{bookSelected.book_name}} : 
+                  <span class="caption">({{sarabunTotal}}) สารบัญ</span> 
+                </v-toolbar-title>
+                <v-spacer></v-spacer>
+                <span>อ่านทั้งเล่ม</span>
+                <v-toolbar-items>
+                  <v-btn
+                    dark
+                    text
+                    :href="bookSelected.book_link_pdf"
+                    target="_blank"
+                  >
+                    PDF
+                    <v-icon>mdi-file-pdf</v-icon>
+                  </v-btn>
+                  <v-btn
+                    dark
+                    text
+                    :href="bookSelected.book_link_text"
+                    target="_blank"
+                  >
+                    TEXT
+                    <v-icon>mdi-format-text</v-icon>
+                  </v-btn>
+                </v-toolbar-items>
+            </v-toolbar>
+
+            <v-card-text>
+              <div>
+                <v-data-table
+                  :headers="headers"
+                  :items="sarabunSelected"
+                  :page.sync="page"
+                  :items-per-page="itemsPerPage"
+                  hide-default-footer
+                  class="elevation-1"
+                  @page-count="pageCount = $event"
+                  >
+
+                  <template v-slot:item.actions="{ item }">
+                    <v-btn :href="item.link_pdf" target="_blank" text>
+                      <v-icon color="red">
+                        mdi-file-pdf
+                      </v-icon>
+                      <span>PDF</span>
+                    </v-btn>
+                    <v-btn
+                      @click="readText(item.search_index,item.search_details)"
+                      text
+                      >
+                      <v-icon color="blue">
+                        mdi-format-text
+                      </v-icon>
+                      <span>TEXT</span>
+                    </v-btn>
+                  </template>
+                  <template v-slot:item.search_heading="{ item }">
+                    <div class="title">
+                      {{indexOn(item)}}                     
+                    </div>
+                  </template>
+
+                </v-data-table>
+                <div class="text-center pt-2">
+                  <v-pagination v-model="page" :length="pages"></v-pagination>
+                  <!-- <v-text-field
+                    :value="itemsPerPage"
+                    label="กำหนดจำนวนสารัญต่อหน้า"
+                    type="number"
+                    min="-1"
+                    max="50"
+                    @input="itemsPerPage = parseInt($event, 10)"
+                  ></v-text-field> -->
+                </div>
+              </div>
+            </v-card-text>
+
+            <v-card-actions>
+              <v-spacer></v-spacer>
+              <v-btn color="primary" text @click="closeDialog"><div class="title">กลับ</div> </v-btn>
+            </v-card-actions>
+
+          </v-card>
+        </v-dialog>
+        
+        <v-dialog
+          v-model="dialogReadText"
+        >
+          <v-card>
+            <v-card-title>
+              {{textSarabun}}
+            </v-card-title>
+            <v-card-text>
+              {{textDetail}}
+            </v-card-text>
+            <v-card-actions>
+              <v-btn
+                color="primary"
+                text
+              >
+                copy
+              </v-btn>
+              <v-btn
+                color="primary"
+                text
+                @click="dialogReadText = false"
+              >
+                Close
+              </v-btn>
+            </v-card-actions>
+          </v-card>
+        </v-dialog>
+      </v-row>
+    </v-container>
+  </div>
 </template>
 
 <script>
   export default {
     name: 'Sarabun',
-
-    data: () => ({
-     
-    }),
+    props: {
+      dialog: {
+        type:Boolean,
+        default:false
+      },
+      bookName: String,
+      linkPdfBook: String
+    },
+    data(){
+      return {
+        dialogReadText: false,
+        page: 1,
+        pageCount: 0,
+        itemsPerPage: 50,
+        headers: [
+          {
+            text: 'ที่',
+            align: 'start',
+            value: 'search_heading',
+            sortable: false,
+          },
+          { text: 'ชื่อสารบัญ', value: 'search_index' },
+          { text: 'อ่าน', value: 'actions',sortable: false,},
+          
+        ],
+        textSarabun:"",
+        textDetail:""
+      }
+    },
+    methods: {
+      closeDialog(){
+        this.$emit('emitFalse',false)
+        this.$store.dispatch('setBookSelected', [])
+      },
+      changePage(){
+        let offset = this.page*50
+        this.$store.dispatch('setPagenation', offset)
+      },
+      indexOn(obj){
+        let no =  obj[" "]
+        return this.sarabunSelected.map(x=> x[" "]).indexOf(no)+1
+      },
+      readText(sarabun,detail){
+        this.dialogReadText = !this.dialogReadText
+        this.textSarabun = sarabun
+        this.textDetail = detail
+      }
+    },
+    computed: {
+      bookSelected(){
+        return this.$store.getters.getBookSelected
+      },
+      sarabunSelected(){
+        return this.$store.getters.getSarabun
+      },
+      sarabunTotal(){
+        return this.$store.getters.getTotalSarabun     
+      },
+      pages(){
+        return Math.ceil(this.sarabunTotal/this.itemsPerPage)
+      },
+      // imageHeight(){
+      //   switch(this.$vuetify.breakpoint.name){
+      //     case 'xs': return '22px'
+      //     case 'sm': return '40px'
+      //     case 'md': return '50px'
+      //     case 'lg': return '60px'
+      //     case 'xl': return '80px'
+      //   }
+      // },
+    }
   }
 </script>
+
+<style scoped>
+  /* .v-simple-table thead tr th {
+    font-weight: bold;
+  }
+
+  img {
+    max-width: 20%;
+  }
+
+  tr a {
+    text-decoration: none;
+  }
+
+  .btn {
+    padding-top: 15px;
+    padding-bottom: 20px;
+  } */
+</style>

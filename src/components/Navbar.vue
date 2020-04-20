@@ -1,90 +1,80 @@
 <template>
-  <div >
-    <!-- <v-system-bar dark color="red lighten-2">
-      <v-spacer></v-spacer>
-    </v-system-bar> -->
-
+  <div>
     <!-- หน้า Home -->
     <div v-if="on" class="homep d-flex" align="center">
       <v-row align="center" justify="center">
-        <v-col cols="12" sm="1" md="1"></v-col>
-        <v-col cols="12" sm="1" md="1"></v-col>
-        <v-col cols="4" sm="6" md="2">
+        <v-col cols="4" sm="8" md="2">
             <v-img alt="logo" contain min-width="150" 
             src="@/assets/logo1.png" width="45" />
         </v-col>
         <v-col cols="10" sm="8" md="4">
-          <h1 style="color:white">101'S DOCTINE</h1>
-          <!-- <v-card color="pink lighten-4" class="pa-6">
-            
-          </v-card> -->
-          <!-- <v-text-field dark label="Search"></v-text-field> -->
-          <!-- <v-text-field  v-model="title" label="Search" outlined></v-text-field> -->
+          <h1 style="color:white">101's DOCTRINE</h1>
           <v-combobox v-model="model" :search-input.sync="search" hide-selected hint="Maximum of 5 tags"
             label="Search" multiple persistent-hint chips solo>
             <template v-slot:no-data>
               <v-list-item>
                 <v-list-item-content>
-                  <v-list-item-title>
-                    "<strong>{{search}}</strong>". Press <kbd>enter</kbd> to create a new one
+                  <v-list-item-title align="center" justify="center">
+                    "<strong>{{search}}</strong>". Press <kbd>enter</kbd> 
+                    <v-btn class="ml-4" dark color="blue lighten-1"><v-icon >mdi-magnify</v-icon></v-btn>
                   </v-list-item-title>
                 </v-list-item-content>
               </v-list-item>
             </template>
           </v-combobox>
-          <v-btn class="mr-4"><v-icon dark>mdi-magnify</v-icon></v-btn>
-          <v-btn dark color="blue lighten-1">Random</v-btn>
+          <v-btn class="mr-8" dark color="blue lighten-1">อ่านอะไรดี</v-btn>
+          <v-btn dark color="black" router-link to="/Books">
+            <v-icon class="mr-2">mdi-book-open-page-variant</v-icon>หนังสือธรรมะ
+          </v-btn>
         </v-col>
-        <v-col cols="12" sm="1" md="1"></v-col>
-        <v-col cols="12" sm="1" md="1"></v-col>
-        <v-col cols="12" sm="1" md="1"></v-col>
       </v-row>
     </div>
     
     <!-- แถบ app-bar -->
-    <div v-if="!on">
+    <div v-else>
       <v-app-bar app color="primary" dark hide-on-scroll
         src="https://images.unsplash.com/photo-1503455637927-730bce8583c0?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1950&q=80"
         width="100%">
-     
+
+        <!-- เมนู bar -->
         <v-toolbar-title mt-2>
           <div class="d-flex align-center">
             <v-img alt="logo" class=" mt-2 hidden-sm" contain min-width="45"
               src="@/assets/logo1.png" width="45" />
-             <h1 style="color:white;font-size:24px;">101'S DOCTINE</h1>
+             <h1 style="color:white;font-size:24px;">101's DOCTRINE</h1>
           </div>
         </v-toolbar-title>
-
         <v-spacer></v-spacer>
         <v-btn icon router-link to="/" text >
           <v-icon>mdi-home</v-icon>
         </v-btn>
         <v-btn icon router-link to="/Books" text >
-          <v-icon>mdi-book-open-variant</v-icon>
+          <v-icon>mdi-book-open-page-variant</v-icon>
         </v-btn>
       </v-app-bar>
 
-      <v-btn v-scroll="onScroll"  v-show="fab" fab fixed bottom right >
-        <!-- <v-icon>mdi-magnify</v-icon>  -->
+      <!-- ปุ่ม to top -->
+      <v-btn v-scroll="onScroll"  v-show="fab" fab fixed bottom right @click="toTop">
         <v-speed-dial v-model="fab" >
-          
-          <template v-slot:activator v-scroll="onScroll"  v-show="fab">
-            <v-btn v-model="fab" color="blue darken-3" dark fab>
-              <v-icon v-if="fab">mdi-close</v-icon>
-              <v-icon v-else>mdi-account-circle</v-icon>
+          <template v-slot:activator>
+            <v-btn v-model="fab" color="blue darken-3" dark fab  >
+              <v-icon>mdi-chevron-up</v-icon>
             </v-btn>
           </template>
           <v-btn fab dark small color="blue darken-1" @click="$vuetify.goTo('#search_index')">
             <v-icon>mdi-magnify</v-icon>
           </v-btn>
-          <v-btn fab dark small color="blue lighten-2" router-link to="/Books">
-            <v-icon>mdi-book-open-variant</v-icon>
-          </v-btn>
-          <v-btn fab dark small color="blue lighten-3" @click="toTop" >
-            <v-icon>mdi-arrow-up-thick</v-icon>
-          </v-btn>
         </v-speed-dial>
       </v-btn>
+
+      <v-tabs dark background-color="blue lighten-2" show-arrows class="Isearch-2">
+        <v-tabs-slide color="teal lighten-3"></v-tabs-slide>
+        <v-tab v-for="i in 20" :key="i" :href="'#tab-' + i">
+          TheBookCategory {{ i }}
+        </v-tab>
+      </v-tabs>
+      <v-text-field v-model="model" placeholder="Search" solo class="Isearch">
+      </v-text-field>
     </div>
 
 
@@ -99,7 +89,6 @@ export default {
   data: () => ({
     drawer: false,
     fab: false,
-    on: false,
     title: '',
     model: [],
     search: null,
@@ -113,6 +102,12 @@ export default {
         default: return {}
       }
     },
+    on () {
+      if (this.$route.name === 'Home') {
+        return true
+      }
+        return false
+    }
   },
 
   methods:{
@@ -128,7 +123,8 @@ export default {
   watch:{
     model (val) {
       if (val.length > 5) {
-        this.$nextTick(() => this.model.pop())
+        // หน้า home
+        this.$nextTick(() => this.model.pop()) 
       }
     },
   },
@@ -145,7 +141,7 @@ export default {
   #create .v-btn--floating {
     position: relative;
   }
-
+      /* หน้า home */
   .homep {
     position: relative;
     background-image: url(https://images.unsplash.com/photo-1503455637927-730bce8583c0?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1950&q=80);
@@ -153,6 +149,23 @@ export default {
     height: 100vh;
     background-repeat: no-repeat;
     background-size: cover;
+  }
+
+  .Isearch{
+     position: relative;
+     top: 90px;
+     left: 25px;
+     width: 450px;
+  }
+  .Isearch-2{
+     position: relative;
+     top: 63px;
+  }
+
+  @media (min-width: 375px) {
+    .Isearch{
+     width: 325px;
+    }
   }
   
 </style>
