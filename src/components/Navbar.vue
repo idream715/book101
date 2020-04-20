@@ -23,7 +23,7 @@
             </template>
           </v-combobox>
           <v-btn class="mr-8" dark color="blue lighten-1">อ่านอะไรดี</v-btn>
-          <v-btn dark color="blue lighten-1" router-link to="/Books">
+          <v-btn dark color="black" router-link to="/Books">
             <v-icon class="mr-2">mdi-book-open-page-variant</v-icon>หนังสือธรรมะ
           </v-btn>
         </v-col>
@@ -35,7 +35,8 @@
       <v-app-bar app color="primary" dark hide-on-scroll
         src="https://images.unsplash.com/photo-1503455637927-730bce8583c0?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1950&q=80"
         width="100%">
-     
+
+        <!-- เมนู bar -->
         <v-toolbar-title mt-2>
           <div class="d-flex align-center">
             <v-img alt="logo" class=" mt-2 hidden-sm" contain min-width="45"
@@ -48,33 +49,32 @@
           <v-icon>mdi-home</v-icon>
         </v-btn>
         <v-btn icon router-link to="/Books" text >
-          <v-icon>mdi-book-open-variant</v-icon>
+          <v-icon>mdi-book-open-page-variant</v-icon>
         </v-btn>
       </v-app-bar>
 
+      <!-- ปุ่ม to top -->
       <v-btn v-scroll="onScroll"  v-show="fab" fab fixed bottom right @click="toTop">
-        <v-btn v-model="fab" color="blue darken-3" dark fab  >
-          <v-icon v-if="fab">mdi-chevron-up</v-icon>
-        </v-btn>
-        <!-- <v-speed-dial v-model="fab" :top="top" :bottom="bottom" :right="right" :left="left"
-          :direction="direction" :open-on-hover="hover" :transition="transition">
-          <template v-slot:activator v-scroll="onScroll"  v-show="fab" >
+        <v-speed-dial v-model="fab" >
+          <template v-slot:activator>
             <v-btn v-model="fab" color="blue darken-3" dark fab  >
-              <v-icon v-if="fab">mdi-chevron-up</v-icon>
-              <v-icon v-else>mdi-account-circle</v-icon>
+              <v-icon>mdi-chevron-up</v-icon>
             </v-btn>
           </template>
           <v-btn fab dark small color="blue darken-1">
             <v-icon>mdi-magnify</v-icon>
           </v-btn>
-          <v-btn fab dark small color="blue lighten-2" router-link to="/Books">
-            <v-icon>mdi-book-open-variant</v-icon>
-          </v-btn>
-          <v-btn fab dark small color="blue lighten-3" @click="toTop" >
-            <v-icon>mdi-arrow-up-thick</v-icon>
-          </v-btn>
-        </v-speed-dial> -->
+        </v-speed-dial>
       </v-btn>
+
+      <v-tabs dark background-color="blue lighten-2" show-arrows class="Isearch-2">
+        <v-tabs-slide color="teal lighten-3"></v-tabs-slide>
+        <v-tab v-for="i in 20" :key="i" :href="'#tab-' + i">
+          TheBookCategory {{ i }}
+        </v-tab>
+      </v-tabs>
+      <v-text-field v-model="model" placeholder="Search" solo class="Isearch">
+      </v-text-field>
     </div>
 
 
@@ -149,6 +149,23 @@ export default {
     height: 100vh;
     background-repeat: no-repeat;
     background-size: cover;
+  }
+
+  .Isearch{
+     position: relative;
+     top: 90px;
+     left: 25px;
+     width: 450px;
+  }
+  .Isearch-2{
+     position: relative;
+     top: 63px;
+  }
+
+  @media (min-width: 375px) {
+    .Isearch{
+     width: 325px;
+    }
   }
   
 </style>
