@@ -175,7 +175,24 @@ export default {
     clicksearch(input){
       this.page = 1
       this.$store.dispatch('setFirstIndexsFromApi',{words:input,page:0})
-    }
+    },
+    copyTextDetail () {
+        let textDetailToCopy = document.querySelector('#textDetail')
+        textDetailToCopy.setAttribute('type', 'text')    
+        textDetailToCopy.select()
+
+        try {
+          var successful = document.execCommand('copy');
+          var msg = successful ? 'successful' : 'unsuccessful';
+          alert('copdied '+ msg);
+        } catch (err) {
+        alert('Oops, unable to copy');
+        }
+
+        /* unselect the range */
+        textDetailToCopy.setAttribute('type', 'hidden')
+        window.getSelection().removeAllRanges()
+      },
   },
    watch: {
     search__pageindex (val) {
