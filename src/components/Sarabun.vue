@@ -1,7 +1,7 @@
 <template>
   <div>
     <v-container>
-      <v-row justify="center">
+      <v-row>
         <v-dialog 
           v-model="dialog" 
           fullscreen
@@ -10,23 +10,18 @@
           @keydown.esc="closeDialog"
           >
           <v-card tile>
+              <!-- :src="bookSelected.book_link_jpg" -->
             <v-toolbar
-              flat
               dark
               color="primary"
-              height="200px"
-              
+              dense
               >
               <v-btn
                 icon
-                dark
                 @click="closeDialog"
                 >
                 <v-icon>mdi-close</v-icon>
               </v-btn>
-                <div class="mr-5" v-if="$vuetify.breakpoint.mdAndUp">
-                  <v-img :src="bookSelected.book_link_jpg" max-width="125"></v-img>
-                </div>
                 <v-toolbar-title>
                   {{bookSelected.book_name}}
                 </v-toolbar-title>
@@ -34,28 +29,26 @@
                 <span>อ่านทั้งเล่ม</span>
                 <v-toolbar-items>
                   <v-btn
-                    dark
                     text
                     :href="bookSelected.book_link_pdf"
                     target="_blank"
                   >
-                    PDF
                     <v-icon>mdi-file-pdf</v-icon>
+                    PDF
                   </v-btn>
                   <v-btn
-                    dark
                     text
                     :href="bookSelected.book_link_text"
                     target="_blank"
                   >
+                    <v-icon class="mr-1">mdi-book-open-page-variant</v-icon>
                     TEXT
-                    <v-icon>mdi-format-text</v-icon>
                   </v-btn>
                 </v-toolbar-items>
             </v-toolbar>
 
             <v-card-text>
-              <div>
+              <div> 
                 <v-data-table
                   :loading="loading" 
                   loading-text="Loading... Please wait"
@@ -64,28 +57,31 @@
                   :page.sync="page"
                   :items-per-page="itemsPerPage"
                   hide-default-footer
-                  class="elevation-1"
-                  @page-count="pages = $event"
+                  class="elevation-1 mt-3"
                   dense
                   >
+                  <!-- class="d-flex justify-end" -->
                   <template v-slot:top>
-                    <div class="title">{{sarabunTotal}} สารบัญ</div> 
+                    <div class="title">สารบัญ ({{sarabunTotal}}) </div> 
                   </template>
+
                   <template v-slot:item.actions="{ item }">
-                    <v-btn :href="item.link_pdf" target="_blank" text>
+                    <v-btn 
+                      :href="item.link_pdf" 
+                      target="_blank" text icon>
                       <v-icon color="red">
                         mdi-file-pdf
                       </v-icon>
-                      <span>PDF</span>
+                      <!-- <span>PDF</span> -->
                     </v-btn>
                     <v-btn
                       @click="readText(item.search_index,item.search_details)"
-                      text
+                      text icon
                       >
                       <v-icon color="blue">
                         mdi-book-open-page-variant
                       </v-icon>
-                      <span>TEXT</span>
+                      <!-- <span>TEXT</span> -->
                     </v-btn>
                   </template>
                 </v-data-table>
@@ -95,15 +91,7 @@
                     v-model="page" 
                     :length="pages"
                     circle
-                    ></v-pagination>
-                  <v-text-field
-                    :value="itemsPerPage"
-                    label="กำหนดจำนวนสารบัญต่อหน้า"
-                    type="number"
-                    min="5"
-                    max="50"
-                    @input="itemsPerPage = parseInt($event)"
-                  ></v-text-field>
+                  ></v-pagination>
                 </div>
               </div>
             </v-card-text>
@@ -132,12 +120,13 @@
                 text
                 @click.stop.prevent="copyTextDetail"
               >
-                คัดลอก
+                copy
               </v-btn>
               <input type="hidden" id="textDetail" :value="textDetail">
               <v-btn
                 color="primary"
                 text
+                @click="dialogReadText = false"
               >
                 Close
               </v-btn>
@@ -164,7 +153,7 @@
       return {
         dialogReadText: false,
         page: 1,
-        itemsPerPage: 10,
+        itemsPerPage: 12,
         page_count:0,
         headers: [
           {
@@ -173,7 +162,10 @@
             value: 'search_index',
             sortable: false,
           },
-          { text: 'อ่าน', value: 'actions',sortable: false,},
+          { text: 'อ่านแต่ละสารัญ', 
+            value: 'actions',
+            align: 'end',
+            sortable: false,},
           
         ],
         textSarabun:"",
@@ -232,13 +224,8 @@
       sarabunTotal(){
         return this.$store.getters.getTotalSarabun     
       },
-      pages:{
-        get: function (){
-          return Math.ceil(this.sarabunTotal/this.itemsPerPage)
-        },
-        set: function (newValue) {
-          console.log('nv'+newValue)
-        }
+      pages(){
+        return Math.ceil(this.sarabunTotal/this.itemsPerPage)
       },
       loading(){
         return this.$store.getters.getCheckLoadSarabun     
