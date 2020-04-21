@@ -28,8 +28,7 @@
                   <v-img :src="bookSelected.book_link_jpg" max-width="125"></v-img>
                 </div>
                 <v-toolbar-title>
-                  {{bookSelected.book_name}} : 
-                  <span class="caption">({{sarabunTotal}}) สารบัญ</span> 
+                  {{bookSelected.book_name}}
                 </v-toolbar-title>
                 <v-spacer></v-spacer>
                 <span>อ่านทั้งเล่ม</span>
@@ -58,15 +57,20 @@
             <v-card-text>
               <div>
                 <v-data-table
+                  :loading="loading" 
+                  loading-text="Loading... Please wait"
                   :headers="headers"
                   :items="sarabunSelected"
                   :page.sync="page"
                   :items-per-page="itemsPerPage"
                   hide-default-footer
                   class="elevation-1"
-                  @page-count="pageCount = $event"
+                  @page-count="pages = $event"
+                  dense
                   >
-
+                  <template v-slot:top>
+                    <div class="title">{{sarabunTotal}} สารบัญ</div> 
+                  </template>
                   <template v-slot:item.actions="{ item }">
                     <v-btn :href="item.link_pdf" target="_blank" text>
                       <v-icon color="red">
@@ -79,28 +83,27 @@
                       text
                       >
                       <v-icon color="blue">
-                        mdi-format-text
+                        mdi-book-open-page-variant
                       </v-icon>
                       <span>TEXT</span>
                     </v-btn>
                   </template>
-                  <template v-slot:item.search_heading="{ item }">
-                    <div class="title">
-                      {{indexOn(item)}}                     
-                    </div>
-                  </template>
-
                 </v-data-table>
+                
                 <div class="text-center pt-2">
-                  <v-pagination v-model="page" :length="pages"></v-pagination>
-                  <!-- <v-text-field
+                  <v-pagination 
+                    v-model="page" 
+                    :length="pages"
+                    circle
+                    ></v-pagination>
+                  <v-text-field
                     :value="itemsPerPage"
-                    label="กำหนดจำนวนสารัญต่อหน้า"
+                    label="กำหนดจำนวนสารบัญต่อหน้า"
                     type="number"
-                    min="-1"
+                    min="5"
                     max="50"
                     @input="itemsPerPage = parseInt($event, 10)"
-                  ></v-text-field> -->
+                  ></v-text-field>
                 </div>
               </div>
             </v-card-text>
@@ -115,7 +118,7 @@
         
         <v-dialog
           v-model="dialogReadText"
-        >
+          >
           <v-card>
             <v-card-title>
               {{textSarabun}}
@@ -133,7 +136,6 @@
               <v-btn
                 color="primary"
                 text
-                @click="dialogReadText = false"
               >
                 Close
               </v-btn>
@@ -160,35 +162,39 @@
       return {
         dialogReadText: false,
         page: 1,
-        pageCount: 0,
-        itemsPerPage: 50,
+        itemsPerPage: 10,
         headers: [
           {
-            text: 'ที่',
+            text: 'ชื่อสารบัญ',
             align: 'start',
-            value: 'search_heading',
+            value: 'search_index',
             sortable: false,
           },
-          { text: 'ชื่อสารบัญ', value: 'search_index' },
           { text: 'อ่าน', value: 'actions',sortable: false,},
           
         ],
         textSarabun:"",
-        textDetail:""
+        textDetail:"",
       }
+    },
+    watch: {
+      page(val){
+        let offset = 0
+        if(val===1)
+          offset =0
+        else 
+          offset = val*this.itemsPerPage-this.itemsPerPage;
+
+        this.$store.dispatch('clearSarabun')
+        this.$store.dispatch('setPagenation', {limit:this.itemsPerPage, offset:offset})
+        console.log('offset'+offset)
+      },
     },
     methods: {
       closeDialog(){
         this.$emit('emitFalse',false)
-        this.$store.dispatch('setBookSelected', [])
-      },
-      changePage(){
-        let offset = this.page*50
-        this.$store.dispatch('setPagenation', offset)
-      },
-      indexOn(obj){
-        let no =  obj[" "]
-        return this.sarabunSelected.map(x=> x[" "]).indexOf(no)+1
+        this.$store.dispatch('clearSarabun')
+        this.$store.dispatch('clearTotalsSarabun')
       },
       readText(sarabun,detail){
         this.dialogReadText = !this.dialogReadText
@@ -209,34 +215,9 @@
       pages(){
         return Math.ceil(this.sarabunTotal/this.itemsPerPage)
       },
-      // imageHeight(){
-      //   switch(this.$vuetify.breakpoint.name){
-      //     case 'xs': return '22px'
-      //     case 'sm': return '40px'
-      //     case 'md': return '50px'
-      //     case 'lg': return '60px'
-      //     case 'xl': return '80px'
-      //   }
-      // },
+      loading(){
+        return this.$store.getters.getCheckLoadSarabun     
+      }
     }
   }
 </script>
-
-<style scoped>
-  /* .v-simple-table thead tr th {
-    font-weight: bold;
-  }
-
-  img {
-    max-width: 20%;
-  }
-
-  tr a {
-    text-decoration: none;
-  }
-
-  .btn {
-    padding-top: 15px;
-    padding-bottom: 20px;
-  } */
-</style>

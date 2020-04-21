@@ -13,7 +13,6 @@ export default new Vuex.Store({
     bookSelected:{},
     sarabunSelected:[],
     totalsSarabun:0,
-    offset:0,
   },
   mutations: {
     SET_BOOKS(state, payload){
@@ -37,9 +36,6 @@ export default new Vuex.Store({
     SET_BOOK_SELECTED(state, payload){
       state.bookSelected = payload
     },
-    SET_PAGENATION(state, payload){
-      state.offset = payload
-    },
     
   },
   actions: {
@@ -61,19 +57,27 @@ export default new Vuex.Store({
         })
         .catch(err => console.log(err))
     },
-    setBookSelected({commit, state}, selected){
+    setBookSelected({commit}, selected){
       commit('SET_BOOK_SELECTED', selected)
-      let name_book = selected.book_name
-      callApi.getData(`?path=/indexs&limit=50&offset=${state.offset}&query={"search_heading":"${name_book}"}`)
-        .then(res=>{
+    },
+    setPagenation({commit, state}, {limit, offset}){
+      callApi.getData(
+        `?path=/indexs&limit=${limit}&offset=${offset}&query={"search_heading":"${state.bookSelected.book_name}"}`
+      ).then(res=>{
           let data = res.data
-          commit('SET_SARABUN_TOTAL', data.nitems)
           commit('SET_SARABUN', data.items)
+          if(!state.totalsSarabun)
+            commit('SET_SARABUN_TOTAL', data.nitems);
         })
         .catch(err => console.log(err))
     },
-    setPagenation({commit}, offset){
-      commit('SET_PAGENATION', offset)
+
+    // clear state
+    clearSarabun({commit}){
+      commit('SET_SARABUN', [])
+    },
+    clearTotalsSarabun({commit}){
+      commit('SET_SARABUN_TOTAL', 0)
     }
   },
   getters: {
@@ -96,12 +100,19 @@ export default new Vuex.Store({
       return state.totalsSarabun
     },
     getSarabun(state){
-      // return state.sarabunSelected
-      let sarabuns = Array.from(new Set(state.sarabunSelected.map(book => book.search_index)))
-      .map(nameSarabun => {
-        return state.sarabunSelected.find(book => book.search_index === nameSarabun)
-      })
-      return sarabuns
+      //show duplicate
+      return state.sarabunSelected
+
+      //not duplicate
+      // let sarabuns = Array.from(new Set(state.sarabunSelected.map(book => book.search_index)))
+      // .map(nameSarabun => {
+      //   return state.sarabunSelected.find(book => book.search_index === nameSarabun)
+      // })
+      // return sarabuns
     },
+    getCheckLoadSarabun(state){
+      if(state.sarabunSelected.length>0)return false
+      else return true
+    }  
   }
 })

@@ -65,6 +65,7 @@ export default {
   methods: {
     bookSelect(selected){
       this.$store.dispatch('setBookSelected', selected)
+      this.$store.dispatch('setPagenation', {limit:50, offset:0})
       this.openDialog = !this.openDialog
     },
     setOpenDialog(val){
