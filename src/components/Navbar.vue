@@ -15,7 +15,7 @@
               <v-list-item>
                 <v-list-item-content>
                   <v-list-item-title align="center" justify="center">
-                    "<strong>{{search}}</strong>". Press <kbd>enter</kbd> 
+                    "<strong>{{ search }}</strong>". Press <kbd>enter</kbd> 
                     <v-btn class="ml-4" dark color="blue lighten-1" @click="clicksearch"><v-icon >mdi-magnify</v-icon></v-btn>
                   </v-list-item-title>
                 </v-list-item-content>
@@ -76,15 +76,19 @@
     </div>
 
     <v-dialog v-model="dialog" width="1000"  >
-      <v-card>
-        <v-card-title class="headline grey lighten-2" primary-title>{{dialog_head}}</v-card-title>
-        <v-card-text style="font-size: 17px;">{{dialog_content}}</v-card-text>
+      <v-card v-for="(item,i) in random" :key="i" :value="item">
+        <v-card-title class="headline grey lighten-2" primary-title>{{ item.search_index }}</v-card-title>
+        <v-card-text style="font-size: 17px;">{{ item.search_details }}</v-card-text>
         <v-card-actions>
           <v-spacer></v-spacer>
           <v-btn color="primary" text @click="closs">ออก</v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
+
+    <v-overlay v-model="setoverlay">
+      <v-progress-circular indeterminate size="64"></v-progress-circular>
+    </v-overlay>
 
 
 
@@ -102,17 +106,12 @@ export default {
     search: null,
     items: ['บุญ', 'วิชชา'],
     dialog: false,
-    dialog_head:'',
-    dialog_content:'',
+
   }),
   created(){
       this.$store.dispatch('clear')
   },
   computed:{
-    getrandom (){
-      console.log(this.$store.getters.getsearchrandom)
-      return this.$store.getters.getsearchrandom
-    },
     activeFab () {
       switch (this.tabs) {
         case 'one': return { class: 'purple', icon: 'account_circle' }
@@ -126,7 +125,14 @@ export default {
         return true
       }
         return false
-    }
+    },
+    random(){
+      return this.$store.getters.getsearchrandom
+    },
+    setoverlay(){
+      return this.$store.getters.getoverlay
+    },
+
   },
 
   methods:{
@@ -142,6 +148,7 @@ export default {
     },
     closs(){
       this.dialog=!this.dialog
+      this.$store.dispatch('clear')
     },
     onScroll (e) {
       if (typeof window === 'undefined') return

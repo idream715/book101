@@ -116,11 +116,14 @@ export default new Vuex.Store({
       commit('SET_INDEXS', [])
       commit('SET_WORDS_SEARCH', [])
       commit('SET_NOTFOUND', false)
+      commit('SET_SEARCH_RANDOM',[])
     },
     setsearchrandom({ commit },number){
+      commit('SET_OVERLAY', true)
       let tag = `{"%23":{"$regex":"${number}"}}`
       callApi.getData(`?path=/indexs&limit=1&query={"$and":[${tag}]} `)
       .then(res=>{
+        commit('SET_OVERLAY', false)
         let data = res.data
         commit('SET_SEARCH_RANDOM',data.items)
       })
