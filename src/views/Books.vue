@@ -1,6 +1,11 @@
 <template>
   <div class="about">
       <v-container>
+        
+        <v-overlay v-model="loading">
+          <v-progress-circular indeterminate size="64"></v-progress-circular>
+        </v-overlay>
+
         <v-row>
           <v-col 
             v-for="n in books"
@@ -60,7 +65,10 @@ export default {
   computed:{
     books(){
       return this.$store.getters.getBooks
-    }
+    },
+    loading(){
+      return this.$store.getters.getoverlay     
+    },
   },
   methods: {
     bookSelect(selected){

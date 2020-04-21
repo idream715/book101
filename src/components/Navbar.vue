@@ -41,7 +41,12 @@
           <div class="d-flex align-center">
             <v-img alt="logo" class=" mt-2 hidden-sm" contain min-width="45"
               src="@/assets/logo1.png" width="45" />
-             <h1 style="color:white;font-size:24px;">101's DOCTRINE</h1>
+            <v-btn
+              text
+              router-link to="/"
+             >
+              <h1 style="color:white;font-size:24px;">101's DOCTRINE</h1>
+            </v-btn>
           </div>
         </v-toolbar-title>
         <v-spacer></v-spacer>

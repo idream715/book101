@@ -59,15 +59,20 @@ export default new Vuex.Store({
     
   },
   actions: {
+    // GET
     getBookFromApi({ commit }){
+      commit('SET_OVERLAY', true)
       callApi.getData(`?path=/books&limit=50`)
         .then(res=>{
           let data = res.data
+          commit('SET_OVERLAY', false)
           commit('SET_TOTALS_BOOKS', data.nitems)
           commit('SET_BOOKS', data.items)
         })
         .catch(err => console.log(err))
     },
+    // SET
+      // PATH INDEXS
     setwordssearch({commit},words){
       commit('SET_WORDS_SEARCH',words)
     },
@@ -122,15 +127,18 @@ export default new Vuex.Store({
       })
       .catch(err => console.log(err))
     },
-    setBookSelected({commit, state}, selected){
+      // PATH BOOKS
+    setBookSelected({commit}, selected){
       commit('SET_BOOK_SELECTED', selected)
     },
     setPagenation({commit, state}, {limit, offset}){
+      commit('SET_OVERLAY', true)
       callApi.getData(
         `?path=/indexs&limit=${limit}&offset=${offset}&query={"search_heading":"${state.bookSelected.book_name}"}`
       ).then(res=>{
           let data = res.data
           commit('SET_SARABUN', data.items)
+          commit('SET_OVERLAY', false)
           if(!state.totalsSarabun)
             commit('SET_SARABUN_TOTAL', data.nitems);
         })
@@ -138,12 +146,6 @@ export default new Vuex.Store({
     },
 
     // clear state
-    clearSarabun({commit}){
-      commit('SET_SARABUN', [])
-    },
-    clearTotalsSarabun({commit}){
-      commit('SET_SARABUN_TOTAL', 0)
-    },
     clear({commit}){
       commit('SET_TOTALS_INDEXS', 0)
       commit('SET_INDEXS', [])
@@ -151,6 +153,13 @@ export default new Vuex.Store({
       commit('SET_NOTFOUND', false)
       commit('SET_SEARCH_RANDOM',[])
     },
+    clearSarabun({commit}){
+      commit('SET_SARABUN', [])
+    },
+    clearTotalsSarabun({commit}){
+      commit('SET_SARABUN_TOTAL', 0)
+    },
+    
   },
   getters: {
     getTotalbooks(state){
@@ -186,7 +195,6 @@ export default new Vuex.Store({
     getSarabun(state){
       //show duplicate
       return state.sarabunSelected
-
       //not duplicate
       // let sarabuns = Array.from(new Set(state.sarabunSelected.map(book => book.search_index)))
       // .map(nameSarabun => {
@@ -194,9 +202,5 @@ export default new Vuex.Store({
       // })
       // return sarabuns
     },
-    getCheckLoadSarabun(state){
-      if(state.sarabunSelected.length>0)return false
-      else return true
-    }  
   }
 })

@@ -60,7 +60,6 @@
                   class="elevation-1 mt-3"
                   dense
                   >
-                  <!-- class="d-flex justify-end" -->
                   <template v-slot:top>
                     <div class="title">สารบัญ ({{sarabunTotal}}) </div> 
                   </template>
@@ -111,16 +110,16 @@
             <v-card-title>
               {{textSarabun}}
             </v-card-title>
-            <v-card-text>
+            <v-card-text style="white-space: pre-wrap;">
               {{textDetail}}
             </v-card-text>
-            <v-card-actions>
+            <v-card-actions class="justify-end">
               <v-btn
                 color="primary"
                 text
                 @click.stop.prevent="copyTextDetail"
               >
-                copy
+                คัดลอก
               </v-btn>
               <input type="hidden" id="textDetail" :value="textDetail">
               <v-btn
@@ -128,7 +127,7 @@
                 text
                 @click="dialogReadText = false"
               >
-                Close
+                ออก
               </v-btn>
             </v-card-actions>
           </v-card>
@@ -169,7 +168,7 @@
           
         ],
         textSarabun:"",
-        textDetail:"",
+        textDetail:``,
       }
     },
     watch: {
@@ -182,7 +181,7 @@
 
         this.$store.dispatch('clearSarabun')
         this.$store.dispatch('setPagenation', {limit:this.itemsPerPage, offset:offset})
-        console.log('offset'+offset)
+        // console.log('offset'+offset)
       },
     },
     methods: {
@@ -228,7 +227,7 @@
         return Math.ceil(this.sarabunTotal/this.itemsPerPage)
       },
       loading(){
-        return this.$store.getters.getCheckLoadSarabun     
+        return this.$store.getters.getoverlay     
       }
     }
   }
