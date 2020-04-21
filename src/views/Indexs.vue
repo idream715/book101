@@ -96,9 +96,6 @@
           <v-overlay v-model="setoverlay">
             <v-progress-circular indeterminate size="64"></v-progress-circular>
           </v-overlay>
-
-         
-
     
           <v-pagination
             v-model ="page"
@@ -116,11 +113,6 @@
 
 <script>
 export default {
-  // mounted(){
-  //   if(this.indexs.length === 0 ){
-  //     this.$store.dispatch('getFirstIndexsFromApi')
-  //   }
-  // },
   data () {
       return {
         dialog: false,
@@ -141,9 +133,6 @@ export default {
       },
     indexs(){
       return this.$store.getters.getIndexs
-    },
-    marks(){
-      return this.$store.getters.getmarks
     },
     getwords(){
       return this.$store.getters.getwords_search

@@ -9,20 +9,20 @@
         </v-col>
         <v-col cols="10" sm="8" md="4">
           <h1 style="color:white">101's DOCTRINE</h1>
-          <v-combobox v-model="model" :search-input.sync="search" hide-selected hint="Maximum of 5 tags"
+          <v-combobox v-model="model" :items="items" :search-input.sync="search" hide-selected hint="Maximum of 5 tags"
             label="Search" multiple persistent-hint chips solo>
             <template v-slot:no-data>
               <v-list-item>
                 <v-list-item-content>
                   <v-list-item-title align="center" justify="center">
                     "<strong>{{search}}</strong>". Press <kbd>enter</kbd> 
-                    <v-btn class="ml-4" dark color="blue lighten-1"><v-icon >mdi-magnify</v-icon></v-btn>
+                    <v-btn class="ml-4" dark color="blue lighten-1" @click="clicksearch"><v-icon >mdi-magnify</v-icon></v-btn>
                   </v-list-item-title>
                 </v-list-item-content>
               </v-list-item>
             </template>
           </v-combobox>
-          <v-btn class="mr-8" dark color="blue lighten-1">อ่านอะไรดี</v-btn>
+          <v-btn @click="searchrandom" class="mr-8" dark color="blue lighten-1">อ่านอะไรดี</v-btn>
           <v-btn dark color="black" router-link to="/Books">
             <v-icon class="mr-2">mdi-book-open-page-variant</v-icon>หนังสือธรรมะ
           </v-btn>
@@ -73,9 +73,18 @@
           TheBookCategory {{ i }}
         </v-tab>
       </v-tabs>
-      <v-text-field v-model="model" placeholder="Search" solo class="Isearch">
-      </v-text-field>
     </div>
+
+    <v-dialog v-model="dialog" width="1000"  >
+      <v-card>
+        <v-card-title class="headline grey lighten-2" primary-title>{{dialog_head}}</v-card-title>
+        <v-card-text style="font-size: 17px;">{{dialog_content}}</v-card-text>
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn color="primary" text @click="closs">ออก</v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
 
 
 
@@ -90,10 +99,20 @@ export default {
     drawer: false,
     fab: false,
     title: '',
-    model: [],
     search: null,
+    items: ['บุญ', 'วิชชา'],
+    dialog: false,
+    dialog_head:'',
+    dialog_content:'',
   }),
+  created(){
+      this.$store.dispatch('clear')
+  },
   computed:{
+    getrandom (){
+      console.log(this.$store.getters.getsearchrandom)
+      return this.$store.getters.getsearchrandom
+    },
     activeFab () {
       switch (this.tabs) {
         case 'one': return { class: 'purple', icon: 'account_circle' }
@@ -111,6 +130,19 @@ export default {
   },
 
   methods:{
+    clicksearch(){
+      this.$store.dispatch('setFirstIndexsFromApi',{words:this.model,page:"0"})
+      this.$router.push('/Indexs')
+    },
+    searchrandom(){
+      let number = Math.ceil(Math.random() *3000)
+      console.log(number)
+      this.$store.dispatch('setsearchrandom',number)
+      this.dialog=!this.dialog
+    },
+    closs(){
+      this.dialog=!this.dialog
+    },
     onScroll (e) {
       if (typeof window === 'undefined') return
       const top = window.pageYOffset ||   e.target.scrollTop || 0

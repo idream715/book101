@@ -12,12 +12,12 @@ export default new Vuex.Store({
     indexs:[],
     overlay:false,
     notfound:false,
-    marks:[],
     words_search:[],
     bookSelected:{},
     sarabunSelected:[],
     totalsSarabun:0,
     offset:0,
+    search_random:[],
   },
   mutations: {
     SET_BOOKS(state, payload){
@@ -44,9 +44,6 @@ export default new Vuex.Store({
     SET_NOTFOUND(state,payload){
       state.notfound = payload
     },
-    SET_MARKS(state,payload){
-      state.marks = payload
-    },
     SET_WORDS_SEARCH(state,payload){
       state.words_search = payload
     },
@@ -55,6 +52,9 @@ export default new Vuex.Store({
     },
     SET_PAGENATION(state, payload){
       state.offset = payload
+    },
+    SET_SEARCH_RANDOM(state,payload){
+      state.search_random = payload
     },
     
   },
@@ -114,9 +114,17 @@ export default new Vuex.Store({
     clear({commit}){
       commit('SET_TOTALS_INDEXS', 0)
       commit('SET_INDEXS', [])
-      commit('SET_MARKS', [])
       commit('SET_WORDS_SEARCH', [])
       commit('SET_NOTFOUND', false)
+    },
+    setsearchrandom({ commit },number){
+      let tag = `{"%23":{"$regex":"${number}"}}`
+      callApi.getData(`?path=/indexs&limit=1&query={"$and":[${tag}]} `)
+      .then(res=>{
+        let data = res.data
+        commit('SET_SEARCH_RANDOM',data.items)
+      })
+      .catch(err => console.log(err))
     },
     setBookSelected({commit, state}, selected){
       commit('SET_BOOK_SELECTED', selected)
@@ -152,9 +160,6 @@ export default new Vuex.Store({
     getnotfound(state){
       return state.notfound
     },
-    getmarks(state){
-      return state.marks
-    },
     getwords_search(state){
       return state.words_search
     },
@@ -163,6 +168,9 @@ export default new Vuex.Store({
     },
     getTotalSarabun(state){
       return state.totalsSarabun
+    },
+    getsearchrandom(state){
+      return state.search_random
     },
     getSarabun(state){
       // return state.sarabunSelected
