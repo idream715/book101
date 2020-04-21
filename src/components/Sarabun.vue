@@ -102,7 +102,7 @@
                     type="number"
                     min="5"
                     max="50"
-                    @input="itemsPerPage = parseInt($event, 10)"
+                    @input="itemsPerPage = parseInt($event)"
                   ></v-text-field>
                 </div>
               </div>
@@ -130,9 +130,11 @@
               <v-btn
                 color="primary"
                 text
+                @click.stop.prevent="copyTextDetail"
               >
-                copy
+                คัดลอก
               </v-btn>
+              <input type="hidden" id="textDetail" :value="textDetail">
               <v-btn
                 color="primary"
                 text
@@ -163,6 +165,7 @@
         dialogReadText: false,
         page: 1,
         itemsPerPage: 10,
+        page_count:0,
         headers: [
           {
             text: 'ชื่อสารบัญ',
@@ -200,7 +203,24 @@
         this.dialogReadText = !this.dialogReadText
         this.textSarabun = sarabun
         this.textDetail = detail
-      }
+      },
+      copyTextDetail () {
+        let textDetailToCopy = document.querySelector('#textDetail')
+        textDetailToCopy.setAttribute('type', 'text')    
+        textDetailToCopy.select()
+
+        try {
+          var successful = document.execCommand('copy');
+          var msg = successful ? 'successful' : 'unsuccessful';
+          alert('copdied '+ msg);
+        } catch (err) {
+        alert('Oops, unable to copy');
+        }
+
+        /* unselect the range */
+        textDetailToCopy.setAttribute('type', 'hidden')
+        window.getSelection().removeAllRanges()
+      },
     },
     computed: {
       bookSelected(){
@@ -212,8 +232,13 @@
       sarabunTotal(){
         return this.$store.getters.getTotalSarabun     
       },
-      pages(){
-        return Math.ceil(this.sarabunTotal/this.itemsPerPage)
+      pages:{
+        get: function (){
+          return Math.ceil(this.sarabunTotal/this.itemsPerPage)
+        },
+        set: function (newValue) {
+          console.log('nv'+newValue)
+        }
       },
       loading(){
         return this.$store.getters.getCheckLoadSarabun     
