@@ -9,6 +9,9 @@ export default {
       return {
       }
     }, 
+  created(){
+      this.$store.dispatch('clear')
+  },
 }
 </script>
 

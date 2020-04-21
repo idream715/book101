@@ -85,7 +85,7 @@
           <v-dialog v-model="dialog" width="1000"  >
             <v-card>
               <v-card-title class="headline grey lighten-2" primary-title>{{head_content}}</v-card-title>
-                <v-card-text style="font-size: 17px;" id="textdetail">{{content}}</v-card-text>
+                <v-card-text style="font-size: 17px;">{{content}}</v-card-text>
               <v-card-actions>
                 <v-spacer></v-spacer>
                 <v-btn color="primary" text @click="closs">ออก</v-btn>
@@ -96,7 +96,7 @@
                 >
                   คัดลอก
                 </v-btn>
-              <input type="hidden" id="textDetail" :value="textDetail">
+              <input type="hidden" id="textDetail" :value="content">
               </v-card-actions>
             </v-card>
           </v-dialog>
@@ -209,9 +209,9 @@ export default {
       }
     },
     page(val){
+      this.$vuetify.goTo('#search_index')
       let remitcards = 10
       let pageoffset = (remitcards*(val-1))
-      console.log(pageoffset)
       this.$store.dispatch('setFirstIndexsFromApi',{words:this.getwords,page:pageoffset})
     },
   },   
