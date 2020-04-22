@@ -10,13 +10,13 @@
         <v-col cols="10" sm="8" md="4">
           <h1 style="color:white">101's DOCTRINE</h1>
           <v-combobox v-model="words_search" :items="items" :search-input.sync="search" hide-selected hint="Maximum of 5 tags"
-            label="Search" multiple persistent-hint chips solo>
+            :label="label_search" multiple persistent-hint chips solo>
             <template v-slot:no-data>
               <v-list-item>
                 <v-list-item-content>
                   <v-list-item-title align="center" justify="center">
                     "<strong>{{ search }}</strong>". Press <kbd>enter</kbd> 
-                    <v-btn class="ml-4" dark color="blue lighten-1" @click="clicksearch"><v-icon >mdi-magnify</v-icon></v-btn>
+                    <v-btn  class="ml-4 " dark color="blue lighten-1" @click="clicksearch"><v-icon >mdi-magnify</v-icon></v-btn>
                   </v-list-item-title>
                 </v-list-item-content>
               </v-list-item>
@@ -78,7 +78,7 @@
     <v-dialog v-model="dialog" width="1000"  >
       <v-card v-for="(item,i) in random" :key="i" :value="item">
         <v-card-title class="headline grey lighten-2" primary-title>{{ item.search_index }}</v-card-title>
-        <v-card-text style="font-size: 17px;">{{ item.search_details }}</v-card-text>
+        <v-card-text style="font-size: 17px; white-space: pre-wrap;">{{ item.search_details }}</v-card-text>
         <v-card-actions>
           <v-spacer></v-spacer>
           <v-btn color="primary" text @click="closs">ออก</v-btn>
@@ -86,13 +86,11 @@
       </v-card>
     </v-dialog>
 
-    <v-overlay v-model="setoverlay">
+   <v-overlay v-if="setoverlay===true && on">
       <v-progress-circular indeterminate size="64"></v-progress-circular>
     </v-overlay>
 
-
-
-  </div>
+  </div> 
 </template>
 
 <script>
@@ -107,6 +105,8 @@ export default {
     items: [],
     dialog: false,
     words_search:'',
+    label_search:'ค้นหาธรรมหลวงพ่อ',
+
 
   }),
   created(){
@@ -138,12 +138,15 @@ export default {
 
   methods:{
     clicksearch(){
-      this.$store.dispatch('setFirstIndexsFromApi',{words:this.words_search,page:"0"})
-      this.$router.push('/Indexs')
+      if(this.words_search===''){
+        this.label_search = 'กรุณาใสคำที่ต้องการค้นหา'
+      }else{
+        this.$store.dispatch('setFirstIndexsFromApi',{words:this.words_search,page:"0"})
+        this.$router.push('/Indexs')}
+        this.label_search = 'ค้นหาธรรมหลวงพ่อ'
     },
     searchrandom(){
       let number = Math.ceil(Math.random() *3000)
-      console.log(number)
       this.$store.dispatch('setsearchrandom',number)
       this.dialog=!this.dialog
     },
