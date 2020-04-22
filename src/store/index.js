@@ -26,6 +26,7 @@ export default new Vuex.Store({
     SET_TOTALS_BOOKS(state, payload){
       state.totalsBooks = payload
     },
+    
     SET_INDEXS(state, payload){
       state.indexs = payload
     },
@@ -140,6 +141,7 @@ export default new Vuex.Store({
         })
         .catch(err => console.log(err))
     },
+   
 
     // clear state
     clear({commit}){
@@ -164,30 +166,37 @@ export default new Vuex.Store({
     getBooks(state){
       return state.books
     },
+    
+
     getTotalIndexs(state){
       return state.totalsIndexs
     },
     getIndexs(state){
       return state.indexs
     },
+
     getoverlay(state){
       return state.overlay
     },
+
     getnotfound(state){
       return state.notfound
     },
     getwords_search(state){
       return state.words_search
     },
+
     getBookSelected(state){
       return state.bookSelected
     },
     getTotalSarabun(state){
       return state.totalsSarabun
     },
+
     getsearchrandom(state){
       return state.search_random
     },
+
     getSarabun(state){
       //show duplicate
       return state.sarabunSelected

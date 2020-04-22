@@ -26,7 +26,7 @@
                   {{bookSelected.book_name}}
                 </v-toolbar-title>
                 <v-spacer></v-spacer>
-                <span>อ่านทั้งเล่ม</span>
+                <span v-if="$vuetify.breakpoint.smAndUp">อ่านทั้งเล่ม</span>
                 <v-toolbar-items>
                   <v-btn
                     text
@@ -34,7 +34,7 @@
                     target="_blank"
                   >
                     <v-icon>mdi-file-pdf</v-icon>
-                    PDF
+                    <div v-if="$vuetify.breakpoint.smAndUp">PDF</div> 
                   </v-btn>
                   <v-btn
                     text
@@ -42,7 +42,7 @@
                     target="_blank"
                   >
                     <v-icon class="mr-1">mdi-book-open-page-variant</v-icon>
-                    TEXT
+                    <div v-if="$vuetify.breakpoint.smAndUp">TEXT</div> 
                   </v-btn>
                 </v-toolbar-items>
             </v-toolbar>
@@ -61,9 +61,9 @@
                   dense
                   >
                   <template v-slot:top>
-                    <div class="title">สารบัญ ({{sarabunTotal}}) </div> 
-                  </template>
-
+                    <div class="title">ชุดหนังสือ{{bookSelected.book_category}} สารบัญ ({{sarabunTotal}}) </div> 
+                  </template> 
+                  
                   <template v-slot:item.actions="{ item }">
                     <v-btn 
                       :href="item.link_pdf" 
@@ -89,7 +89,6 @@
                   <v-pagination 
                     v-model="page" 
                     :length="pages"
-                    circle
                   ></v-pagination>
                 </div>
               </div>
@@ -187,6 +186,7 @@
     methods: {
       closeDialog(){
         this.$emit('emitFalse',false)
+        this.page = 1
         this.$store.dispatch('clearSarabun')
         this.$store.dispatch('clearTotalsSarabun')
       },

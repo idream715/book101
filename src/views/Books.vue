@@ -6,21 +6,49 @@
           <v-progress-circular indeterminate size="64"></v-progress-circular>
         </v-overlay>
 
+        <v-card>
+          <v-container fluid>
+            <v-row
+              align="center"
+            >
+              <v-col cols="10">
+                <v-autocomplete
+                  v-model="filBookCategoty"
+                  :items="items"
+                  outlined
+                  dense
+                  label="เลือกชุดหนังสือ"
+                ></v-autocomplete>
+              </v-col>
+              <v-col cols="2" md="2" class="mb-8">
+                <v-btn 
+                  color="primary" 
+                  v-if="filBookCategoty"
+                  outlined 
+                  @click="filBookCategoty = null" 
+                  >
+                  <p class="mt-2">ยกเลิก</p>
+                  <v-icon class="mb-1" right>mdi-close-circle</v-icon> 
+                </v-btn>
+              </v-col>
+            </v-row>
+          </v-container>
+        </v-card>
         <v-row>
           <v-col 
-            v-for="n in books"
+            v-for="n in filterBooks"
             :key="n.book_name"
             cols="6"
             sm="4"
             md="3"
             lg="2"
             xl="1"
-          >
+            > 
             <v-card 
               class="mx-auto ma-5 " 
               max-width="160"
               @click="bookSelect(n)"
-            >
+              >
               <v-img 
                 :src="n.book_link_jpg" 
                 height="200px" 
@@ -36,7 +64,6 @@
                 {{n.book_name}}
               </v-card-text>
             </v-card>
-          
           </v-col>
         </v-row>
       </v-container>
@@ -54,7 +81,8 @@ export default {
   },
   data() {
     return {
-      openDialog : false
+      openDialog : false,
+      filBookCategoty:"",
     }
   },
   created(){
@@ -66,9 +94,21 @@ export default {
     books(){
       return this.$store.getters.getBooks
     },
+    filterBooks(){
+      if(this.filBookCategoty){
+        return this.books.filter(el => el.book_category === this.filBookCategoty)
+      }else{
+        return this.books
+      }
+      
+    },
     loading(){
       return this.$store.getters.getoverlay     
     },
+    items(){
+      return Array.from(new Set(this.$store.getters.getBooks.map(a => a.book_category)))   
+    },
+    
   },
   methods: {
     bookSelect(selected){
@@ -78,7 +118,7 @@ export default {
     },
     setOpenDialog(val){
       this.openDialog = val
-    }
+    },
   }
 }
 </script>
