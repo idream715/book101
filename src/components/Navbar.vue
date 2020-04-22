@@ -15,7 +15,7 @@
               <v-list-item>
                 <v-list-item-content>
                   <v-list-item-title align="center" justify="center">
-                    "<strong>{{ search }}</strong>"กรุณากด <kbd>enter</kbd> 
+                    "<strong>{{ search }}</strong>"กรุณากดปุ่ม <kbd>enter</kbd> 
                     <v-btn  class="ml-4 " dark color="blue lighten-1" @click="clicksearch_home"><v-icon >mdi-magnify</v-icon></v-btn>
                   </v-list-item-title>
                 </v-list-item-content>
@@ -117,7 +117,7 @@ export default {
   }),
   created(){
       this.words_search = ''
-      this.label_search = 'ค้นหาธรรมหลวงพ่อ'
+      this.label_search = 'ค้นหาธรรมะหลวงพ่อ'
       this.$store.dispatch('clear')
   },
   computed:{
