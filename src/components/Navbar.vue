@@ -15,8 +15,8 @@
               <v-list-item>
                 <v-list-item-content>
                   <v-list-item-title align="center" justify="center">
-                    "<strong>{{ search }}</strong>". Press <kbd>enter</kbd> 
-                    <v-btn  class="ml-4 " dark color="blue lighten-1" @click="clicksearch"><v-icon >mdi-magnify</v-icon></v-btn>
+                    "<strong>{{ search }}</strong>"กรุณากด <kbd>enter</kbd> 
+                    <v-btn  class="ml-4 " dark color="blue lighten-1" @click="clicksearch_home"><v-icon >mdi-magnify</v-icon></v-btn>
                   </v-list-item-title>
                 </v-list-item-content>
               </v-list-item>
@@ -105,6 +105,8 @@ export default {
 
   }),
   created(){
+      this.words_search = ''
+      this.label_search = 'ค้นหาธรรมหลวงพ่อ'
       this.$store.dispatch('clear')
   },
   computed:{
@@ -132,16 +134,16 @@ export default {
   },
 
   methods:{
-    clicksearch(){
+    clicksearch_home(){
       if(this.words_search===''){
         this.label_search = 'กรุณาใสคำที่ต้องการค้นหา'
       }else{
-        this.$store.dispatch('setFirstIndexsFromApi',{words:this.words_search,page:"0"})
         this.$router.push('/Indexs')}
-        this.label_search = 'ค้นหาธรรมหลวงพ่อ'
+        this.$store.dispatch('setFirstIndexsFromApi',{words:this.words_search,page:"0"})
+
     },
     searchrandom(){
-      let number = Math.ceil(Math.random() *3000)
+      let number = Math.ceil(Math.random() *3548)
       this.$store.dispatch('setsearchrandom',number)
       this.dialog=!this.dialog
     },
