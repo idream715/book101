@@ -118,9 +118,9 @@
                 text
                 @click.stop.prevent="copyTextDetail"
               >
-                คัดลอก
+                {{word_copy}}
               </v-btn>
-              <input type="hidden" id="textDetail" :value="textDetail">
+              <input type="hidden" id="textDetail" :value="textSarabun+' '+textDetail">
               <v-btn
                 color="primary"
                 text
@@ -168,6 +168,7 @@
         ],
         textSarabun:"",
         textDetail:``,
+        word_copy:'คัดลอก'
       }
     },
     watch: {
@@ -194,6 +195,7 @@
         this.dialogReadText = !this.dialogReadText
         this.textSarabun = sarabun
         this.textDetail = detail
+        this.word_copy = 'คัดลอก'
       },
       copyTextDetail () {
         let textDetailToCopy = document.querySelector('#textDetail')
@@ -202,8 +204,8 @@
 
         try {
           var successful = document.execCommand('copy');
-          var msg = successful ? 'successful' : 'unsuccessful';
-          alert('copdied '+ msg);
+          var msg = successful ? 'คัดลอกแล้ว' : 'คัดลอกไม่สำเร็จ';
+          this.word_copy = `${msg}`
         } catch (err) {
         alert('Oops, unable to copy');
         }

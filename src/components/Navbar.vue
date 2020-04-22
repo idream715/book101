@@ -22,9 +22,14 @@
               </v-list-item>
             </template>
           </v-combobox>
-          <v-btn @click="searchrandom" class="mr-8" dark color="blue lighten-1">อ่านอะไรดี</v-btn>
-          <v-btn dark color="black" router-link to="/Books">
-            <v-icon class="mr-2">mdi-book-open-page-variant</v-icon>หนังสือธรรมะ
+          <v-btn @click="searchrandom" class="mr-8" dark color="red">
+            <v-icon class="mr-2">mdi-card-text</v-icon>
+            สุ่มอ่านธรรมะ
+          </v-btn>
+            
+          <v-btn dark color="blue" router-link to="/Books">
+            <v-icon class="mr-2">mdi-book-open-page-variant</v-icon>
+            หนังสือธรรมะ
           </v-btn>
         </v-col>
       </v-row>
@@ -77,7 +82,8 @@
 
     <v-dialog v-model="dialog" width="1000"  >
       <v-card v-for="(item,i) in random" :key="i" :value="item">
-        <v-card-title class="headline grey lighten-2" primary-title>{{ item.search_index }}</v-card-title>
+        <v-card-title class="headline lighten-2" primary-title>{{ item.search_index }}</v-card-title>
+        <v-card-text class="grey--text">จากหนังสือ:{{item.search_heading}}</v-card-text>
         <v-card-text style="font-size: 17px; white-space: pre-wrap;">{{ item.search_details }}</v-card-text>
         <v-card-actions>
           <v-spacer></v-spacer>
@@ -105,12 +111,13 @@ export default {
     items: [],
     dialog: false,
     words_search:'',
-    label_search:'ค้นหาธรรมหลวงพ่อ',
+    label_search:'ค้นหาธรรมะหลวงพ่อ',
 
 
   }),
   created(){
-      this.$store.dispatch('clear')
+    this.label_search = 'ค้นหาธรรมะหลวงพ่อ'
+    this.$store.dispatch('clear')
   },
   computed:{
     activeFab () {
@@ -143,7 +150,7 @@ export default {
       }else{
         this.$store.dispatch('setFirstIndexsFromApi',{words:this.words_search,page:"0"})
         this.$router.push('/Indexs')}
-        this.label_search = 'ค้นหาธรรมหลวงพ่อ'
+        
     },
     searchrandom(){
       let number = Math.ceil(Math.random() *3000)
