@@ -9,7 +9,7 @@
         </v-col>
         <v-col cols="10" sm="8" md="4">
           <h1 style="color:white">101's DOCTRINE</h1>
-          <v-combobox v-model="model" :items="items" :search-input.sync="search" hide-selected hint="Maximum of 5 tags"
+          <v-combobox v-model="words_search" :items="items" :search-input.sync="search" hide-selected hint="Maximum of 5 tags"
             label="Search" multiple persistent-hint chips solo>
             <template v-slot:no-data>
               <v-list-item>
@@ -72,12 +72,7 @@
         </v-speed-dial>
       </v-btn>
 
-      <v-tabs dark background-color="blue lighten-2" show-arrows class="Isearch-2">
-        <v-tabs-slide color="teal lighten-3"></v-tabs-slide>
-        <v-tab v-for="i in 20" :key="i" :href="'#tab-' + i">
-          TheBookCategory {{ i }}
-        </v-tab>
-      </v-tabs>
+
     </div>
 
     <v-dialog v-model="dialog" width="1000"  >
@@ -109,8 +104,9 @@ export default {
     fab: false,
     title: '',
     search: null,
-    items: ['บุญ', 'วิชชา'],
+    items: [],
     dialog: false,
+    words_search:'',
 
   }),
   created(){
@@ -142,7 +138,7 @@ export default {
 
   methods:{
     clicksearch(){
-      this.$store.dispatch('setFirstIndexsFromApi',{words:this.model,page:"0"})
+      this.$store.dispatch('setFirstIndexsFromApi',{words:this.words_search,page:"0"})
       this.$router.push('/Indexs')
     },
     searchrandom(){
@@ -165,10 +161,10 @@ export default {
     }
   },
   watch:{
-    model (val) {
+    words_search (val) {
       if (val.length > 5) {
         // หน้า home
-        this.$nextTick(() => this.model.pop()) 
+        this.$nextTick(() => this.words_search.pop()) 
       }
     },
   },
