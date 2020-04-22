@@ -1,7 +1,7 @@
 <template>
   <div>
     <v-container>
-      <v-row justify="center">
+      <v-row>
         <v-dialog 
           v-model="dialog" 
           fullscreen
@@ -10,97 +10,86 @@
           @keydown.esc="closeDialog"
           >
           <v-card tile>
+              <!-- :src="bookSelected.book_link_jpg" -->
             <v-toolbar
-              flat
               dark
               color="primary"
-              height="200px"
-              
+              dense
               >
               <v-btn
                 icon
-                dark
                 @click="closeDialog"
                 >
                 <v-icon>mdi-close</v-icon>
               </v-btn>
-                <div class="mr-5" v-if="$vuetify.breakpoint.mdAndUp">
-                  <v-img :src="bookSelected.book_link_jpg" max-width="125"></v-img>
-                </div>
                 <v-toolbar-title>
-                  {{bookSelected.book_name}} : 
-                  <span class="caption">({{sarabunTotal}}) สารบัญ</span> 
+                  {{bookSelected.book_name}}
                 </v-toolbar-title>
                 <v-spacer></v-spacer>
-                <span>อ่านทั้งเล่ม</span>
+                <span v-if="$vuetify.breakpoint.smAndUp">อ่านทั้งเล่ม</span>
                 <v-toolbar-items>
                   <v-btn
-                    dark
                     text
                     :href="bookSelected.book_link_pdf"
                     target="_blank"
                   >
-                    PDF
                     <v-icon>mdi-file-pdf</v-icon>
+                    <div v-if="$vuetify.breakpoint.smAndUp">PDF</div> 
                   </v-btn>
                   <v-btn
-                    dark
                     text
                     :href="bookSelected.book_link_text"
                     target="_blank"
                   >
-                    TEXT
-                    <v-icon>mdi-format-text</v-icon>
+                    <v-icon class="mr-1">mdi-book-open-page-variant</v-icon>
+                    <div v-if="$vuetify.breakpoint.smAndUp">TEXT</div> 
                   </v-btn>
                 </v-toolbar-items>
             </v-toolbar>
 
             <v-card-text>
-              <div>
+              <div> 
                 <v-data-table
+                  :loading="loading" 
+                  loading-text="Loading... Please wait"
                   :headers="headers"
                   :items="sarabunSelected"
                   :page.sync="page"
                   :items-per-page="itemsPerPage"
                   hide-default-footer
-                  class="elevation-1"
-                  @page-count="pageCount = $event"
+                  class="elevation-1 mt-3"
+                  dense
                   >
-
+                  <template v-slot:top>
+                    <div class="title">ชุดหนังสือ{{bookSelected.book_category}} สารบัญ ({{sarabunTotal}}) </div> 
+                  </template> 
+                  
                   <template v-slot:item.actions="{ item }">
-                    <v-btn :href="item.link_pdf" target="_blank" text>
+                    <v-btn 
+                      :href="item.link_pdf" 
+                      target="_blank" text icon>
                       <v-icon color="red">
                         mdi-file-pdf
                       </v-icon>
-                      <span>PDF</span>
+                      <!-- <span>PDF</span> -->
                     </v-btn>
                     <v-btn
                       @click="readText(item.search_index,item.search_details)"
-                      text
+                      text icon
                       >
                       <v-icon color="blue">
-                        mdi-format-text
+                        mdi-book-open-page-variant
                       </v-icon>
-                      <span>TEXT</span>
+                      <!-- <span>TEXT</span> -->
                     </v-btn>
                   </template>
-                  <template v-slot:item.search_heading="{ item }">
-                    <div class="title">
-                      {{indexOn(item)}}                     
-                    </div>
-                  </template>
-
                 </v-data-table>
+                
                 <div class="text-center pt-2">
-                  <v-pagination v-model="page" :length="pages"></v-pagination>
-                  <!-- <v-text-field
-                    :value="itemsPerPage"
-                    label="กำหนดจำนวนสารัญต่อหน้า"
-                    type="number"
-                    min="-1"
-                    max="50"
-                    @input="itemsPerPage = parseInt($event, 10)"
-                  ></v-text-field> -->
+                  <v-pagination 
+                    v-model="page" 
+                    :length="pages"
+                  ></v-pagination>
                 </div>
               </div>
             </v-card-text>
@@ -115,27 +104,29 @@
         
         <v-dialog
           v-model="dialogReadText"
-        >
+          >
           <v-card>
             <v-card-title>
               {{textSarabun}}
             </v-card-title>
-            <v-card-text>
+            <v-card-text style="white-space: pre-wrap;">
               {{textDetail}}
             </v-card-text>
-            <v-card-actions>
+            <v-card-actions class="justify-end">
               <v-btn
                 color="primary"
                 text
+                @click.stop.prevent="copyTextDetail"
               >
-                copy
+                {{word_copy}}
               </v-btn>
+              <input type="hidden" id="textDetail" :value="textSarabun+' '+textDetail">
               <v-btn
                 color="primary"
                 text
                 @click="dialogReadText = false"
               >
-                Close
+                ออก
               </v-btn>
             </v-card-actions>
           </v-card>
@@ -160,41 +151,69 @@
       return {
         dialogReadText: false,
         page: 1,
-        pageCount: 0,
-        itemsPerPage: 50,
+        itemsPerPage: 12,
+        page_count:0,
         headers: [
           {
-            text: 'ที่',
+            text: 'ชื่อสารบัญ',
             align: 'start',
-            value: 'search_heading',
+            value: 'search_index',
             sortable: false,
           },
-          { text: 'ชื่อสารบัญ', value: 'search_index' },
-          { text: 'อ่าน', value: 'actions',sortable: false,},
+          { text: 'อ่านแต่ละสารัญ', 
+            value: 'actions',
+            align: 'end',
+            sortable: false,},
           
         ],
         textSarabun:"",
-        textDetail:""
+        textDetail:``,
+        word_copy:'คัดลอก'
       }
+    },
+    watch: {
+      page(val){
+        let offset = 0
+        if(val===1)
+          offset =0
+        else 
+          offset = val*this.itemsPerPage-this.itemsPerPage;
+
+        this.$store.dispatch('clearSarabun')
+        this.$store.dispatch('setPagenation', {limit:this.itemsPerPage, offset:offset})
+        // console.log('offset'+offset)
+      },
     },
     methods: {
       closeDialog(){
         this.$emit('emitFalse',false)
-        this.$store.dispatch('setBookSelected', [])
-      },
-      changePage(){
-        let offset = this.page*50
-        this.$store.dispatch('setPagenation', offset)
-      },
-      indexOn(obj){
-        let no =  obj[" "]
-        return this.sarabunSelected.map(x=> x[" "]).indexOf(no)+1
+        this.page = 1
+        this.$store.dispatch('clearSarabun')
+        this.$store.dispatch('clearTotalsSarabun')
       },
       readText(sarabun,detail){
         this.dialogReadText = !this.dialogReadText
         this.textSarabun = sarabun
         this.textDetail = detail
-      }
+        this.word_copy = 'คัดลอก'
+      },
+      copyTextDetail () {
+        let textDetailToCopy = document.querySelector('#textDetail')
+        textDetailToCopy.setAttribute('type', 'text')    
+        textDetailToCopy.select()
+
+        try {
+          var successful = document.execCommand('copy');
+          var msg = successful ? 'คัดลอกแล้ว' : 'คัดลอกไม่สำเร็จ';
+          this.word_copy = `${msg}`
+        } catch (err) {
+        alert('Oops, unable to copy');
+        }
+
+        /* unselect the range */
+        textDetailToCopy.setAttribute('type', 'hidden')
+        window.getSelection().removeAllRanges()
+      },
     },
     computed: {
       bookSelected(){
@@ -209,34 +228,9 @@
       pages(){
         return Math.ceil(this.sarabunTotal/this.itemsPerPage)
       },
-      // imageHeight(){
-      //   switch(this.$vuetify.breakpoint.name){
-      //     case 'xs': return '22px'
-      //     case 'sm': return '40px'
-      //     case 'md': return '50px'
-      //     case 'lg': return '60px'
-      //     case 'xl': return '80px'
-      //   }
-      // },
+      loading(){
+        return this.$store.getters.getoverlay     
+      }
     }
   }
 </script>
-
-<style scoped>
-  /* .v-simple-table thead tr th {
-    font-weight: bold;
-  }
-
-  img {
-    max-width: 20%;
-  }
-
-  tr a {
-    text-decoration: none;
-  }
-
-  .btn {
-    padding-top: 15px;
-    padding-bottom: 20px;
-  } */
-</style>

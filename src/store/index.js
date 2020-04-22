@@ -26,6 +26,7 @@ export default new Vuex.Store({
     SET_TOTALS_BOOKS(state, payload){
       state.totalsBooks = payload
     },
+    
     SET_INDEXS(state, payload){
       state.indexs = payload
     },
@@ -59,15 +60,20 @@ export default new Vuex.Store({
     
   },
   actions: {
+    // GET
     getBookFromApi({ commit }){
+      commit('SET_OVERLAY', true)
       callApi.getData(`?path=/books&limit=50`)
         .then(res=>{
           let data = res.data
+          commit('SET_OVERLAY', false)
           commit('SET_TOTALS_BOOKS', data.nitems)
           commit('SET_BOOKS', data.items)
         })
         .catch(err => console.log(err))
     },
+    // SET
+      // PATH INDEXS
     setwordssearch({commit},words){
       commit('SET_WORDS_SEARCH',words)
     },
@@ -107,13 +113,6 @@ export default new Vuex.Store({
         commit('SET_INDEXS', data.items)
         }).catch(err => console.log(err))
     },
-    clear({commit}){
-      commit('SET_TOTALS_INDEXS', 0)
-      commit('SET_INDEXS', [])
-      commit('SET_WORDS_SEARCH', [])
-      commit('SET_NOTFOUND', false)
-      commit('SET_SEARCH_RANDOM',[])
-    },
     setsearchrandom({ commit },number){
       commit('SET_OVERLAY', true)
       let tag = `{"%23":{"$regex":"${number}"}}`
@@ -125,20 +124,40 @@ export default new Vuex.Store({
       })
       .catch(err => console.log(err))
     },
-    setBookSelected({commit, state}, selected){
+      // PATH BOOKS
+    setBookSelected({commit}, selected){
       commit('SET_BOOK_SELECTED', selected)
-      let name_book = selected.book_name
-      callApi.getData(`?path=/indexs&limit=50&offset=${state.offset}&query={"search_heading":"${name_book}"}`)
-        .then(res=>{
+    },
+    setPagenation({commit, state}, {limit, offset}){
+      commit('SET_OVERLAY', true)
+      callApi.getData(
+        `?path=/indexs&limit=${limit}&offset=${offset}&query={"search_heading":"${state.bookSelected.book_name}"}`
+      ).then(res=>{
           let data = res.data
-          commit('SET_SARABUN_TOTAL', data.nitems)
           commit('SET_SARABUN', data.items)
+          commit('SET_OVERLAY', false)
+          if(!state.totalsSarabun)
+            commit('SET_SARABUN_TOTAL', data.nitems);
         })
         .catch(err => console.log(err))
     },
-    setPagenation({commit}, offset){
-      commit('SET_PAGENATION', offset)
-    }
+   
+
+    // clear state
+    clear({commit}){
+      commit('SET_TOTALS_INDEXS', 0)
+      commit('SET_INDEXS', [])
+      commit('SET_WORDS_SEARCH', [])
+      commit('SET_NOTFOUND', false)
+      commit('SET_SEARCH_RANDOM',[])
+    },
+    clearSarabun({commit}){
+      commit('SET_SARABUN', [])
+    },
+    clearTotalsSarabun({commit}){
+      commit('SET_SARABUN_TOTAL', 0)
+    },
+    
   },
   getters: {
     getTotalbooks(state){
@@ -147,37 +166,46 @@ export default new Vuex.Store({
     getBooks(state){
       return state.books
     },
+    
+
     getTotalIndexs(state){
       return state.totalsIndexs
     },
     getIndexs(state){
       return state.indexs
     },
+
     getoverlay(state){
       return state.overlay
     },
+
     getnotfound(state){
       return state.notfound
     },
     getwords_search(state){
       return state.words_search
     },
+
     getBookSelected(state){
       return state.bookSelected
     },
     getTotalSarabun(state){
       return state.totalsSarabun
     },
+
     getsearchrandom(state){
       return state.search_random
     },
+
     getSarabun(state){
-      // return state.sarabunSelected
-      let sarabuns = Array.from(new Set(state.sarabunSelected.map(book => book.search_index)))
-      .map(nameSarabun => {
-        return state.sarabunSelected.find(book => book.search_index === nameSarabun)
-      })
-      return sarabuns
+      //show duplicate
+      return state.sarabunSelected
+      //not duplicate
+      // let sarabuns = Array.from(new Set(state.sarabunSelected.map(book => book.search_index)))
+      // .map(nameSarabun => {
+      //   return state.sarabunSelected.find(book => book.search_index === nameSarabun)
+      // })
+      // return sarabuns
     },
   }
 })

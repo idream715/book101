@@ -1,40 +1,40 @@
 <template>
   <div class="indexs">
-     <v-container  >
+    <v-container  >
        
-         <v-row class="row" align="center" justify="center">
-           
-              <v-col cols="12" md="10" class="">
-                <v-combobox
-                  id="search_index"
-                  v-model="search__pageindex"
-                  :items="items"
-                  :search-input.sync="search"
-                  hide-selected
-                  hint="Maximum of 5 tags"
-                  label="Add some tags"
-                  multiple
-                  persistent-hint
-                  small-chips
-                >
-                  <template v-slot:no-data>
-                    <v-list-item>
-                      <v-list-item-content>
-                        <v-list-item-title>
-                          No results matching "<strong>{{ search }}</strong>". Press <kbd>enter</kbd> to create a new one
-                        </v-list-item-title>
-                      </v-list-item-content>
-                    </v-list-item>
-                  </template>
-                </v-combobox>
-              </v-col>
-              <v-col cols="12" md="2" class="">
-                <v-btn color="primary" outlined @click="clicksearch(getwords)" align="center" justify="center">
-                  <v-icon class="mb-2" >mdi-magnify</v-icon> <p class="mt-2">Search</p>
-                </v-btn>
-              </v-col>
+      <v-row class="row" align="center" justify="center">
             
-          </v-row>
+          <v-col cols="12" md="10" class="">
+            <v-combobox
+              id="search_index"
+              v-model="search__pageindex"
+              :items="items"
+              :search-input.sync="search"
+              hide-selected
+              hint="Maximum of 5 tags"
+              label="Add some tags"
+              multiple
+              persistent-hint
+              small-chips
+            >
+              <template v-slot:no-data>
+                <v-list-item>
+                  <v-list-item-content>
+                    <v-list-item-title>
+                      No results matching "<strong>{{ search }}</strong>". Press <kbd>enter</kbd> to create a new one
+                    </v-list-item-title>
+                  </v-list-item-content>
+                </v-list-item>
+              </template>
+            </v-combobox>
+          </v-col>
+          <v-col cols="12" md="2" class="">
+            <v-btn color="primary" outlined @click="clicksearch(getwords)" align="center" justify="center">
+              <v-icon class="mb-2" >mdi-magnify</v-icon> <p class="mt-2">Search</p>
+            </v-btn>
+          </v-col>
+        
+      </v-row>
 
        <v-row v-if="setoverlay===false">
          <v-col cols="6" align="start" justify="center">พบ {{getTotalIndexs}} รายการ</v-col>
