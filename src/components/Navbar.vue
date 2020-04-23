@@ -80,6 +80,10 @@
 
     </div>
 
+   <v-overlay v-if="setoverlay===true && on">
+      <v-progress-circular indeterminate size="64"></v-progress-circular>
+    </v-overlay>
+
     <v-dialog v-model="dialog" width="1000"  >
       <v-card v-for="(item,i) in random" :key="i" :value="item">
         <v-card-title class="headline lighten-2" primary-title>{{ item.search_index }}</v-card-title>
@@ -87,14 +91,11 @@
         <v-card-text style="font-size: 17px; white-space: pre-wrap;">{{ item.search_details }}</v-card-text>
         <v-card-actions>
           <v-spacer></v-spacer>
+          <v-btn color="primary" text @click="searchrandom">สุ่มเพิ่ม</v-btn>
           <v-btn color="primary" text @click="closs">ออก</v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
-
-   <v-overlay v-if="setoverlay===true && on">
-      <v-progress-circular indeterminate size="64"></v-progress-circular>
-    </v-overlay>
 
   </div> 
 </template>
@@ -154,12 +155,13 @@ export default {
 
     },
     searchrandom(){
+      this.$store.dispatch('clear')
       let number = Math.ceil(Math.random() *3548)
       this.$store.dispatch('setsearchrandom',number)
-      this.dialog=!this.dialog
+      this.dialog=true
     },
     closs(){
-      this.dialog=!this.dialog
+      this.dialog=false
       this.$store.dispatch('clear')
     },
     onScroll (e) {
