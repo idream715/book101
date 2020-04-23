@@ -71,7 +71,7 @@
               <v-icon>mdi-chevron-up</v-icon>
             </v-btn>
           </template>
-          <v-btn fab dark small color="blue darken-1" @click="$vuetify.goTo('#search_index')">
+          <v-btn fab dark small color="blue darken-1" >
             <v-icon>mdi-magnify</v-icon>
           </v-btn>
         </v-speed-dial>
