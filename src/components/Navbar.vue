@@ -120,6 +120,7 @@ export default {
       this.words_search = ''
       this.label_search = 'ค้นหาธรรมะหลวงพ่อ'
       this.$store.dispatch('clear')
+      this.$store.dispatch('getBookFromApi')
   },
   computed:{
     activeFab () {

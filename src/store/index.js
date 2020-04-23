@@ -125,13 +125,8 @@ export default new Vuex.Store({
       .catch(err => console.log(err))
     },
     setbook_index({commit},name){
-        let tag = `{"book_name":{"$regex":"${name}"}}`
-      callApi.getData(`?path=/books&limit=1&query={"$and":[${tag}]} `)
-        .then(res=>{
-          let data = res.data
-          commit('SET_BOOK_SELECTED', data.items)
-        })
-      .catch(err => console.log(err))
+        let data = this.state.books.filter(x=>x.book_name===name)
+          commit('SET_BOOK_SELECTED', data)
     },
       // PATH BOOKS
     setBookSelected({commit}, selected){
