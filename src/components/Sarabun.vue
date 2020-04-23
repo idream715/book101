@@ -49,41 +49,42 @@
 
             <v-card-text>
               <div> 
-                <v-data-table
-                  :loading="loading" 
-                  loading-text="Loading... Please wait"
-                  :headers="headers"
-                  :items="sarabunSelected"
-                  :page.sync="page"
-                  :items-per-page="itemsPerPage"
-                  hide-default-footer
-                  class="elevation-1 mt-3"
-                  dense
-                  >
-                  <template v-slot:top>
-                    <div class="title">ชุดหนังสือ{{bookSelected.book_category}} สารบัญ ({{sarabunTotal}}) </div> 
-                  </template> 
-                  
-                  <template v-slot:item.actions="{ item }">
-                    <v-btn 
-                      :href="item.link_pdf" 
-                      target="_blank" text icon>
-                      <v-icon color="red">
-                        mdi-file-pdf
-                      </v-icon>
-                      <!-- <span>PDF</span> -->
-                    </v-btn>
-                    <v-btn
-                      @click="readText(item.search_index,item.search_details)"
-                      text icon
-                      >
-                      <v-icon color="blue">
-                        mdi-book-open-page-variant
-                      </v-icon>
-                      <!-- <span>TEXT</span> -->
-                    </v-btn>
-                  </template>
-                </v-data-table>
+                
+                  <v-data-table
+                    :loading="loading" 
+                    loading-text="Loading... Please wait"
+                    :headers="headers"
+                    :items="sarabunSelected"
+                    :page.sync="page"
+                    :items-per-page="itemsPerPage"
+                    hide-default-footer
+                    class="elevation-1 mt-3"
+                    dense
+                    >
+                    <template v-slot:top>
+                      <div class="title ml-2">จำนวนสารบัญ {{sarabunTotal}} </div> 
+                    </template> 
+
+                    <template v-slot:item.actions="{ item }">
+                      <v-btn 
+                        :href="item.link_pdf" 
+                        target="_blank" text icon>
+                        <v-icon color="red">
+                          mdi-file-pdf
+                        </v-icon>
+                        <!-- <span>PDF</span> -->
+                      </v-btn>
+                      <v-btn
+                        @click="readText(item.search_index,item.search_details)"
+                        text icon
+                        >
+                        <v-icon color="blue">
+                          mdi-book-open-page-variant
+                        </v-icon>
+                        <!-- <span>TEXT</span> -->
+                      </v-btn>
+                    </template>
+                  </v-data-table>
                 
                 <div class="text-center pt-2">
                   <v-pagination 
@@ -155,16 +156,17 @@
         page_count:0,
         headers: [
           {
-            text: 'ชื่อสารบัญ',
+            text: 'สารบัญ',
             align: 'start',
             value: 'search_index',
             sortable: false,
           },
-          { text: 'อ่านแต่ละสารัญ', 
+          {
+            text: 'อ่าน', 
             value: 'actions',
             align: 'end',
-            sortable: false,},
-          
+            sortable: false,
+          },
         ],
         textSarabun:"",
         textDetail:``,
