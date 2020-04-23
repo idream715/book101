@@ -41,10 +41,7 @@
           <div class="d-flex align-center">
             <v-img alt="logo" class=" mt-2 hidden-sm" contain min-width="45"
               src="@/assets/logo1.png" width="45" />
-            <v-btn
-              text
-              router-link to="/"
-             >
+            <v-btn text router-link to="/">
               <h1 style="color:white;font-size:24px;">101's DOCTRINE</h1>
             </v-btn>
           </div>
@@ -53,7 +50,10 @@
         <v-btn icon router-link to="/" text >
           <v-icon>mdi-home</v-icon>
         </v-btn>
-        <v-btn icon router-link to="/Books" text >
+        <v-btn v-if="close" icon router-link to="/Books" text >
+          <v-icon>mdi-book</v-icon>
+        </v-btn>
+        <v-btn v-else icon router-link to="/Books" text >
           <v-icon>mdi-book-open-page-variant</v-icon>
         </v-btn>
       </v-app-bar>
@@ -71,13 +71,6 @@
           </v-btn>
         </v-speed-dial>
       </v-btn>
-
-      <v-tabs dark background-color="blue lighten-2" show-arrows class="Isearch-2">
-        <v-tabs-slide color="teal lighten-3"></v-tabs-slide>
-        <v-tab v-for="i in 20" :key="i" :href="'#tab-' + i">
-          TheBookCategory {{ i }}
-        </v-tab>
-      </v-tabs>
     </div>
 
     <v-dialog v-model="dialog" width="1000"  >
@@ -94,6 +87,8 @@
     <v-overlay v-model="setoverlay">
       <v-progress-circular indeterminate size="64"></v-progress-circular>
     </v-overlay>
+
+    
 
 
 
@@ -130,6 +125,12 @@ export default {
         return true
       }
         return false
+    },
+    close () {
+      if (this.$route.name === 'Indexs') {
+        return true
+      }
+        return false 
     },
     random(){
       return this.$store.getters.getsearchrandom
@@ -193,23 +194,6 @@ export default {
     height: 100vh;
     background-repeat: no-repeat;
     background-size: cover;
-  }
-
-  .Isearch{
-     position: relative;
-     top: 90px;
-     left: 25px;
-     width: 450px;
-  }
-  .Isearch-2{
-     position: relative;
-     top: 63px;
-  }
-
-  @media (min-width: 375px) {
-    .Isearch{
-     width: 325px;
-    }
   }
   
 </style>
