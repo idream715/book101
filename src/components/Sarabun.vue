@@ -10,10 +10,11 @@
           @keydown.esc="closeDialog"
           >
           <v-card tile>
-              <!-- :src="bookSelected.book_link_jpg" -->
+            <!-- :src="bookSelected.book_link_jpg" -->
             <v-toolbar
               dark
               color="primary"
+              src="https://images.unsplash.com/photo-1503455637927-730bce8583c0?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1950&q=80"
               dense
               >
               <v-btn
@@ -49,42 +50,41 @@
 
             <v-card-text>
               <div> 
-                
-                  <v-data-table
-                    :loading="loading" 
-                    loading-text="Loading... Please wait"
-                    :headers="headers"
-                    :items="sarabunSelected"
-                    :page.sync="page"
-                    :items-per-page="itemsPerPage"
-                    hide-default-footer
-                    class="elevation-1 mt-3"
-                    dense
-                    >
-                    <template v-slot:top>
-                      <div class="title ml-2">จำนวนสารบัญ {{sarabunTotal}} </div> 
-                    </template> 
+                <v-data-table
+                  :loading="loading" 
+                  loading-text="Loading... Please wait"
+                  :headers="headers"
+                  :items="sarabunSelected"
+                  :page.sync="page"
+                  :items-per-page="itemsPerPage"
+                  hide-default-footer
+                  class="elevation-1 mt-3"
+                  dense
+                  >
+                  <template v-slot:top>
+                    <div class="title ml-2">จำนวนสารบัญ {{sarabunTotal}} </div> 
+                  </template> 
 
-                    <template v-slot:item.actions="{ item }">
-                      <v-btn 
-                        :href="item.link_pdf" 
-                        target="_blank" text icon>
-                        <v-icon color="red">
-                          mdi-file-pdf
-                        </v-icon>
-                        <!-- <span>PDF</span> -->
-                      </v-btn>
-                      <v-btn
-                        @click="readText(item.search_index,item.search_details)"
-                        text icon
-                        >
-                        <v-icon color="blue">
-                          mdi-book-open-page-variant
-                        </v-icon>
-                        <!-- <span>TEXT</span> -->
-                      </v-btn>
-                    </template>
-                  </v-data-table>
+                  <template v-slot:item.actions="{ item }">
+                    <v-btn 
+                      :href="item.link_pdf" 
+                      target="_blank" text icon>
+                      <v-icon color="red">
+                        mdi-file-pdf
+                      </v-icon>
+                      <!-- <span>PDF</span> -->
+                    </v-btn>
+                    <v-btn
+                      @click="readText(item.search_index,item.search_details)"
+                      text icon
+                      >
+                      <v-icon color="blue">
+                        mdi-book-open-page-variant
+                      </v-icon>
+                      <!-- <span>TEXT</span> -->
+                    </v-btn>
+                  </template>
+                </v-data-table>
                 
                 <div class="text-center pt-2">
                   <v-pagination 
