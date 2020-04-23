@@ -26,6 +26,7 @@ export default new Vuex.Store({
     SET_TOTALS_BOOKS(state, payload){
       state.totalsBooks = payload
     },
+    
     SET_INDEXS(state, payload){
       state.indexs = payload
     },
@@ -84,37 +85,33 @@ export default new Vuex.Store({
         tags.push(tag)
       });
       commit('SET_OVERLAY', true)
-
       callApi.getData(`?path=/indexs&limit=10&offset=${page}&query={"$and":[${tags}]} `)
       .then(res=>{
         let data = res.data
-        console.log(data.items.length)
         if(data.items.length===0){commit('SET_NOTFOUND', true)}else{commit('SET_NOTFOUND', false)}
         commit('SET_OVERLAY', false)
         commit('SET_TOTALS_INDEXS', data.nitems)
         let details = data.items.map(x=>x.search_details)
         let index = data.items.map(x=>x.search_index)
-        function marks(array){        
+        function marks(array1,array2){        
           let marks = []
-          array.forEach(index => {
+          array1.forEach(index => {
             let render = index
-            words.forEach(word=>{
+            array2.forEach(word=>{
               render = render.replace(word,`<mark>${word}</mark>`)
             })
             marks.push(render)
           })
           return marks
         }
-        let indexmarked =  marks(index)
-        let detailsmarked = marks(details) 
-          
+        let indexmarked =  marks(index,words)
+        let detailsmarked = marks(details,words)  
         data.items.forEach((item,i) =>{
           item["mark_index"]= indexmarked[i]
           item["mark_details"]= detailsmarked[i]
         })
         commit('SET_INDEXS', data.items)
-        })
-        .catch(err => console.log(err))
+        }).catch(err => console.log(err))
     },
     setsearchrandom({ commit },number){
       commit('SET_OVERLAY', true)
@@ -131,10 +128,10 @@ export default new Vuex.Store({
     setBookSelected({commit}, selected){
       commit('SET_BOOK_SELECTED', selected)
     },
-    setPagenation({commit, state}, {limit, offset}){
+    setPagenation({commit, state}, {limit, offset, book_name}){
       commit('SET_OVERLAY', true)
       callApi.getData(
-        `?path=/indexs&limit=${limit}&offset=${offset}&query={"search_heading":"${state.bookSelected.book_name}"}`
+        `?path=/indexs&limit=${limit}&offset=${offset}&query={"search_heading":"${book_name}"}`
       ).then(res=>{
           let data = res.data
           commit('SET_SARABUN', data.items)
@@ -144,6 +141,7 @@ export default new Vuex.Store({
         })
         .catch(err => console.log(err))
     },
+   
 
     // clear state
     clear({commit}){
@@ -168,30 +166,37 @@ export default new Vuex.Store({
     getBooks(state){
       return state.books
     },
+    
+
     getTotalIndexs(state){
       return state.totalsIndexs
     },
     getIndexs(state){
       return state.indexs
     },
+
     getoverlay(state){
       return state.overlay
     },
+
     getnotfound(state){
       return state.notfound
     },
     getwords_search(state){
       return state.words_search
     },
+
     getBookSelected(state){
       return state.bookSelected
     },
     getTotalSarabun(state){
       return state.totalsSarabun
     },
+
     getsearchrandom(state){
       return state.search_random
     },
+
     getSarabun(state){
       //show duplicate
       return state.sarabunSelected

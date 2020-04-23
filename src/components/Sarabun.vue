@@ -10,10 +10,11 @@
           @keydown.esc="closeDialog"
           >
           <v-card tile>
-              <!-- :src="bookSelected.book_link_jpg" -->
+            <!-- :src="bookSelected.book_link_jpg" -->
             <v-toolbar
               dark
               color="primary"
+              src="https://images.unsplash.com/photo-1503455637927-730bce8583c0?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1950&q=80"
               dense
               >
               <v-btn
@@ -26,7 +27,7 @@
                   {{bookSelected.book_name}}
                 </v-toolbar-title>
                 <v-spacer></v-spacer>
-                <span>อ่านทั้งเล่ม</span>
+                <span v-if="$vuetify.breakpoint.smAndUp">อ่านทั้งเล่ม</span>
                 <v-toolbar-items>
                   <v-btn
                     text
@@ -34,7 +35,7 @@
                     target="_blank"
                   >
                     <v-icon>mdi-file-pdf</v-icon>
-                    PDF
+                    <div v-if="$vuetify.breakpoint.smAndUp">PDF</div> 
                   </v-btn>
                   <v-btn
                     text
@@ -42,7 +43,7 @@
                     target="_blank"
                   >
                     <v-icon class="mr-1">mdi-book-open-page-variant</v-icon>
-                    TEXT
+                    <div v-if="$vuetify.breakpoint.smAndUp">TEXT</div> 
                   </v-btn>
                 </v-toolbar-items>
             </v-toolbar>
@@ -61,8 +62,8 @@
                   dense
                   >
                   <template v-slot:top>
-                    <div class="title">สารบัญ ({{sarabunTotal}}) </div> 
-                  </template>
+                    <div class="title ml-2">จำนวนสารบัญ {{sarabunTotal}} </div> 
+                  </template> 
 
                   <template v-slot:item.actions="{ item }">
                     <v-btn 
@@ -89,7 +90,6 @@
                   <v-pagination 
                     v-model="page" 
                     :length="pages"
-                    circle
                   ></v-pagination>
                 </div>
               </div>
@@ -119,9 +119,9 @@
                 text
                 @click.stop.prevent="copyTextDetail"
               >
-                คัดลอก
+                {{word_copy}}
               </v-btn>
-              <input type="hidden" id="textDetail" :value="textDetail">
+              <input type="hidden" id="textDetail" :value="textSarabun+' '+textDetail">
               <v-btn
                 color="primary"
                 text
@@ -156,19 +156,21 @@
         page_count:0,
         headers: [
           {
-            text: 'ชื่อสารบัญ',
+            text: 'สารบัญ',
             align: 'start',
             value: 'search_index',
             sortable: false,
           },
-          { text: 'อ่านแต่ละสารัญ', 
+          {
+            text: 'อ่าน', 
             value: 'actions',
             align: 'end',
-            sortable: false,},
-          
+            sortable: false,
+          },
         ],
         textSarabun:"",
         textDetail:``,
+        word_copy:'คัดลอก',
       }
     },
     watch: {
@@ -187,6 +189,7 @@
     methods: {
       closeDialog(){
         this.$emit('emitFalse',false)
+        this.page = 1
         this.$store.dispatch('clearSarabun')
         this.$store.dispatch('clearTotalsSarabun')
       },
@@ -194,6 +197,7 @@
         this.dialogReadText = !this.dialogReadText
         this.textSarabun = sarabun
         this.textDetail = detail
+        this.word_copy = 'คัดลอก'
       },
       copyTextDetail () {
         let textDetailToCopy = document.querySelector('#textDetail')
@@ -202,8 +206,8 @@
 
         try {
           var successful = document.execCommand('copy');
-          var msg = successful ? 'successful' : 'unsuccessful';
-          alert('copdied '+ msg);
+          var msg = successful ? 'คัดลอกแล้ว' : 'คัดลอกไม่สำเร็จ';
+          this.word_copy = `${msg}`
         } catch (err) {
         alert('Oops, unable to copy');
         }

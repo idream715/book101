@@ -24,6 +24,7 @@ Vue.use(VueRouter)
     component: () => import(/* webpackChunkName: "about" */ '../views/Books.vue')
   },
   {
+<<<<<<< HEAD
     path: '/about',
     name: 'About',
     // route level code-splitting
@@ -32,6 +33,13 @@ Vue.use(VueRouter)
     component: () => import(/* webpackChunkName: "about" */ '../views/About.vue')
   },
   
+=======
+    path: '/book/:book_name',
+    name: 'Sarabun',
+    component: () => import('@/views/Sarabun.vue'),
+    props: true
+  },
+>>>>>>> 7d29412df782c55ba55d6b0ef2b2db0b4da0ad43
 ]
 
 const router = new VueRouter({
