@@ -224,7 +224,7 @@ export default {
       },
        clickedSendbook(bookname2) {
         this.$store.dispatch('setbook_index',bookname2)
-        this.$store.dispatch('setPagenation',{limit:12, offset:0,bookname:bookname2})
+        this.$store.dispatch('setPagenation',{limit:12, offset:0,book_name:bookname2})
         this.$router.push({ path: `/book/${bookname2}` })
       },
   },
