@@ -128,10 +128,10 @@ export default new Vuex.Store({
     setBookSelected({commit}, selected){
       commit('SET_BOOK_SELECTED', selected)
     },
-    setPagenation({commit, state}, {limit, offset}){
+    setPagenation({commit, state}, {limit, offset, book_name}){
       commit('SET_OVERLAY', true)
       callApi.getData(
-        `?path=/indexs&limit=${limit}&offset=${offset}&query={"search_heading":"${state.bookSelected.book_name}"}`
+        `?path=/indexs&limit=${limit}&offset=${offset}&query={"search_heading":"${book_name}"}`
       ).then(res=>{
           let data = res.data
           commit('SET_SARABUN', data.items)

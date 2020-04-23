@@ -1,5 +1,5 @@
 <template>
-  <div class="about">
+  <div class="books">
       <v-container>
         
         <v-overlay v-model="loading">
@@ -99,7 +99,6 @@ export default {
       }else{
         return this.books
       }
-      
     },
     loading(){
       return this.$store.getters.getoverlay     
@@ -112,8 +111,11 @@ export default {
   methods: {
     bookSelect(selected){
       this.$store.dispatch('setBookSelected', selected)
-      this.$store.dispatch('setPagenation', {limit:50, offset:0})
-      this.openDialog = !this.openDialog
+      this.$store.dispatch('setPagenation', {limit:12, offset:0, book_name:selected.book_name})
+      // this.openDialog = !this.openDialog
+      this.$router.push({ path: `/book/${selected.book_name}`})
+      // let openBook = this.$router.resolve({path: `/book/${selected.book_name}`});
+      // window.open(openBook.href, '_blank');
     },
     setOpenDialog(val){
       this.openDialog = val

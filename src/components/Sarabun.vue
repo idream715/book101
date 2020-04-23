@@ -170,7 +170,7 @@
         ],
         textSarabun:"",
         textDetail:``,
-        word_copy:'คัดลอก'
+        word_copy:'คัดลอก',
       }
     },
     watch: {

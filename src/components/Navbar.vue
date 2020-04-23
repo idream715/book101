@@ -55,10 +55,10 @@
           </div>
         </v-toolbar-title>
         <v-spacer></v-spacer>
-        <v-btn icon router-link to="/" text >
+        <v-btn icon router-link to="/" text @click="clearBook">
           <v-icon>mdi-home</v-icon>
         </v-btn>
-        <v-btn icon router-link to="/Books" text >
+        <v-btn icon router-link to="/Books" text @click="clearBook">
           <v-icon>mdi-book-open-page-variant</v-icon>
         </v-btn>
       </v-app-bar>
@@ -168,7 +168,13 @@ export default {
     },
     toTop () {
       this.$vuetify.goTo(0)
-    }
+    },
+    clearBook(){
+      this.$emit('emitFalse',false)
+      this.page = 1
+      this.$store.dispatch('clearSarabun')
+      this.$store.dispatch('clearTotalsSarabun')
+    },
   },
   watch:{
     words_search (val) {
