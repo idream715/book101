@@ -15,8 +15,8 @@
               <v-list-item>
                 <v-list-item-content>
                   <v-list-item-title align="center" justify="center">
-                    "<strong>{{ search }}</strong>". Press <kbd>enter</kbd> 
-                    <v-btn  class="ml-4 " dark color="blue lighten-1" @click="clicksearch"><v-icon >mdi-magnify</v-icon></v-btn>
+                    "<strong>{{ search }}</strong>"กรุณากดปุ่ม <kbd>enter</kbd> 
+                    <v-btn  class="ml-4 " dark color="blue lighten-1" @click="clicksearch_home"><v-icon >mdi-magnify</v-icon></v-btn>
                   </v-list-item-title>
                 </v-list-item-content>
               </v-list-item>
@@ -71,7 +71,7 @@
               <v-icon>mdi-chevron-up</v-icon>
             </v-btn>
           </template>
-          <v-btn fab dark small color="blue darken-1" @click="$vuetify.goTo('#search_index')">
+          <v-btn fab dark small color="blue darken-1" >
             <v-icon>mdi-magnify</v-icon>
           </v-btn>
         </v-speed-dial>
@@ -80,6 +80,10 @@
 
     </div>
 
+   <v-overlay v-if="setoverlay===true && on">
+      <v-progress-circular indeterminate size="64"></v-progress-circular>
+    </v-overlay>
+
     <v-dialog v-model="dialog" width="1000"  >
       <v-card v-for="(item,i) in random" :key="i" :value="item">
         <v-card-title class="headline lighten-2" primary-title>{{ item.search_index }}</v-card-title>
@@ -87,14 +91,11 @@
         <v-card-text style="font-size: 17px; white-space: pre-wrap;">{{ item.search_details }}</v-card-text>
         <v-card-actions>
           <v-spacer></v-spacer>
+          <v-btn color="primary" text @click="searchrandom">สุ่มเพิ่ม</v-btn>
           <v-btn color="primary" text @click="closs">ออก</v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
-
-   <v-overlay v-if="setoverlay===true && on">
-      <v-progress-circular indeterminate size="64"></v-progress-circular>
-    </v-overlay>
 
   </div> 
 </template>
@@ -116,8 +117,9 @@ export default {
 
   }),
   created(){
-    this.label_search = 'ค้นหาธรรมะหลวงพ่อ'
-    this.$store.dispatch('clear')
+      this.words_search = ''
+      this.label_search = 'ค้นหาธรรมะหลวงพ่อ'
+      this.$store.dispatch('clear')
   },
   computed:{
     activeFab () {
@@ -144,21 +146,22 @@ export default {
   },
 
   methods:{
-    clicksearch(){
+    clicksearch_home(){
       if(this.words_search===''){
         this.label_search = 'กรุณาใสคำที่ต้องการค้นหา'
       }else{
-        this.$store.dispatch('setFirstIndexsFromApi',{words:this.words_search,page:"0"})
         this.$router.push('/Indexs')}
-        
+        this.$store.dispatch('setFirstIndexsFromApi',{words:this.words_search,page:"0"})
+
     },
     searchrandom(){
-      let number = Math.ceil(Math.random() *3000)
+      this.$store.dispatch('clear')
+      let number = Math.ceil(Math.random() *3548)
       this.$store.dispatch('setsearchrandom',number)
-      this.dialog=!this.dialog
+      this.dialog=true
     },
     closs(){
-      this.dialog=!this.dialog
+      this.dialog=false
       this.$store.dispatch('clear')
     },
     onScroll (e) {

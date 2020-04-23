@@ -69,15 +69,15 @@
             <v-card  height="" flat>
                 <v-col cols="12" class="pa-1">
                   <v-card-text class="pa-1">
-                    <v-list-item-title class="headline mb-5" v-html="text_render(index.mark_index)"></v-list-item-title>
-                    <v-list-item-title class="grey--text">จากหนังสือ:{{index.search_heading}}</v-list-item-title>
+                    <v-list-item-title class="headline mb-5" v-html="index.mark_index"></v-list-item-title>
+                    <v-list-item-title class="grey--text"><v-btn text @click="clickedSendbook(index.search_heading)">จากหนังสือ:{{index.search_heading}}</v-btn></v-list-item-title>
                     <p v-html="text_render(index.mark_details)"></p>
                   </v-card-text>
                 </v-col>
                 <v-col cols="12" class="pa-1">
                   <v-card-actions class="d-flex justify-end pa-1">
                      <v-btn text color="orange" style="margin-right:10px;" target="_blank" :href="index.link_pdf">PDF</v-btn>
-                     <v-btn text color="red lighten-2" @click="dialogs(index.search_index,index.search_details)">Read All</v-btn>
+                     <v-btn text color="red lighten-2" @click="dialogs(index.search_index,index.search_details,index.mark_details)">Read All</v-btn>
                   </v-card-actions>
                 </v-col>
             </v-card><hr>
@@ -86,7 +86,7 @@
           <v-dialog v-model="dialog" width="1500"  >
             <v-card>
               <v-card-title class="headline lighten-2">{{head_content}}</v-card-title>
-                <v-card-text style="font-size: 17px; white-space: pre-wrap; ">{{content}}</v-card-text>
+                <v-card-text v-html="content_copy" style="font-size: 17px; white-space: pre-wrap;" ></v-card-text>
               <v-card-actions>
                 <v-spacer></v-spacer>
                 <v-btn color="primary" text @click.stop.prevent="copyTextDetail">{{word_copy}}</v-btn>
@@ -130,6 +130,7 @@ export default {
       return {
         dialog: false,
         content:"",
+        content_copy:"",
         head_content:"",
         search:"",
         page:1,
@@ -169,9 +170,10 @@ export default {
     }
   },
   methods:{
-    dialogs(head,content){
+    dialogs(head,content,content_copy){
       this.dialog=!this.dialog
       this.content=content
+      this.content_copy=content_copy
       this.head_content=head
     },
     closs(){
@@ -183,9 +185,19 @@ export default {
     text_render(input){
        let text = input.split("html")
        if(text.length>1){
-         return input.split("html").slice(1).join(' ')
+        let t = input.split("html").slice(1).join(' ')
+        let b = t.replace('<mark>',`$<mark>`)
+        let s = b.split("$")
+        console.log(s)
+        let x = s[0].split(" ")
+        let value =`${x[x.length-1]}${s[1]}`
+        return value
        }else{
-         return input
+        let b = input.replace('<mark>',`$<mark>`)
+        let s = b.split("$")
+        let x = s[0].split(" ")
+        let value =`${x[x.length-1]}${s[1]}`
+        return value
        }
     },
     clicksearch(input){
@@ -209,6 +221,11 @@ export default {
         /* unselect the range */
         textDetailToCopy.setAttribute('type', 'hidden')
         window.getSelection().removeAllRanges()
+      },
+       clickedSendbook(bookname2) {
+        this.$store.dispatch('setbook_index',bookname2)
+        this.$store.dispatch('setPagenation',{limit:12, offset:0,bookname:bookname2})
+        this.$router.push({ path: `/book/${bookname2}` })
       },
   },
    watch: {
