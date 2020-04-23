@@ -1,7 +1,6 @@
 <template>
   <div>
     <!-- หน้า Home -->
-<<<<<<< HEAD
     <div v-if="on" class="homep" align="center">
       <div v-if="opn" align="end">
         <v-btn dark router-link to="/Books" text>
@@ -77,40 +76,6 @@
         </v-row>
       </div>
       
-=======
-    <div v-if="on" class="homep d-flex" align="center">
-      <v-row align="center" justify="center">
-        <v-col cols="4" sm="8" md="2">
-            <v-img alt="logo" contain min-width="150" 
-            src="@/assets/logo1.png" width="45" />
-        </v-col>
-        <v-col cols="10" sm="8" md="4">
-          <h1 style="color:white">101's DOCTRINE</h1>
-          <v-combobox v-model="words_search" :items="items" :search-input.sync="search" hide-selected hint="Maximum of 5 tags"
-            :label="label_search" multiple persistent-hint chips solo>
-            <template v-slot:no-data>
-              <v-list-item>
-                <v-list-item-content>
-                  <v-list-item-title align="center" justify="center">
-                    "<strong>{{ search }}</strong>". Press <kbd>enter</kbd> 
-                    <v-btn  class="ml-4 " dark color="blue lighten-1" @click="clicksearch"><v-icon >mdi-magnify</v-icon></v-btn>
-                  </v-list-item-title>
-                </v-list-item-content>
-              </v-list-item>
-            </template>
-          </v-combobox>
-          <v-btn @click="searchrandom" class="mr-8" dark color="red">
-            <v-icon class="mr-2">mdi-card-text</v-icon>
-            สุ่มอ่านธรรมะ
-          </v-btn>
-            
-          <v-btn dark color="blue" router-link to="/Books">
-            <v-icon class="mr-2">mdi-book-open-page-variant</v-icon>
-            หนังสือธรรมะ
-          </v-btn>
-        </v-col>
-      </v-row>
->>>>>>> 7d29412df782c55ba55d6b0ef2b2db0b4da0ad43
     </div>
     
     <!-- แถบ app-bar -->
@@ -133,14 +98,10 @@
         <v-btn icon router-link to="/" text @click="clearBook">
           <v-icon>mdi-home</v-icon>
         </v-btn>
-<<<<<<< HEAD
         <v-btn v-if="close" icon router-link to="/Books" text >
           <v-icon>mdi-book</v-icon>
         </v-btn>
         <v-btn v-else icon router-link to="/Books" text >
-=======
-        <v-btn icon router-link to="/Books" text @click="clearBook">
->>>>>>> 7d29412df782c55ba55d6b0ef2b2db0b4da0ad43
           <v-icon>mdi-book-open-page-variant</v-icon>
         </v-btn>
       </v-app-bar>
@@ -158,11 +119,6 @@
           </v-btn>
         </v-speed-dial>
       </v-btn>
-<<<<<<< HEAD
-=======
-
-
->>>>>>> 7d29412df782c55ba55d6b0ef2b2db0b4da0ad43
     </div>
 
     <v-dialog v-model="dialog" width="1000"  >
@@ -181,15 +137,11 @@
       <v-progress-circular indeterminate size="64"></v-progress-circular>
     </v-overlay>
 
-<<<<<<< HEAD
     
 
 
 
   </div>
-=======
-  </div> 
->>>>>>> 7d29412df782c55ba55d6b0ef2b2db0b4da0ad43
 </template>
 
 <script>
@@ -203,15 +155,8 @@ export default {
     search: null,
     items: [],
     dialog: false,
-<<<<<<< HEAD
     group: null,
     model: '',
-=======
-    words_search:'',
-    label_search:'ค้นหาธรรมะหลวงพ่อ',
-
-
->>>>>>> 7d29412df782c55ba55d6b0ef2b2db0b4da0ad43
   }),
   created(){
     this.label_search = 'ค้นหาธรรมะหลวงพ่อ'
