@@ -1,12 +1,12 @@
 <template>
-  <div class="about">
+  <div class="books">
       <v-container>
         
         <v-overlay v-model="loading">
           <v-progress-circular indeterminate size="64"></v-progress-circular>
         </v-overlay>
 
-        <v-card>
+        <v-card flat class="mt-3">
           <v-container fluid>
             <v-row
               align="center"
@@ -21,15 +21,14 @@
                 ></v-autocomplete>
               </v-col>
               <v-col cols="2" md="2" class="mb-8">
-                <v-btn 
-                  color="primary" 
-                  v-if="filBookCategoty"
-                  outlined 
-                  @click="filBookCategoty = null" 
-                  >
-                  <p class="mt-2">ยกเลิก</p>
-                  <v-icon class="mb-1" right>mdi-close-circle</v-icon> 
-                </v-btn>
+                  <v-icon 
+                    color="primary" 
+                    v-if="filBookCategoty"
+                    outlined 
+                    @click="filBookCategoty = null" 
+                    >
+                    mdi-filter-remove
+                  </v-icon> 
               </v-col>
             </v-row>
           </v-container>
@@ -45,7 +44,7 @@
             xl="1"
             > 
             <v-card 
-              class="mx-auto ma-5 " 
+              class="mx-auto" 
               max-width="160"
               @click="bookSelect(n)"
               >
@@ -100,7 +99,6 @@ export default {
       }else{
         return this.books
       }
-      
     },
     loading(){
       return this.$store.getters.getoverlay     
@@ -113,8 +111,11 @@ export default {
   methods: {
     bookSelect(selected){
       this.$store.dispatch('setBookSelected', selected)
-      this.$store.dispatch('setPagenation', {limit:50, offset:0})
-      this.openDialog = !this.openDialog
+      this.$store.dispatch('setPagenation', {limit:12, offset:0, book_name:selected.book_name})
+      // this.openDialog = !this.openDialog
+      this.$router.push({ path: `/book/${selected.book_name}`})
+      // let openBook = this.$router.resolve({path: `/book/${selected.book_name}`});
+      // window.open(openBook.href, '_blank');
     },
     setOpenDialog(val){
       this.openDialog = val

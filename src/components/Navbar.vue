@@ -1,38 +1,81 @@
 <template>
   <div>
     <!-- หน้า Home -->
-    <div v-if="on" class="homep d-flex" align="center">
-      <v-row align="center" justify="center">
-        <v-col cols="4" sm="8" md="2">
-            <v-img alt="logo" contain min-width="150" 
-            src="@/assets/logo1.png" width="45" />
-        </v-col>
-        <v-col cols="10" sm="8" md="4">
-          <h1 style="color:white">101's DOCTRINE</h1>
-          <v-combobox v-model="words_search" :items="items" :search-input.sync="search" hide-selected hint="Maximum of 5 tags"
-            :label="label_search" multiple persistent-hint chips solo>
-            <template v-slot:no-data>
-              <v-list-item>
-                <v-list-item-content>
-                  <v-list-item-title align="center" justify="center">
-                    "<strong>{{ search }}</strong>"กรุณากดปุ่ม <kbd>enter</kbd> 
-                    <v-btn  class="ml-4 " dark color="blue lighten-1" @click="clicksearch_home"><v-icon >mdi-magnify</v-icon></v-btn>
+    <div v-if="on" class="homep" align="center">
+      <div v-if="opn" align="end">
+        <v-btn dark router-link to="/Books" text>
+          <v-icon class="mr-2"></v-icon>หนังสือธรรมะ
+        </v-btn>
+        <v-btn dark router-link to="/Books" text>
+          <v-icon class="mr-2"></v-icon>ค้นหารูป
+        </v-btn>
+        <v-btn dark router-link to="/About" text>
+          <v-icon class="mr-2"></v-icon>เกี่ยวกับ
+        </v-btn>
+      </div>
+      <div v-else align="end" class="mr-5">
+          <v-app-bar-nav-icon dark @click.stop="drawer = !drawer"></v-app-bar-nav-icon>
+          <v-navigation-drawer v-model="drawer" absolute right temporary color="blue lighten-2">
+            <v-list nav dense>
+              <v-list-item-group align="start" v-model="group">
+                <v-list-item>
+                  <v-list-item-title>
+                    <v-btn dark router-link to="/Books" text>
+                      <v-icon class="mr-2"></v-icon><v-icon class="mr-4">mdi-book-open-page-variant</v-icon>หนังสือธรรมะ
+                    </v-btn>
                   </v-list-item-title>
-                </v-list-item-content>
-              </v-list-item>
-            </template>
-          </v-combobox>
-          <v-btn @click="searchrandom" class="mr-8" dark color="red">
-            <v-icon class="mr-2">mdi-card-text</v-icon>
-            สุ่มอ่านธรรมะ
-          </v-btn>
-            
-          <v-btn dark color="blue" router-link to="/Books">
-            <v-icon class="mr-2">mdi-book-open-page-variant</v-icon>
-            หนังสือธรรมะ
-          </v-btn>
-        </v-col>
-      </v-row>
+                </v-list-item>
+                <v-list-item>
+                  <v-list-item-title>
+                    <v-btn dark router-link to="/Books" text>
+                      <v-icon class="mr-2"></v-icon><v-icon class="mr-4">mdi-view-carousel</v-icon>ค้นหาการ์ด
+                    </v-btn>
+                  </v-list-item-title>
+                </v-list-item>
+                <v-list-item>
+                  <v-list-item-title>
+                    <v-btn dark router-link to="/About" text>
+                      <v-icon class="mr-2"></v-icon><v-icon class="mr-4">mdi-account-circle</v-icon>เกี่ยวกับ
+                    </v-btn>
+                  </v-list-item-title>
+                </v-list-item>
+              </v-list-item-group>
+            </v-list>
+          </v-navigation-drawer>
+      </div>
+      
+      <div class="d-flex" align="center" justify="center">
+        <v-row align="center" justify="center">
+          <v-col cols="12">
+            <v-img class="mt-8" alt="logo" contain min-width="150" 
+              src="@/assets/logo1.png" width="45" />
+            <h1 style="color:white" class="mt-8">คำสอนคุณครูไม่ใหญ่</h1>
+          </v-col>
+          <v-col cols="12">
+            <v-combobox v-model="model" :items="items" :search-input.sync="search" hide-selected hint="สูงสุด 5 เเท็ก"
+              label="Search" multiple persistent-hint chips solo style="width:325px;">
+              <template v-slot:no-data>
+                <v-list-item>
+                  <v-list-item-content>
+                    <v-list-item-title align="center" justify="center">
+                      "<strong>{{ search }}</strong>". Press <kbd>enter</kbd> 
+                      <v-btn class="ml-4" dark color="blue lighten-1" @click="clicksearch"><v-icon >mdi-magnify</v-icon></v-btn>
+                    </v-list-item-title>
+                  </v-list-item-content>
+                </v-list-item>
+              </template>
+            </v-combobox>
+          </v-col>
+          <v-col cols="12" sm="1">
+            <v-btn @click="searchrandom" class="mr-8 mb-4" dark color="blue lighten-1">อ่านอะไรดี</v-btn>
+          </v-col> 
+          <v-col cols="12" sm="1">
+            <v-btn @click="searchrandom" class="mr-8 mb-4" dark color="blue lighten-1">อ่านอะไรดี</v-btn>
+          </v-col> 
+           
+        </v-row>
+      </div>
+      
     </div>
     
     <!-- แถบ app-bar -->
@@ -46,19 +89,19 @@
           <div class="d-flex align-center">
             <v-img alt="logo" class=" mt-2 hidden-sm" contain min-width="45"
               src="@/assets/logo1.png" width="45" />
-            <v-btn
-              text
-              router-link to="/"
-             >
+            <v-btn text router-link to="/">
               <h1 style="color:white;font-size:24px;">101's DOCTRINE</h1>
             </v-btn>
           </div>
         </v-toolbar-title>
         <v-spacer></v-spacer>
-        <v-btn icon router-link to="/" text >
+        <v-btn icon router-link to="/" text @click="clearBook">
           <v-icon>mdi-home</v-icon>
         </v-btn>
-        <v-btn icon router-link to="/Books" text >
+        <v-btn v-if="close" icon router-link to="/Books" text >
+          <v-icon>mdi-book</v-icon>
+        </v-btn>
+        <v-btn v-else icon router-link to="/Books" text >
           <v-icon>mdi-book-open-page-variant</v-icon>
         </v-btn>
       </v-app-bar>
@@ -76,8 +119,6 @@
           </v-btn>
         </v-speed-dial>
       </v-btn>
-
-
     </div>
 
    <v-overlay v-if="setoverlay===true && on">
@@ -97,7 +138,15 @@
       </v-card>
     </v-dialog>
 
-  </div> 
+   <v-overlay v-if="setoverlay===true && on">
+      <v-progress-circular indeterminate size="64"></v-progress-circular>
+    </v-overlay>
+
+    
+
+
+
+  </div>
 </template>
 
 <script>
@@ -111,10 +160,8 @@ export default {
     search: null,
     items: [],
     dialog: false,
-    words_search:'',
-    label_search:'ค้นหาธรรมะหลวงพ่อ',
-
-
+    group: null,
+    model: '',
   }),
   created(){
       this.words_search = ''
@@ -136,6 +183,16 @@ export default {
         return true
       }
         return false
+    },
+    close () {
+      if (this.$route.name === 'Indexs') {
+        return true
+      }
+        return false 
+    },
+    opn () {
+      console.log (!this.$vuetify.breakpoint.xsOnly)
+      return !this.$vuetify.breakpoint.xsOnly
     },
     random(){
       return this.$store.getters.getsearchrandom
@@ -172,7 +229,13 @@ export default {
     },
     toTop () {
       this.$vuetify.goTo(0)
-    }
+    },
+    clearBook(){
+      this.$emit('emitFalse',false)
+      this.page = 1
+      this.$store.dispatch('clearSarabun')
+      this.$store.dispatch('clearTotalsSarabun')
+    },
   },
   watch:{
     words_search (val) {
@@ -180,6 +243,9 @@ export default {
         // หน้า home
         this.$nextTick(() => this.words_search.pop()) 
       }
+    },
+    group () {
+      this.drawer = false
     },
   },
 };
@@ -203,23 +269,6 @@ export default {
     height: 100vh;
     background-repeat: no-repeat;
     background-size: cover;
-  }
-
-  .Isearch{
-     position: relative;
-     top: 90px;
-     left: 25px;
-     width: 450px;
-  }
-  .Isearch-2{
-     position: relative;
-     top: 63px;
-  }
-
-  @media (min-width: 375px) {
-    .Isearch{
-     width: 325px;
-    }
   }
   
 </style>

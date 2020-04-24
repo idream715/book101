@@ -10,10 +10,11 @@
           @keydown.esc="closeDialog"
           >
           <v-card tile>
-              <!-- :src="bookSelected.book_link_jpg" -->
+            <!-- :src="bookSelected.book_link_jpg" -->
             <v-toolbar
               dark
               color="primary"
+              src="https://images.unsplash.com/photo-1503455637927-730bce8583c0?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1950&q=80"
               dense
               >
               <v-btn
@@ -61,9 +62,9 @@
                   dense
                   >
                   <template v-slot:top>
-                    <div class="title">ชุดหนังสือ{{bookSelected.book_category}} สารบัญ ({{sarabunTotal}}) </div> 
+                    <div class="title ml-2">จำนวนสารบัญ {{sarabunTotal}} </div> 
                   </template> 
-                  
+
                   <template v-slot:item.actions="{ item }">
                     <v-btn 
                       :href="item.link_pdf" 
@@ -155,20 +156,21 @@
         page_count:0,
         headers: [
           {
-            text: 'ชื่อสารบัญ',
+            text: 'สารบัญ',
             align: 'start',
             value: 'search_index',
             sortable: false,
           },
-          { text: 'อ่านแต่ละสารัญ', 
+          {
+            text: 'อ่าน', 
             value: 'actions',
             align: 'end',
-            sortable: false,},
-          
+            sortable: false,
+          },
         ],
         textSarabun:"",
         textDetail:``,
-        word_copy:'คัดลอก'
+        word_copy:'คัดลอก',
       }
     },
     watch: {
