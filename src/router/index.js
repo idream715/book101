@@ -24,6 +24,12 @@ Vue.use(VueRouter)
     component: () => import(/* webpackChunkName: "about" */ '../views/Books.vue')
   },
   {
+    path: '/book/:book_name',
+    name: 'Book',
+    component: () => import('../views/Sarabun.vue'),
+    props:true
+  },
+  {
     path: '/about',
     name: 'About',
     // route level code-splitting
