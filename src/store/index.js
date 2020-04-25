@@ -162,11 +162,11 @@ export default new Vuex.Store({
     setbook_index({commit},name){
       let tag = `{"book_name":{"$regex":"${name}"}}`
       commit('SET_OVERLAY', true)
-      callApi.getData(`?path=/books&limit=1&offset=0&query={[${tag}]} `)
+      callApi.getData(`?path=/books&limit=1&offset=0&query={"$and":[${tag}]}`)
         .then(res=>{
           let data = res.data
           commit('SET_OVERLAY', false)
-          commit('SET_BOOK_SELECTED', data.items)
+          commit('SET_BOOK_SELECTED', data.items[0])
         })
         .catch(err => console.log(err))
     },

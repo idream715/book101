@@ -67,14 +67,13 @@
                 class="d-flex justify-start"
               ></v-skeleton-loader>
             </div>
-            <div>
+            <div v-else>
               <p>รวมสารบัญ 
                 <span class="pink--text subtitle-1" v-text="sarabunTotal"></span>
               </p>
               <p>ชุดหนังสือ 
                 <span class="pink--text subtitle-1" v-text="bookSelected.book_category"></span>
               </p>
-            </div>
             <v-btn
               :href="bookSelected.book_link_pdf"
               target="_blank"
@@ -92,6 +91,7 @@
               <v-icon class="mr-1">mdi-book-open-page-variant</v-icon>
               <div>TEXT</div> 
             </v-btn>
+            </div>
           </v-col>
         </v-row>
       </v-card-text>
@@ -106,7 +106,7 @@
           ></v-subheader>
           <div v-if="loading===true">
             <v-skeleton-loader
-              v-for="(n,i) in 2" :key="i"
+              v-for="(n,i) in 3" :key="i"
               ref="skeleton"
               type="list-item"
               class="mx-auto"
@@ -158,7 +158,7 @@
           <v-row>
             <v-col cols="12">
             <v-skeleton-loader
-              v-for="n in 2"
+              v-for="n in 3"
               :key="n"
               type="list-item"
               class="mx-auto"
@@ -217,10 +217,10 @@
       v-model="dialogReadText"
       >
       <v-card>
-        <v-card-title>
+        <v-card-title class="d-flex justify-center">
           {{textSarabun}}
         </v-card-title>
-        <v-card-text style="white-space: pre-wrap;">
+        <v-card-text style="white-space: pre-wrap;" class="d-flex justify-center">
           {{textDetail}}
         </v-card-text>
         <v-card-actions class="justify-end">
