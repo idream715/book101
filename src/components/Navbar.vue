@@ -7,7 +7,7 @@
           <v-icon class="mr-2"></v-icon>หนังสือธรรมะ
         </v-btn>
         <v-btn dark router-link to="/Books" text>
-          <v-icon class="mr-2"></v-icon>ค้นหารูป
+          <v-icon class="mr-2"></v-icon>ค้นหาการ์ด
         </v-btn>
         <v-btn dark router-link to="/About" text>
           <v-icon class="mr-2"></v-icon>เกี่ยวกับ
@@ -47,7 +47,7 @@
       <div class="d-flex" align="center" justify="center">
         <v-row align="center" justify="center">
           <v-col cols="12">
-            <v-img class="mt-8" alt="logo" contain min-width="150" 
+            <v-img class="mt-3" alt="logo" contain min-width="250" 
               src="@/assets/logo1.png" width="45" />
             <h1 style="color:white" class="mt-8">คำสอนคุณครูไม่ใหญ่</h1>
           </v-col>
@@ -66,11 +66,11 @@
               </template>
             </v-combobox>
           </v-col>
-          <v-col cols="12" sm="1">
-            <v-btn @click="searchrandom" class="mr-8 mb-4" dark color="blue lighten-1">อ่านอะไรดี</v-btn>
+          <v-col cols="12" sm="2" md="2" lg="1">
+            <v-btn @click="clicksearch" class="mb-4" dark color="blue lighten-1">ค้นหา</v-btn>
           </v-col> 
-          <v-col cols="12" sm="1">
-            <v-btn @click="searchrandom" class="mr-8 mb-4" dark color="blue lighten-1">อ่านอะไรดี</v-btn>
+          <v-col cols="12" sm="2" md="2" lg="1">
+            <v-btn @click="searchrandom" class="mb-4" dark color="blue lighten-1">อ่านอะไรดี</v-btn>
           </v-col> 
            
         </v-row>
@@ -191,7 +191,7 @@ export default {
     },
     opn () {
       console.log (!this.$vuetify.breakpoint.xsOnly)
-      return !this.$vuetify.breakpoint.xsOnly
+      return !this.$vuetify.breakpoint.smOnly
     },
     random(){
       return this.$store.getters.getsearchrandom
@@ -251,6 +251,7 @@ export default {
 </script>
 
 <style scoped>
+@import url('https://fonts.googleapis.com/css2?family=Prompt&display=swap');
   #create .v-speed-dial {
     position: absolute;
     right: 25px;
@@ -262,6 +263,7 @@ export default {
   }
       /* หน้า home */
   .homep {
+    font-family: 'Prompt', sans-serif;
     position: relative;
     background-image: url(https://images.unsplash.com/photo-1503455637927-730bce8583c0?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1950&q=80);
     width: 100%;
