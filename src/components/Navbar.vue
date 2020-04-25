@@ -52,22 +52,22 @@
             <h1 style="color:white" class="mt-8">คำสอนคุณครูไม่ใหญ่</h1>
           </v-col>
           <v-col cols="12">
-            <v-combobox v-model="model" :items="items" :search-input.sync="search" hide-selected hint="สูงสุด 5 เเท็ก"
-              label="Search" multiple persistent-hint chips solo style="width:325px;">
+            <v-combobox v-model="words_search" :items="items" :search-input.sync="search" hide-selected hint="สูงสุด 5 เเท็ก"
+              :label="label_search" multiple persistent-hint chips solo style="width:325px;">
               <template v-slot:no-data>
                 <v-list-item>
                   <v-list-item-content>
                     <v-list-item-title align="center" justify="center">
-                      "<strong>{{ search }}</strong>". Press <kbd>enter</kbd> 
-                      <v-btn class="ml-4" dark color="blue lighten-1" @click="clicksearch"><v-icon >mdi-magnify</v-icon></v-btn>
+                      ยืนยันคำว่า"<strong>{{ search }}</strong>"กรุณากด<kbd>enter</kbd> 
+                      <v-btn class="ml-4" dark color="blue lighten-1" @click="clicksearch_home"><v-icon >mdi-magnify</v-icon></v-btn>
                     </v-list-item-title>
                   </v-list-item-content>
                 </v-list-item>
               </template>
             </v-combobox>
           </v-col>
-          <v-col cols="12" sm="2" md="2" lg="1">
-            <v-btn @click="clicksearch" class="mb-4" dark color="blue lighten-1">ค้นหา</v-btn>
+          <v-col cols="12" sm="1">
+            <v-btn @click="clicksearch_home" class="mr-8 mb-4" dark color="blue lighten-1">ค้นหา</v-btn>
           </v-col> 
           <v-col cols="12" sm="2" md="2" lg="1">
             <v-btn @click="searchrandom" class="mb-4" dark color="blue lighten-1">อ่านอะไรดี</v-btn>
@@ -162,6 +162,8 @@ export default {
     dialog: false,
     group: null,
     model: '',
+    words_search:'',
+    label_search:'',
   }),
   created(){
       this.words_search = ''
@@ -208,7 +210,8 @@ export default {
         this.label_search = 'กรุณาใสคำที่ต้องการค้นหา'
       }else{
         this.$router.push('/Indexs')}
-        this.$store.dispatch('setFirstIndexsFromApi',{words:this.words_search,page:"0"})
+        this.$store.dispatch('clearindex')
+        this.$store.dispatch('setFirstIndexsFromApi',{words:this.words_search,page:"0",infenit:false})
 
     },
     searchrandom(){

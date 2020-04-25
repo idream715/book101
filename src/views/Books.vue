@@ -27,7 +27,7 @@
                     outlined 
                     @click="filBookCategoty = null" 
                     >
-                    mdi-filter-remove
+                    mdi-filter-remove 
                   </v-icon> 
               </v-col>
             </v-row>
@@ -110,7 +110,7 @@ export default {
   },
   methods: {
     bookSelect(selected){
-      this.$store.dispatch('setPagenation', {limit:12, offset:0, book_name:selected.book_name})
+      // this.$store.dispatch('setPagenation', {limit:12, offset:0, book_name:selected.book_name})
       // this.$router.push({ path: `/book/${selected.book_name}`})
 
       //send obj_book to store
