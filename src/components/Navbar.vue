@@ -67,7 +67,7 @@
             </v-combobox>
           </v-col>
           <v-col cols="12" sm="2" md="2" lg="1">
-            <v-btn @click="clicksearch" class="mb-4" dark color="blue lighten-1">ค้นหา</v-btn>
+            <v-btn @click="clicksearch" class="mb-4" dark color="blue lighten-1"><v-icon class="mr-3">mdi-magnify</v-icon>ค้นหา</v-btn>
           </v-col> 
           <v-col cols="12" sm="2" md="2" lg="1">
             <v-btn @click="searchrandom" class="mb-4" dark color="blue lighten-1">อ่านอะไรดี</v-btn>
