@@ -191,7 +191,7 @@ export default {
     },
     opn () {
       console.log (!this.$vuetify.breakpoint.xsOnly)
-      return !this.$vuetify.breakpoint.smOnly
+      return !this.$vuetify.breakpoint.xsOnly
     },
     random(){
       return this.$store.getters.getsearchrandom
