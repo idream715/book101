@@ -249,6 +249,7 @@ export default {
     font-size: 0.8em;
   }
 } */
+@import url('https://fonts.googleapis.com/css2?family=Prompt&display=swap');
 
 p{
   display: -webkit-box;
@@ -257,6 +258,9 @@ p{
   overflow: hidden;
   text-overflow: ellipsis;
   font-size: 17px;
+}
+.indexs{
+  font-family: 'Prompt', sans-serif;
 }
 
 </style>
