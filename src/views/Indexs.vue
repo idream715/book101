@@ -244,7 +244,7 @@ export default {
         window.getSelection().removeAllRanges()
       },
     clickedSendbook(bookname2) {
-        this.$store.dispatch('setbook_index',bookname2)
+        // this.$store.dispatch('setbook_index',bookname2)
         let openBook = this.$router.resolve({path: `/book/${bookname2}`});
         window.open(openBook.href, '_blank')
     },
@@ -274,7 +274,6 @@ p{
   overflow: hidden;
   text-overflow: ellipsis;
   font-size: 17px;
-  
 }
 .indexs{
   font-family: 'Sarabun', sans-serif;
