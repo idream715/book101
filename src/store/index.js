@@ -165,6 +165,7 @@ export default new Vuex.Store({
     },
     clearTotalsSarabun({commit}){
       commit('SET_SARABUN_TOTAL', 0)
+      commit('SET_BOOK_SELECTED', {})
     },
     
   },

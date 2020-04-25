@@ -98,10 +98,10 @@
         <v-btn icon router-link to="/" text @click="clearBook">
           <v-icon>mdi-home</v-icon>
         </v-btn>
-        <v-btn v-if="close" icon router-link to="/Books" text >
+        <v-btn v-if="close" icon router-link to="/Books" text @click="clearBook">
           <v-icon>mdi-book</v-icon>
         </v-btn>
-        <v-btn v-else icon router-link to="/Books" text >
+        <v-btn v-else icon router-link to="/Books" text @click="clearBook">
           <v-icon>mdi-book-open-page-variant</v-icon>
         </v-btn>
       </v-app-bar>
@@ -230,7 +230,6 @@ export default {
       this.$vuetify.goTo(0)
     },
     clearBook(){
-      this.$emit('emitFalse',false)
       this.page = 1
       this.$store.dispatch('clearSarabun')
       this.$store.dispatch('clearTotalsSarabun')

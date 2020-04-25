@@ -110,12 +110,18 @@ export default {
   },
   methods: {
     bookSelect(selected){
-      this.$store.dispatch('setBookSelected', selected)
       this.$store.dispatch('setPagenation', {limit:12, offset:0, book_name:selected.book_name})
+      // this.$router.push({ path: `/book/${selected.book_name}`})
+
+      //send obj_book to store
+      // this.$store.dispatch('setBookSelected', selected)
+
+      //sarabunOld
       // this.openDialog = !this.openDialog
-      this.$router.push({ path: `/book/${selected.book_name}`})
-      // let openBook = this.$router.resolve({path: `/book/${selected.book_name}`});
-      // window.open(openBook.href, '_blank');
+
+      //new tab
+      let openBook = this.$router.resolve({path: `/book/${selected.book_name}`});
+      window.open(openBook.href, '_blank');
     },
     setOpenDialog(val){
       this.openDialog = val

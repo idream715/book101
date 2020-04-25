@@ -257,7 +257,6 @@ p{
   overflow: hidden;
   text-overflow: ellipsis;
   font-size: 17px;
-  
 }
 
 </style>
