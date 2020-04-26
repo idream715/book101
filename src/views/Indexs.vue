@@ -77,7 +77,7 @@
                         <v-list-item-title align="end">รายการที่ {{i+1}}</v-list-item-title>
                       </v-col>
                     </v-row>
-                    <v-list-item-title class="grey--text"><v-btn text @click="clickedSendbook(index.search_heading)">จากหนังสือ:{{index.search_heading}}</v-btn></v-list-item-title>
+                    <v-list-item-title class="grey--text"><v-btn text @click="clickedSendbook(index.book_id)">จากหนังสือ:{{index.search_heading}}</v-btn></v-list-item-title>
                     <p v-html="text_render(index.mark_details)"></p>
                   </v-card-text>
                 </v-col>
@@ -244,9 +244,8 @@ export default {
         window.getSelection().removeAllRanges()
       },
     clickedSendbook(bookname2) {
-        // this.$store.dispatch('setbook_index',bookname2)
-        let openBook = this.$router.resolve({path: `/book/${bookname2}`});
-        window.open(openBook.href, '_blank')
+      let openBook = this.$router.resolve({path: `/book/${bookname2}`});
+      window.open(openBook.href, '_blank')
     },
   },
    watch: {

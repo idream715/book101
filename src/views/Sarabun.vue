@@ -107,7 +107,6 @@
           <div v-if="loading===true">
             <v-skeleton-loader
               v-for="(n,i) in 10" :key="i"
-              ref="skeleton"
               type="list-item"
               transition="scale-transition"
               class="mx-auto"
