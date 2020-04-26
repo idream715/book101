@@ -1,8 +1,8 @@
 <template>
-  <div name="sarabun">
+  <div name="sarabun" class="all">
     <v-card>
       <v-card-title class="justify-center">
-        <div class="display-1 font-weight-bold">
+        <div class="font-weight-bold">
           {{book_name}}
         </div>
       </v-card-title>
@@ -49,8 +49,8 @@
             sm="12"
             md="6" 
             class="
+              d-flex 
               align-center 
-              justify-sm-center 
               align-md-start 
               flex-column
             "
@@ -69,10 +69,10 @@
             </div>
             <div class="subtitle-1" v-else>
               <p>รวมสารบัญ 
-                <span class="pink--text subtitle-1" v-text="sarabunTotal"></span>
+                <span class="pink--text subtitle-1"  v-text="sarabunTotal"></span>
               </p>
               <p>ชุดหนังสือ 
-                <span class="pink--text subtitle-1" v-text="bookSelected.book_category"></span>
+                <span class="pink--text subtitle-1"  v-text="bookSelected.book_category"></span>
               </p>
             <v-btn
               :href="bookSelected.book_link_pdf"
@@ -102,8 +102,7 @@
         <v-list>
           <v-subheader 
             class="primary--text title d-flex justify-center font-weight-bold"
-            v-text="'สารบัญ'"
-          ></v-subheader>
+          ><h4 class="sara">สารบัญ</h4></v-subheader>
           <div v-if="loading===true">
             <v-skeleton-loader
               v-for="(n,i) in 3" :key="i"
@@ -292,7 +291,7 @@ export default {
       // console.log('offset'+offset)
     },
   },
-   methods: {
+  methods: {
     readText(sarabun,detail){
       this.dialogReadText = !this.dialogReadText
       this.textSarabun = sarabun
@@ -336,3 +335,28 @@ export default {
     }
 }
 </script>
+
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Sarabun&display=swap');
+
+  .v-application .font-weight-bold {  
+    font-family: 'Sarabun', sans-serif;
+    font-size: 1.5rem;
+  }
+
+  .all {
+    font-family: 'Sarabun', sans-serif;
+  }
+
+  p {
+    font-family: 'Sarabun', sans-serif;
+  }
+  
+  .sara {
+    font-family: 'Sarabun', sans-serif;
+  }
+  
+  .v-application .subtitle-1 {
+    font-family: 'Sarabun', sans-serif !important;
+  }
+</style>
