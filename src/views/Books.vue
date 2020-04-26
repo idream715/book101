@@ -130,9 +130,9 @@ export default {
 }
 </script>
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Prompt&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Sarabun&display=swap');
 
 .books{
-  font-family: 'Prompt', sans-serif;
+  font-family: 'Sarabun', sans-serif;
 }
 </style>

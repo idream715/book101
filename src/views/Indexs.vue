@@ -93,7 +93,7 @@
                   <v-card-text class="pa-1">
                     <v-row>
                       <v-col cols="10">
-                        <v-list-item-title class="headline mb-5" v-html="index.mark_index" ></v-list-item-title>
+                        <v-list-item-title class="headline mb-5 " v-html="index.mark_index"></v-list-item-title>
                       </v-col>
                       <v-col cols="2">
                         <v-list-item-title class="grey--text" align="end">{{i+1}}</v-list-item-title>
@@ -315,7 +315,7 @@ export default {
     font-size: 0.8em;
   }
 } */
-@import url('https://fonts.googleapis.com/css2?family=Prompt&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Sarabun&display=swap');
 
 p{
   display: -webkit-box;
@@ -326,7 +326,10 @@ p{
   font-size: 17px;
 }
 .indexs{
-  font-family: 'Prompt', sans-serif;
+  font-family: 'Sarabun', sans-serif;
+}
+.headline{
+  font-family: 'Sarabun', sans-serif;
 }
 
 </style>

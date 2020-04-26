@@ -68,8 +68,8 @@
                 </template>
               </v-combobox>
           </v-col>
-          <v-col cols="12" sm="1">
-            <v-btn @click="clicksearch_home" class="mr-8 mb-4" dark color="blue lighten-1">ค้นหา</v-btn>
+          <v-col cols="12" sm="2" md="2" lg="1">
+            <v-btn @click="clicksearch_home" class="mb-4" dark color="blue lighten-1"><v-icon class="mr-3">mdi-magnify</v-icon>ค้นหา</v-btn>
           </v-col> 
           <v-col cols="12" sm="2" md="2" lg="1">
             <v-btn @click="searchrandom" class="mb-4" dark color="blue lighten-1">อ่านอะไรดี</v-btn>
@@ -206,7 +206,7 @@ export default {
     },
     opn () {
       console.log (!this.$vuetify.breakpoint.xsOnly)
-      return !this.$vuetify.breakpoint.smOnly
+      return !this.$vuetify.breakpoint.xsOnly
     },
     random(){
       return this.$store.getters.getsearchrandom
@@ -298,7 +298,7 @@ export default {
 </script>
 
 <style scoped>
-@import url('https://fonts.googleapis.com/css2?family=Prompt&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Sarabun&display=swap');
   #create .v-speed-dial {
     position: absolute;
     right: 25px;
@@ -310,7 +310,7 @@ export default {
   }
       /* หน้า home */
   .homep {
-    font-family: 'Prompt', sans-serif;
+    font-family: 'Sarabun', sans-serif;
     position: relative;
     background-image: url(https://images.unsplash.com/photo-1503455637927-730bce8583c0?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1950&q=80);
     width: 100%;
