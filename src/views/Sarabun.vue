@@ -1,9 +1,9 @@
 <template>
   <div name="sarabun">
-    <v-card>
+    <v-card flat>
       <v-card-title class="justify-center">
         <div class="display-1 font-weight-bold">
-          {{book_name}}
+          {{bookSelected.book_name}}
         </div>
       </v-card-title>
       <v-card-text >
@@ -67,30 +67,30 @@
                 class="d-flex justify-start"
               ></v-skeleton-loader>
             </div>
-            <div class="subtitle-1" v-else>
-              <p>รวมสารบัญ 
-                <span class="pink--text subtitle-1" v-text="sarabunTotal"></span>
+            <div class="subtitle-1 justify-md-center" v-else>
+              <p v-if="sarabunTotal">จำนวนสารบัญ 
+                <span class="pink--text subtitle-1 font-weight-bold" v-text="sarabunTotal"></span>
               </p>
               <p>ชุดหนังสือ 
-                <span class="pink--text subtitle-1" v-text="bookSelected.book_category"></span>
+                <span class="pink--text subtitle-1 font-weight-bold" v-text="bookSelected.book_category"></span>
               </p>
-            <v-btn
-              :href="bookSelected.book_link_pdf"
-              target="_blank"
-              class="mr-3"
-              color="primary"
-              >
-              <v-icon>mdi-file-pdf</v-icon>
-              <div>PDF</div> 
-            </v-btn>
-            <v-btn
-              :href="bookSelected.book_link_text"
-              target="_blank"
-              color="primary"
-              >
-              <v-icon class="mr-1">mdi-book-open-page-variant</v-icon>
-              <div>TEXT</div> 
-            </v-btn>
+              <v-btn
+                :href="bookSelected.book_link_pdf"
+                target="_blank"
+                class="mr-3"
+                color="primary"
+                >
+                <v-icon>mdi-file-pdf</v-icon>
+                <div>PDF</div> 
+              </v-btn>
+              <v-btn
+                :href="bookSelected.book_link_text"
+                target="_blank"
+                color="primary"
+                >
+                <v-icon class="mr-1">mdi-book-open-page-variant</v-icon>
+                <div>TEXT</div> 
+              </v-btn>
             </div>
           </v-col>
         </v-row>
@@ -98,6 +98,7 @@
       <v-card
         max-width="800"
         class="mx-auto elevation-10"
+        v-if="sarabunTotal"
       >
         <v-list>
           <v-subheader 
@@ -106,9 +107,10 @@
           ></v-subheader>
           <div v-if="loading===true">
             <v-skeleton-loader
-              v-for="(n,i) in 3" :key="i"
+              v-for="(n,i) in 10" :key="i"
               ref="skeleton"
               type="list-item"
+              transition="scale-transition"
               class="mx-auto"
             ></v-skeleton-loader>
           </div>
@@ -116,7 +118,7 @@
             
           <v-list-item-group
             active-class="primary--text"
-            >
+          >
             <template v-for="(item, i) in sarabunSelected">
               <v-list-item :key="item.search_index">
                 <template v-slot:default="{ active }">
@@ -153,76 +155,32 @@
               ></v-divider>
             </template>
           </v-list-item-group>
-          <v-divider></v-divider>
-          <!-- v-intersect="onIntersect" -->
           <v-row>
-            <v-col cols="12">
-            <v-skeleton-loader
-              v-for="n in 3"
-              :key="n"
-              type="list-item"
-              class="mx-auto"
-            ></v-skeleton-loader>
+            <v-col cols="12" v-if="sarabunSelected.length>0 && sarabunSelected.length < sarabunTotal">
+              <v-skeleton-loader
+                v-for="n in 3"
+                :key="n"
+                type="list-item"
+                class="mx-auto"
+                v-intersect="nextLoading"
+              ></v-skeleton-loader>
             </v-col>
           </v-row>
            
         </v-list>
       </v-card>
-
-      <!-- <v-card-text>
-        <div> 
-          <v-data-table
-            :loading="loading" 
-            loading-text="Loading... Please wait"
-            :headers="headers"
-            :items="sarabunSelected"
-            :page.sync="page"
-            :items-per-page="itemsPerPage"
-            hide-default-footer
-            class="elevation-1 mt-3"
-            dense
-            mx-width="500"
-            >
-            <template v-slot:item.actions="{ item }">
-              <v-btn 
-                :href="item.link_pdf" 
-                target="_blank" text icon>
-                <v-icon color="red">
-                  mdi-file-pdf
-                </v-icon>
-                <span>PDF</span>
-              </v-btn>
-              <v-btn
-                @click="readText(item.search_index,item.search_details)"
-                text icon
-                >
-                <v-icon color="blue">
-                  mdi-book-open-page-variant
-                </v-icon>
-                <span>TEXT</span>
-              </v-btn>
-            </template>
-          </v-data-table>
-          
-          <div class="text-center pt-2">
-            <v-pagination 
-              v-model="page" 
-              :length="pages"
-            ></v-pagination>
-          </div>
-        </div>
-      </v-card-text> -->
     </v-card>
     <v-dialog
       v-model="dialogReadText"
-      >
-      <v-card>
-        <v-card-title class="d-flex justify-center">
-          {{textSarabun}}
+      max-width="800" 
+      class="elevation-10"
+    >
+      <v-card >
+        <v-card-title class="d-flex justify-center" v-html="textSarabun">
         </v-card-title>
-        <v-card-text style="white-space: pre-wrap;" class="d-flex justify-center">
-          {{textDetail}}
+        <v-card-text style="white-space: pre-wrap;" class="d-flex justify-center" v-html="textDetail">
         </v-card-text>
+        <input type="hidden" id="textDetail" style="white-space: pre-wrap; " :value="textDetail">
         <v-card-actions class="justify-end">
           <v-btn
             color="primary"
@@ -231,7 +189,6 @@
           >
             {{word_copy}}
           </v-btn>
-          <input type="hidden" id="textDetail" :value="textSarabun+' '+textDetail">
           <v-btn
             color="primary"
             text
@@ -248,51 +205,22 @@
 <script>
 export default {
   props: {
-    book_name: String
+    id: String
   },
   data() {
     return {
       dialogReadText: false,
-      page: 1,
       itemsPerPage: 50,
-      page_count:0,
-      headers: [
-        {
-          text: 'สารบัญ',
-          align: 'start',
-          value: 'search_index',
-          sortable: false,
-        },
-        {
-          text: 'อ่าน', 
-          value: 'actions',
-          align: 'end',
-          sortable: false,
-        },
-      ],
       textSarabun:"",
       textDetail:``,
       word_copy:'คัดลอก',
     }
   },
   created() {
-    this.$store.dispatch('setbook_index',this.book_name)
-    this.$store.dispatch('setPagenation', {limit:this.itemsPerPage, offset:0, book_name: this.book_name})
+    this.$store.dispatch('setbook_index',this.id)
+    this.$store.dispatch('setPagenation', {limit:this.itemsPerPage, offset:0, book_id: this.id})
   },
-  watch: {
-    page(val){
-      let offset = 0
-      if(val===1)
-        offset =0
-      else 
-        offset = val*this.itemsPerPage-this.itemsPerPage;
-
-      this.$store.dispatch('clearSarabun')
-      this.$store.dispatch('setPagenation', {limit:this.itemsPerPage, offset:offset, book_name: this.book_name})
-      // console.log('offset'+offset)
-    },
-  },
-   methods: {
+  methods: {
     readText(sarabun,detail){
       this.dialogReadText = !this.dialogReadText
       this.textSarabun = sarabun
@@ -309,12 +237,22 @@ export default {
         var msg = successful ? 'คัดลอกแล้ว' : 'คัดลอกไม่สำเร็จ';
         this.word_copy = `${msg}`
       } catch (err) {
-      alert('Oops, unable to copy');
+        alert('Oops, unable to copy');
       }
 
       /* unselect the range */
       textDetailToCopy.setAttribute('type', 'hidden')
       window.getSelection().removeAllRanges()
+    },
+    nextLoading(){
+      let timesLoaded = Math.ceil(this.$store.getters.getSarabun.length/this.itemsPerPage) 
+      if(timesLoaded<this.pages){
+        timesLoaded += 1
+        let offset = 0
+        offset = timesLoaded*this.itemsPerPage-this.itemsPerPage;
+        this.$store.dispatch('setContinueToLoad', {limit:this.itemsPerPage, offset:offset, book_id : this.id})
+        console.log('offset'+offset)
+      }
     },
   },
   computed: {
@@ -332,7 +270,7 @@ export default {
       },
       loading(){
         return this.$store.getters.getoverlay     
-      }
+      },
     }
 }
 </script>
