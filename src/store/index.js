@@ -26,12 +26,14 @@ export default new Vuex.Store({
     SET_TOTALS_BOOKS(state, payload){
       state.totalsBooks = payload
     },
-    
+    SET_INDEXS_INFENIT(state, payload){
+      payload.forEach(x=>{state.indexs.push(x)})
+    },
     SET_INDEXS(state, payload){
-      state.indexs = payload
+      state.indexs=payload
     },
     SET_SARABUN_TOTAL(state, payload){
-      state.totalsSarabun = payload
+        state.totalsSarabun=payload
     },
     SET_SARABUN(state, payload){
       state.sarabunSelected = payload
@@ -77,6 +79,9 @@ export default new Vuex.Store({
     setwordssearch({commit},words){
       commit('SET_WORDS_SEARCH',words)
     },
+    clearindex({commit}){
+      commit('SET_INDEXS', [])
+    },
     setFirstIndexsFromApi({ commit },{words,page}){
       commit('SET_WORDS_SEARCH',words)
       let tags = []
@@ -85,12 +90,42 @@ export default new Vuex.Store({
         tags.push(tag)
       });
       commit('SET_OVERLAY', true)
-      callApi.getData(`?path=/indexs&limit=10&offset=${page}&query={"$and":[${tags}]} `)
+      callApi.getData(`?path=/indexs&limit=5&offset=${page}&query={"$and":[${tags}]} `)
       .then(res=>{
         let data = res.data
-        if(data.items.length===0){commit('SET_NOTFOUND', true)}else{commit('SET_NOTFOUND', false)}
+        if(data.length===0){commit('SET_NOTFOUND', true)}else{commit('SET_NOTFOUND', false)}
         commit('SET_OVERLAY', false)
         commit('SET_TOTALS_INDEXS', data.nitems)
+        let details = data.items.map(x=>x.search_details)
+        let index = data.items.map(x=>x.search_index)
+        function marks(array1,array2){        
+          let marks = []
+          array1.forEach(index => {
+            let render = index
+            array2.forEach(word=>{render = render.replace(word,`<mark>${word}</mark>`)})
+            marks.push(render)
+          })
+          return marks
+        }
+        let indexmarked =  marks(index,words)
+        let detailsmarked = marks(details,words)  
+        data.items.forEach((item,i) =>{
+          item["mark_index"]= indexmarked[i]
+          item["mark_details"]= detailsmarked[i]
+        })
+        commit('SET_INDEXS', data.items)
+        }).catch(err => console.log(err))
+    },
+    setFirstIndexsFromApi_infenit({ commit },{words,page}){
+      commit('SET_WORDS_SEARCH',words)
+      let tags = []
+      words.forEach(element => {
+        let tag = `{"search_details":{"$regex":"${element}"}}`
+        tags.push(tag)
+      });
+      callApi.getData(`?path=/indexs&limit=5&offset=${page}&query={"$and":[${tags}]} `)
+      .then(res=>{
+        let data = res.data
         let details = data.items.map(x=>x.search_details)
         let index = data.items.map(x=>x.search_index)
         function marks(array1,array2){        
@@ -110,7 +145,7 @@ export default new Vuex.Store({
           item["mark_index"]= indexmarked[i]
           item["mark_details"]= detailsmarked[i]
         })
-        commit('SET_INDEXS', data.items)
+        commit('SET_INDEXS_INFENIT', data.items)
         }).catch(err => console.log(err))
     },
     setsearchrandom({ commit },number){
@@ -126,12 +161,14 @@ export default new Vuex.Store({
     },
     setbook_index({commit},name){
       let tag = `{"book_name":{"$regex":"${name}"}}`
-      callApi.getData(`?path=/books&limit=1&query={"$and":[${tag}]} `)
+      commit('SET_OVERLAY', true)
+      callApi.getData(`?path=/books&limit=1&offset=0&query={"$and":[${tag}]}`)
         .then(res=>{
           let data = res.data
+          commit('SET_OVERLAY', false)
           commit('SET_BOOK_SELECTED', data.items[0])
         })
-      .catch(err => console.log(err))
+        .catch(err => console.log(err))
     },
       // PATH BOOKS
     setBookSelected({commit}, selected){
@@ -165,6 +202,7 @@ export default new Vuex.Store({
     },
     clearTotalsSarabun({commit}){
       commit('SET_SARABUN_TOTAL', 0)
+      commit('SET_BOOK_SELECTED', {})
     },
     
   },

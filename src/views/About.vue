@@ -67,4 +67,10 @@
     }),
   }
 </script>
-      
+
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Sarabun&display=swap');
+.about {
+    font-family: 'Sarabun', sans-serif;
+}
+</style>

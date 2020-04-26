@@ -1,5 +1,6 @@
 <template>
-  <v-app>
+  <div class="homep">
+    <v-app>
     <navbar></navbar>
     
     <v-content id="app">
@@ -8,6 +9,7 @@
     </v-content>
     
   </v-app>
+  </div>
 </template>
 
 <script>
@@ -23,3 +25,9 @@ export default {
   
 };
 </script>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Prompt&display=swap');
+.homep {
+    font-family: 'Prompt', sans-serif;
+  }
+</style>

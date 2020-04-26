@@ -38,7 +38,7 @@
 
        <v-row v-if="setoverlay===false">
          <v-col cols="6" align="start" justify="center">พบ {{getTotalIndexs}} รายการ</v-col>
-         <v-col cols="6" align="end" justify="center">หน้าที่ {{page}}-{{pages}}</v-col>
+         <v-col cols="6" align="end" justify="center"></v-col>
        </v-row>   
 
        <v-row v-if="setoverlay===false">
@@ -69,7 +69,14 @@
             <v-card  height="" flat>
                 <v-col cols="12" class="pa-1">
                   <v-card-text class="pa-1">
-                    <v-list-item-title class="headline mb-5" v-html="index.mark_index"></v-list-item-title>
+                    <v-row>
+                      <v-col cols="10">
+                        <v-list-item-title class="headline mb-5 " v-html="index.mark_index"></v-list-item-title>
+                      </v-col>
+                      <v-col cols="2">
+                        <v-list-item-title align="end">รายการที่ {{i+1}}</v-list-item-title>
+                      </v-col>
+                    </v-row>
                     <v-list-item-title class="grey--text"><v-btn text @click="clickedSendbook(index.search_heading)">จากหนังสือ:{{index.search_heading}}</v-btn></v-list-item-title>
                     <p v-html="text_render(index.mark_details)"></p>
                   </v-card-text>
@@ -96,17 +103,9 @@
             </v-card>
           </v-dialog>
 
-          <v-pagination
-            v-model ="page"
-            class="my-4"
-            :length ="pages"
-            total-visible="7"
-            v-if="getTotalIndexs!==0"
-           ></v-pagination>
-     
         </v-col>
       </v-row><br>
-
+     
         <div v-if="setoverlay===true">
           <v-col cols="12" v-for="(item,i) in 10" :key="i">
             <v-card >
@@ -120,6 +119,19 @@
             </v-card><br>
           </v-col>
         </div>
+
+        <v-col cols="12" v-if="indexs.length>0 && indexs.length<getTotalIndexs">
+          <v-card >
+              
+            <v-skeleton-loader
+              ref="skeleton"
+              type= "article, actions"
+              class="mx-auto"
+              v-intersect="search_infenit"
+            ></v-skeleton-loader>
+               
+          </v-card><br>
+        </v-col>
     </v-container>
   </div>
 </template>
@@ -133,7 +145,7 @@ export default {
         content_copy:"",
         head_content:"",
         search:"",
-        page:1,
+        page:0,
         items: ['บุญ', 'วิชชา'],
         word_copy:'คัดลอก'
        
@@ -157,7 +169,7 @@ export default {
       return this.$store.getters.getTotalIndexs
     },
     pages(){ 
-      return Math.ceil(this.getTotalIndexs/10)
+      return Math.ceil(this.getTotalIndexs/5)
     },
     search__pageindex: {
 			get: function() {
@@ -188,7 +200,6 @@ export default {
         let t = input.split("html").slice(1).join(' ')
         let b = t.replace('<mark>',`$<mark>`)
         let s = b.split("$")
-        console.log(s)
         let x = s[0].split(" ")
         let value =`${x[x.length-1]}${s[1]}`
         return value
@@ -201,8 +212,18 @@ export default {
        }
     },
     clicksearch(input){
-      this.page = 1
-      this.$store.dispatch('setFirstIndexsFromApi',{words:input,page:0})
+      this.page = 0
+      this.$store.dispatch('setFirstIndexsFromApi',{words:input,page:0,infenit:false})
+    },
+    search_infenit(){
+      let page =Math.ceil(this.$store.getters.getIndexs.length/5) 
+      if(page<=this.pages){
+      page += 1
+      console.log(page)
+      let remitcards = 5
+      let pageoffset = (remitcards*(page-1))
+      this.$store.dispatch('setFirstIndexsFromApi_infenit',{words:this.getwords,page:pageoffset,infenit:true})
+      }
     },
     copyTextDetail () {
         
@@ -222,11 +243,11 @@ export default {
         textDetailToCopy.setAttribute('type', 'hidden')
         window.getSelection().removeAllRanges()
       },
-       clickedSendbook(bookname2) {
-        this.$store.dispatch('setbook_index',bookname2)
-        this.$store.dispatch('setPagenation',{limit:12, offset:0,book_name:bookname2})
-        this.$router.push({ path: `/book/${bookname2}` })
-      },
+    clickedSendbook(bookname2) {
+        // this.$store.dispatch('setbook_index',bookname2)
+        let openBook = this.$router.resolve({path: `/book/${bookname2}`});
+        window.open(openBook.href, '_blank')
+    },
   },
    watch: {
     search__pageindex (val) {
@@ -234,12 +255,7 @@ export default {
         this.$nextTick(() => this.search__pageindex.pop())
       }
     },
-    page(val){
-      this.$vuetify.goTo('#search_index')
-      let remitcards = 10
-      let pageoffset = (remitcards*(val-1))
-      this.$store.dispatch('setFirstIndexsFromApi',{words:this.getwords,page:pageoffset})
-    },
+
   },   
 }
 </script>
@@ -249,6 +265,7 @@ export default {
     font-size: 0.8em;
   }
 } */
+@import url('https://fonts.googleapis.com/css2?family=Sarabun&display=swap');
 
 p{
   display: -webkit-box;
@@ -257,7 +274,12 @@ p{
   overflow: hidden;
   text-overflow: ellipsis;
   font-size: 17px;
-  
+}
+.indexs{
+  font-family: 'Sarabun', sans-serif;
+}
+.headline{
+  font-family: 'Sarabun', sans-serif;
 }
 
 </style>
