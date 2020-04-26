@@ -6,9 +6,14 @@
         <v-btn dark router-link to="/Books" text>
           <v-icon class="mr-2"></v-icon>หนังสือธรรมะ
         </v-btn>
-        <v-btn dark router-link to="/Books" text>
+
+        <v-btn v-if="hp" dark router-link to="/" text>
+          <v-icon class="mr-2"></v-icon>ค้นเนื้อหา
+        </v-btn>
+        <v-btn v-else dark router-link to="/home2" text>
           <v-icon class="mr-2"></v-icon>ค้นหาการ์ด
         </v-btn>
+
         <v-btn dark router-link to="/About" text>
           <v-icon class="mr-2"></v-icon>เกี่ยวกับ
         </v-btn>
@@ -27,7 +32,10 @@
                 </v-list-item>
                 <v-list-item>
                   <v-list-item-title>
-                    <v-btn dark router-link to="/Books" text>
+                    <v-btn v-if="hp" dark router-link to="/" text>
+                      <v-icon class="mr-2"></v-icon><v-icon class="mr-4">mdi-view-carousel</v-icon>ค้นเนื้อหา
+                    </v-btn>
+                    <v-btn v-else dark router-link to="/Home2" text>
                       <v-icon class="mr-2"></v-icon><v-icon class="mr-4">mdi-view-carousel</v-icon>ค้นหาการ์ด
                     </v-btn>
                   </v-list-item-title>
@@ -45,15 +53,67 @@
       </div>
       
       <div class="d-flex" align="center" justify="center">
-        <v-row align="center" justify="center">
+        <v-row v-if="pz" align="center" justify="center">
+          <v-col>
+            <v-row>
+              <v-col cols="5" >
+                <v-img class="ml-12 mt-12" alt="logo" contain min-width="175" 
+                  src="@/assets/logo1.png" width="45" />
+              </v-col>
+              <v-col cols="5">
+                <v-row align="center" justify="center">
+                  <v-col cols="12">
+                    <h1 style="color:white" class="mt-8">คำสอนคุณครูไม่ใหญ่</h1>
+                  </v-col>
+                  <v-col cols="12">
+                    <v-combobox v-model="words_search" :items="items" :search-input.sync="search" hide-selected hint="สูงสุด 5 เเท็ก"
+                      :label="label_search" multiple persistent-hint chips solo style="width:325px;">
+                      <template v-slot:no-data>
+                        <v-list-item>
+                          <v-list-item-content>
+                            <v-list-item-title align="center" justify="center">
+                              ยืนยันคำว่า"<strong>{{ search }}</strong>"กรุณากด<kbd>enter</kbd> 
+                              <v-btn class="ml-4" dark color="blue lighten-1" @click="clicksearch_home"><v-icon >mdi-magnify</v-icon></v-btn>
+                            </v-list-item-title>
+                          </v-list-item-content>
+                        </v-list-item>
+                      </template>
+                    </v-combobox>
+                  </v-col>
+                  <v-col cols="5">
+                    <v-btn @click="clicksearch_home" class="mb-4" dark color="blue lighten-1"><v-icon class="mr-3">mdi-magnify</v-icon>ค้นหา</v-btn>
+                  </v-col>
+                  <v-col cols="5">
+                    <v-btn @click="searchrandom" class="mb-4" dark color="blue lighten-1">อ่านอะไรดี</v-btn>
+                  </v-col>
+                </v-row>
+              </v-col>
+            </v-row>
+          </v-col> 
+        </v-row>
+
+        <v-row v-else align="center" justify="center">
           <v-col cols="12">
-            <v-img class="mt-3" alt="logo" contain min-width="250" 
+            <v-img class="mt-3" alt="logo" contain min-width="200" 
               src="@/assets/logo1.png" width="45" />
             <h1 style="color:white" class="mt-8">คำสอนคุณครูไม่ใหญ่</h1>
           </v-col>
           <v-col cols="12">
-            <v-combobox v-model="words_search" :items="items" :search-input.sync="search" hide-selected hint="สูงสุด 5 เเท็ก"
-              :label="label_search" multiple persistent-hint chips solo style="width:325px;">
+            <v-combobox v-if="hp" v-model="words_search" :items="items" :search-input.sync="search" hide-selected hint="สูงสุด 5 เเท็ก"
+              label="ค้นหาการ์ด" multiple persistent-hint chips solo style="width:325px;">
+              <template v-slot:no-data>
+                <v-list-item>
+                  <v-list-item-content>
+                    <v-list-item-title align="center" justify="center">
+                      ยืนยันคำว่า"<strong>{{ search }}</strong>"กรุณากด<kbd>enter</kbd> 
+                      <v-btn class="ml-4" dark color="blue lighten-1" @click="clicksearch_home"><v-icon >mdi-magnify</v-icon></v-btn>
+                    </v-list-item-title>
+                  </v-list-item-content>
+                </v-list-item>
+              </template>
+            </v-combobox>
+            <v-combobox v-else v-model="words_search" :items="items" :search-input.sync="search" hide-selected hint="สูงสุด 5 เเท็ก"
+              label="ค้นหาธรรมะหลวงพ่อ" multiple persistent-hint chips solo style="width:325px;">
               <template v-slot:no-data>
                 <v-list-item>
                   <v-list-item-content>
@@ -66,13 +126,13 @@
               </template>
             </v-combobox>
           </v-col>
-          <v-col cols="12" sm="2" md="2" lg="1">
+          <v-col cols="4" sm="2" md="2" lg="1">
             <v-btn @click="clicksearch_home" class="mb-4" dark color="blue lighten-1"><v-icon class="mr-3">mdi-magnify</v-icon>ค้นหา</v-btn>
           </v-col> 
-          <v-col cols="12" sm="2" md="2" lg="1">
-            <v-btn @click="searchrandom" class="mb-4" dark color="blue lighten-1">อ่านอะไรดี</v-btn>
+          <v-col cols="4" sm="2" md="2" lg="1">
+            <v-btn v-if="hp" @click="searchrandom" class="mb-4" dark color="blue lighten-1">กดสุ่มการ์ด</v-btn>
+            <v-btn v-else @click="searchrandom" class="mb-4" dark color="blue lighten-1">อ่านอะไรดี</v-btn>
           </v-col> 
-           
         </v-row>
       </div>
       
@@ -90,7 +150,8 @@
             <v-img alt="logo" class=" mt-2 hidden-sm" contain min-width="45"
               src="@/assets/logo1.png" width="45" />
             <v-btn text router-link to="/">
-              <h1 style="color:white;font-size:24px;">101's DOCTRINE</h1>
+              <h1 v-if="wn" style="color:white;font-size:18px;"></h1>
+              <h1 v-else style="color:white;font-size:24px; font-family: 'Sarabun', sans-serif;">คำสอนคุณครูไม่ใหญ่</h1>
             </v-btn>
           </div>
         </v-toolbar-title>
@@ -107,17 +168,21 @@
       </v-app-bar>
 
       <!-- ปุ่ม to top -->
-      <v-btn v-scroll="onScroll"  v-show="fab" fab fixed bottom right @click="toTop">
-        <v-speed-dial v-model="fab" >
+      <v-btn v-scroll="onScroll"  v-show="fab" fab fixed bottom right >
+        <!-- <v-btn v-model="fab" color="blue darken-3" dark fab  >
+          <v-icon>mdi-chevron-up</v-icon>
+        </v-btn> -->
+        <v-speed-dial v-model="fab">
           <template v-slot:activator>
-            <v-btn v-model="fab" color="blue darken-3" dark fab  >
-              <v-icon>mdi-chevron-up</v-icon>
+            <v-btn v-model="fab" color="blue darken-3" dark fab>
+              <v-icon v-if="fab">mdi-close</v-icon>
             </v-btn>
           </template>
-          <v-btn fab dark small color="blue darken-1" >
-            <v-icon>mdi-magnify</v-icon>
+          <v-btn v-model="fab" color="blue lighten-1" dark fab @click="toTop">
+            <v-icon>mdi-chevron-up</v-icon>
           </v-btn>
         </v-speed-dial>
+
       </v-btn>
     </div>
 
@@ -167,7 +232,7 @@ export default {
   }),
   created(){
       this.words_search = ''
-      this.label_search = 'ค้นหาธรรมะหลวงพ่อ'
+      
       this.$store.dispatch('clear')
   },
   computed:{
@@ -180,7 +245,7 @@ export default {
       }
     },
     on () {
-      if (this.$route.name === 'Home') {
+      if (this.$route.name === 'Home' || this.$route.name ===  'Home2') {
         return true
       }
         return false
@@ -191,9 +256,21 @@ export default {
       }
         return false 
     },
+    hp () {
+      if (this.$route.name === 'Home2') {
+        return true
+      }
+        return false 
+    },
     opn () {
       console.log (!this.$vuetify.breakpoint.xsOnly)
       return !this.$vuetify.breakpoint.xsOnly
+    },
+    wn () {
+      return this.$vuetify.breakpoint.xsOnly
+    },
+    pz () {
+      return this.$vuetify.breakpoint.smOnly
     },
     random(){
       return this.$store.getters.getsearchrandom
