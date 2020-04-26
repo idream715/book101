@@ -1,8 +1,8 @@
 <template>
-  <div name="sarabun">
+  <div name="sarabun" class="all">
     <v-card flat>
       <v-card-title class="justify-center">
-        <div class="display-1 font-weight-bold">
+        <div class="font-weight-bold">
           {{bookSelected.book_name}}
         </div>
       </v-card-title>
@@ -49,8 +49,8 @@
             sm="12"
             md="6" 
             class="
+              d-flex 
               align-center 
-              justify-sm-center 
               align-md-start 
               flex-column
             "
@@ -103,8 +103,7 @@
         <v-list>
           <v-subheader 
             class="primary--text title d-flex justify-center font-weight-bold"
-            v-text="'สารบัญ'"
-          ></v-subheader>
+          ><h4 class="sara">สารบัญ</h4></v-subheader>
           <div v-if="loading===true">
             <v-skeleton-loader
               v-for="(n,i) in 10" :key="i"
@@ -274,3 +273,28 @@ export default {
     }
 }
 </script>
+
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Sarabun&display=swap');
+
+  .v-application .font-weight-bold {  
+    font-family: 'Sarabun', sans-serif;
+    font-size: 1.5rem;
+  }
+
+  .all {
+    font-family: 'Sarabun', sans-serif;
+  }
+
+  p {
+    font-family: 'Sarabun', sans-serif;
+  }
+  
+  .sara {
+    font-family: 'Sarabun', sans-serif;
+  }
+  
+  .v-application .subtitle-1 {
+    font-family: 'Sarabun', sans-serif !important;
+  }
+</style>
