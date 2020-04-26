@@ -168,10 +168,21 @@
       </v-app-bar>
 
       <!-- ปุ่ม to top -->
-      <v-btn v-scroll="onScroll"  v-show="fab" fab fixed bottom right @click="toTop">
-        <v-btn v-model="fab" color="blue darken-3" dark fab  >
+      <v-btn v-scroll="onScroll"  v-show="fab" fab fixed bottom right >
+        <!-- <v-btn v-model="fab" color="blue darken-3" dark fab  >
           <v-icon>mdi-chevron-up</v-icon>
-        </v-btn>
+        </v-btn> -->
+        <v-speed-dial v-model="fab">
+          <template v-slot:activator>
+            <v-btn v-model="fab" color="blue darken-3" dark fab>
+              <v-icon v-if="fab">mdi-close</v-icon>
+            </v-btn>
+          </template>
+          <v-btn v-model="fab" color="blue lighten-1" dark fab @click="toTop">
+            <v-icon>mdi-chevron-up</v-icon>
+          </v-btn>
+        </v-speed-dial>
+
       </v-btn>
     </div>
 
