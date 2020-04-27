@@ -185,7 +185,6 @@ export default new Vuex.Store({
       commit('SET_BOOK_SELECTED', selected)
     },
     setPagenation({commit, state}, {limit, offset, book_id}){
-      console.log(book_id)
       commit('SET_OVERLAY', true)
       callApi.getData(
         `?path=/indexs&limit=${limit}&offset=${offset}&query={"book_id":"${book_id}"}`

@@ -273,7 +273,6 @@
           let offset = 0
           offset = timesLoaded*this.itemsPerPage-this.itemsPerPage;
           this.$store.dispatch('setContinueToLoad', {limit:this.itemsPerPage, offset:offset, book_id : this.id})
-          console.log('offset'+offset)
         }
       },
       // searchSarabun(e){

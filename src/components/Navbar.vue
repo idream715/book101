@@ -5,53 +5,45 @@
     <div v-if="on" class="homep">
       <div v-if="opn" align="end">
         <v-btn dark router-link to="/Books" text>
-          <v-icon class="mr-2"></v-icon>หนังสือธรรมะ
+          <v-icon class="mr-2">mdi-book</v-icon>หนังสือธรรมะ
         </v-btn>
-
-        <v-btn v-if="hp" dark router-link to="/" text>
-          <v-icon class="mr-2"></v-icon>ค้นเนื้อหา
-        </v-btn>
-        <v-btn v-else dark router-link to="/home2" text>
-          <v-icon class="mr-2"></v-icon>ค้นหาการ์ด
-        </v-btn>
-
         <v-btn dark router-link to="/About" text>
-          <v-icon class="mr-2"></v-icon>เกี่ยวกับ
+          <v-icon class="mr-2">mdi-account-circle</v-icon>เกี่ยวกับ
         </v-btn>
       </div>
       <!-- แถบเมนูโทรศัพท์ -->
       <div v-else align="end" class="mr-5">
-          <v-app-bar-nav-icon dark @click.stop="drawer = !drawer"></v-app-bar-nav-icon>
-          <v-navigation-drawer v-model="drawer" absolute right temporary color="blue lighten-2">
-            <v-list nav dense>
-              <v-list-item-group align="start" v-model="group">
-                <v-list-item>
-                  <v-list-item-title>
-                    <v-btn dark router-link to="/Books" text>
-                      <v-icon class="mr-2"></v-icon><v-icon class="mr-4">mdi-book-open-page-variant</v-icon>หนังสือธรรมะ
-                    </v-btn>
-                  </v-list-item-title>
-                </v-list-item>
-                <v-list-item>
-                  <v-list-item-title>
-                    <v-btn v-if="hp" dark router-link to="/" text>
-                      <v-icon class="mr-2"></v-icon><v-icon class="mr-4">mdi-view-carousel</v-icon>ค้นเนื้อหา
-                    </v-btn>
-                    <v-btn v-else dark router-link to="/Home2" text>
-                      <v-icon class="mr-2"></v-icon><v-icon class="mr-4">mdi-view-carousel</v-icon>ค้นหาการ์ด
-                    </v-btn>
-                  </v-list-item-title>
-                </v-list-item>
-                <v-list-item>
-                  <v-list-item-title>
-                    <v-btn dark router-link to="/About" text>
-                      <v-icon class="mr-2"></v-icon><v-icon class="mr-4">mdi-account-circle</v-icon>เกี่ยวกับ
-                    </v-btn>
-                  </v-list-item-title>
-                </v-list-item>
-              </v-list-item-group>
-            </v-list>
-          </v-navigation-drawer>
+        <v-menu
+        bottom
+        left
+      >
+        <template v-slot:activator="{ on }">
+          <v-btn
+            icon
+            color="white"
+            v-on="on"
+          >
+            <v-icon>mdi-dots-vertical</v-icon>
+          </v-btn>
+        </template>
+
+        <v-list>
+          <v-list-item>  
+            <v-list-item-title>
+              <v-btn router-link to="/Books" text>
+                <v-icon class="mr-2"></v-icon><v-icon class="mr-4">mdi-book</v-icon>หนังสือธรรมะ
+              </v-btn>
+            </v-list-item-title>
+          </v-list-item>
+          <v-list-item>  
+            <v-list-item-title>
+              <v-btn router-link to="/About" text>
+                <v-icon class="mr-2"></v-icon><v-icon class="mr-4">mdi-account-circle</v-icon>เกี่ยวกับ
+              </v-btn>
+            </v-list-item-title>
+          </v-list-item>
+        </v-list>
+      </v-menu>
       </div>
 
       <div>
@@ -195,7 +187,7 @@ export default {
     colors: ['green', 'purple', 'indigo', 'cyan', 'teal', 'orange'],
     editing: null,
     index: -1,
-    items: [{ header: 'สามารถใสคำได้สูงสุด 5 คำ' }],
+    items: [{ header: 'สามารถใส่คำค้นหาได้สูงสุด 5 คำ' }],
     nonce: 1,
     menu: false,
     x: 0,      
@@ -229,15 +221,7 @@ export default {
       }
         return false 
     },
-    hp () {
-      if (this.$route.name === 'Home2') {
-        return true
-      }
-        return false
-        
-    },
     opn () {
-      // console.log (!this.$vuetify.breakpoint.xsOnly)
       return !this.$vuetify.breakpoint.xsOnly
     },
     wn () {
@@ -258,7 +242,7 @@ export default {
         this.$router.push('/Indexs');
         this.$store.dispatch('setFirstIndexsFromApi',{words:this.words_search,page:"0"})
       }else{
-        this.label_search = 'กรุณาใส่คำที่ต้องการค้นหา'
+        this.label_search = 'กรุณาใส่คำที่่ต้องการค้นหา'
       }
     },
     searchrandom(){

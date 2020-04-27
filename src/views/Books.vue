@@ -66,18 +66,13 @@
           </v-col>
         </v-row>
       </v-container>
-    <Sarabun @emitFalse="setOpenDialog" :dialog="openDialog" />
   </div>
 </template>
 
 <script>
-// @ is an alias to /src
-import Sarabun from '@/components/Sarabun.vue'
+
 
 export default {
-  components: {
-    Sarabun
-  },
   data() {
     return {
       openDialog : false,

@@ -12,7 +12,7 @@
                 :items="items"
                 :search-input.sync="search"
                 hide-selected
-                label="ค้นหาธรรมะ"
+                :label="label_search"
                 multiple
                 small-chips
                 solo
@@ -170,6 +170,7 @@ export default {
   data () {
       return {
         dialog: false,
+        label_search:"ค้นหาธรรมะ",
         content:"",
         content_copy:"",
         head_content:"",
@@ -181,7 +182,7 @@ export default {
         colors: ['green', 'purple', 'indigo', 'cyan', 'teal', 'orange'],
         editing: null,
         index: -1,
-        items: [{ header: 'สามารถใสคำได้สูงสุด 5 คำ' }],
+        items: [{ header: 'สามารถใส่คำค้นหาได้สูงสุด 5 คำ' }],
         nonce: 1,
         menu: false,
         x: 0,      
@@ -247,7 +248,11 @@ export default {
        }
     },
     clicksearch(input){
+      if(!(input.length===0)){
       this.$store.dispatch('setFirstIndexsFromApi',{words:input,page:0,infenit:false})
+      }else{
+        this.label_search='กรุณาใส่คำที่่ต้องการค้นหา'
+      }
     },
     search_infenit(){
       let offset = this.$store.getters.getIndexs.length
