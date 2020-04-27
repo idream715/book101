@@ -16,8 +16,8 @@ export default new Vuex.Store({
     bookSelected:{},
     sarabunSelected:[],
     totalsSarabun:0,
-    offset:0,
     search_random:[],
+    flag:1,
   },
   mutations: {
     SET_BOOKS(state, payload){
@@ -28,6 +28,9 @@ export default new Vuex.Store({
     },
     SET_INDEXS_INFENIT(state, payload){
       payload.forEach(x=>{state.indexs.push(x)})
+    },
+    SET_SARABUN_INFENIT(state, payload){
+      payload.forEach(x=>{state.sarabunSelected.push(x)})
     },
     SET_INDEXS(state, payload){
       state.indexs=payload
@@ -53,11 +56,17 @@ export default new Vuex.Store({
     SET_BOOK_SELECTED(state, payload){
       state.bookSelected = payload
     },
-    SET_PAGENATION(state, payload){
-      state.offset = payload
-    },
-    SET_SEARCH_RANDOM(state,payload){
+    SET_SEARCH_RANDOM(state, payload){
       state.search_random = payload
+    },
+    SET_FLAG(state){
+      state.flag+=10
+    },
+    CLEAR_FLAG(state){
+      state.flag=1
+    },
+    SET_FLAG_BOOK(state, payload){
+      state.flag += payload
     },
     
   },
@@ -79,74 +88,76 @@ export default new Vuex.Store({
     setwordssearch({commit},words){
       commit('SET_WORDS_SEARCH',words)
     },
-    clearindex({commit}){
-      commit('SET_INDEXS', [])
-    },
     setFirstIndexsFromApi({ commit },{words,page}){
+      commit('SET_INDEXS', [])
       commit('SET_WORDS_SEARCH',words)
+      commit('CLEAR_FLAG')
       let tags = []
       words.forEach(element => {
-        let tag = `{"search_details":{"$regex":"${element}"}}`
+        let tag = `{"search_details":{"$regex":"${element.text}"}}`
         tags.push(tag)
       });
       commit('SET_OVERLAY', true)
-      callApi.getData(`?path=/indexs&limit=5&offset=${page}&query={"$and":[${tags}]} `)
-      .then(res=>{
-        let data = res.data
-        if(data.length===0){commit('SET_NOTFOUND', true)}else{commit('SET_NOTFOUND', false)}
-        commit('SET_OVERLAY', false)
-        commit('SET_TOTALS_INDEXS', data.nitems)
-        let details = data.items.map(x=>x.search_details)
-        let index = data.items.map(x=>x.search_index)
-        function marks(array1,array2){        
-          let marks = []
-          array1.forEach(index => {
-            let render = index
-            array2.forEach(word=>{render = render.replace(word,`<mark>${word}</mark>`)})
-            marks.push(render)
+      callApi.getData(`?path=/indexs&limit=10&offset=${page}&query={"$and":[${tags}]} `)
+        .then(res=>{
+          let data = res.data
+          commit('SET_OVERLAY', false)
+          if(data.nitems === 0){commit('SET_NOTFOUND', true)}else{commit('SET_NOTFOUND', false)}
+          commit('SET_TOTALS_INDEXS', data.nitems)
+          let details = data.items.map(x=>x.search_details)
+          let index = data.items.map(x=>x.search_index)
+          function marks(array1,array2){        
+            let marks = []
+            array1.forEach(index => {
+              let render = index
+              array2.forEach(word=>{render = render.replace(word.text,`<mark>${word.text}</mark>`)})
+              marks.push(render)
+            })
+            return marks
+          }
+          let indexmarked =  marks(index,words)
+          let detailsmarked = marks(details,words)  
+          data.items.forEach((item,i) =>{
+            item["mark_index"]= indexmarked[i]
+            item["mark_details"]= detailsmarked[i]
           })
-          return marks
-        }
-        let indexmarked =  marks(index,words)
-        let detailsmarked = marks(details,words)  
-        data.items.forEach((item,i) =>{
-          item["mark_index"]= indexmarked[i]
-          item["mark_details"]= detailsmarked[i]
-        })
-        commit('SET_INDEXS', data.items)
+          commit('SET_INDEXS', data.items)
         }).catch(err => console.log(err))
     },
-    setFirstIndexsFromApi_infenit({ commit },{words,page}){
-      commit('SET_WORDS_SEARCH',words)
-      let tags = []
-      words.forEach(element => {
-        let tag = `{"search_details":{"$regex":"${element}"}}`
-        tags.push(tag)
-      });
-      callApi.getData(`?path=/indexs&limit=5&offset=${page}&query={"$and":[${tags}]} `)
-      .then(res=>{
-        let data = res.data
-        let details = data.items.map(x=>x.search_details)
-        let index = data.items.map(x=>x.search_index)
-        function marks(array1,array2){        
-          let marks = []
-          array1.forEach(index => {
-            let render = index
-            array2.forEach(word=>{
-              render = render.replace(word,`<mark>${word}</mark>`)
+    setFirstIndexsFromApi_infenit({ commit,state },{words,page}){
+      if(page>state.flag){
+        commit('SET_FLAG')
+        commit('SET_WORDS_SEARCH',words)
+        let tags = []
+        words.forEach(element => {
+          let tag = `{"search_details":{"$regex":"${element.text}"}}`
+          tags.push(tag)
+        });
+        callApi.getData(`?path=/indexs&limit=10&offset=${page}&query={"$and":[${tags}]} `)
+          .then(res=>{
+            let data = res.data
+            let details = data.items.map(x=>x.search_details)
+            let index = data.items.map(x=>x.search_index)
+            function marks(array1,array2){        
+              let marks = []
+              array1.forEach(index => {
+                let render = index
+                array2.forEach(word=>{
+                  render = render.replace(word.text,`<mark>${word.text}</mark>`)
+                })
+                marks.push(render)
+              })
+              return marks
+            }
+            let indexmarked =  marks(index,words)
+            let detailsmarked = marks(details,words)  
+            data.items.forEach((item,i) =>{
+              item["mark_index"]= indexmarked[i]
+              item["mark_details"]= detailsmarked[i]
             })
-            marks.push(render)
-          })
-          return marks
-        }
-        let indexmarked =  marks(index,words)
-        let detailsmarked = marks(details,words)  
-        data.items.forEach((item,i) =>{
-          item["mark_index"]= indexmarked[i]
-          item["mark_details"]= detailsmarked[i]
-        })
-        commit('SET_INDEXS_INFENIT', data.items)
-        }).catch(err => console.log(err))
+          commit('SET_INDEXS_INFENIT', data.items)
+          }).catch(err => console.log(err))
+      }else{return}  
     },
     setsearchrandom({ commit },number){
       commit('SET_OVERLAY', true)
@@ -159,14 +170,13 @@ export default new Vuex.Store({
       })
       .catch(err => console.log(err))
     },
-    setbook_index({commit},name){
-      let tag = `{"book_name":{"$regex":"${name}"}}`
+    setbook_index({commit}, id){
       commit('SET_OVERLAY', true)
-      callApi.getData(`?path=/books&limit=1&offset=0&query={"$and":[${tag}]}`)
+      callApi.getData(`?path=/books/${id}`)
         .then(res=>{
           let data = res.data
           commit('SET_OVERLAY', false)
-          commit('SET_BOOK_SELECTED', data.items[0])
+          commit('SET_BOOK_SELECTED', data)
         })
         .catch(err => console.log(err))
     },
@@ -174,10 +184,11 @@ export default new Vuex.Store({
     setBookSelected({commit}, selected){
       commit('SET_BOOK_SELECTED', selected)
     },
-    setPagenation({commit, state}, {limit, offset, book_name}){
+    setPagenation({commit, state}, {limit, offset, book_id}){
+      console.log(book_id)
       commit('SET_OVERLAY', true)
       callApi.getData(
-        `?path=/indexs&limit=${limit}&offset=${offset}&query={"search_heading":"${book_name}"}`
+        `?path=/indexs&limit=${limit}&offset=${offset}&query={"book_id":"${book_id}"}`
       ).then(res=>{
           let data = res.data
           commit('SET_SARABUN', data.items)
@@ -186,6 +197,18 @@ export default new Vuex.Store({
             commit('SET_SARABUN_TOTAL', data.nitems);
         })
         .catch(err => console.log(err))
+    },
+    setContinueToLoad({commit, state}, {limit, offset, book_id}){
+      if(offset>state.flag){
+        commit('SET_FLAG_BOOK', limit)
+        callApi.getData(
+          `?path=/indexs&limit=${limit}&offset=${offset}&query={"book_id":"${book_id}"}`
+        ).then(res=>{
+            let data = res.data
+            commit('SET_SARABUN_INFENIT', data.items)
+        }).catch(err => console.log(err))
+      }else{return}
+      
     },
    
 
@@ -221,11 +244,9 @@ export default new Vuex.Store({
     getIndexs(state){
       return state.indexs
     },
-
     getoverlay(state){
       return state.overlay
     },
-
     getnotfound(state){
       return state.notfound
     },

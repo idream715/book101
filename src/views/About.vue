@@ -91,11 +91,12 @@
                  </v-card>            
             </v-container>
         </v-content>
-        <v-footer class="justify-center" padless > 
+        <!-- <v-footer padless > 
             <v-card
                 flat
                 tile
-                class="white--text text-center"
+                class="white--text text-center "
+                absolute
             >
             <v-card-text>
                 <v-btn
@@ -107,15 +108,19 @@
                     <v-icon size="24px">{{ icon }}</v-icon>
                 </v-btn>
             </v-card-text>
-            
-            <v-card-text>
-             
-            </v-card-text>
-                <v-divider></v-divider>
+            <v-divider></v-divider>
             <v-card-text > &copy;
                 {{ new Date().getFullYear() }} — <strong>Created by  RGT-101BOOK</strong>
             </v-card-text>
             </v-card>
+        </v-footer> -->
+        <v-footer padless>
+            <v-col
+            class="text-center"
+            cols="12"
+            >
+            {{ new Date().getFullYear() }} — <strong>Created by  RGT-101BOOK</strong>
+            </v-col>
         </v-footer>
     </div>
 </template>

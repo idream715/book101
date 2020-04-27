@@ -1,9 +1,15 @@
 <template>
-  <div name="sarabun">
-    <v-card>
+  <div name="sarabun" class="all">
+    <v-card flat max-width="800" class="mx-auto">
+      <v-skeleton-loader
+        v-if="loading===true"
+        max-width="600"
+        type="heading"
+        class="mx-auto d-flex justify-center mt-5"
+      ></v-skeleton-loader>
       <v-card-title class="justify-center">
-        <div class="display-1 font-weight-bold">
-          {{book_name}}
+        <div class="font-weight-bold">
+          {{bookSelected.book_name}}
         </div>
       </v-card-title>
       <v-card-text >
@@ -49,8 +55,8 @@
             sm="12"
             md="6" 
             class="
+              d-flex 
               align-center 
-              justify-sm-center 
               align-md-start 
               flex-column
             "
@@ -67,56 +73,73 @@
                 class="d-flex justify-start"
               ></v-skeleton-loader>
             </div>
-            <div class="subtitle-1" v-else>
-              <p>รวมสารบัญ 
-                <span class="pink--text subtitle-1" v-text="sarabunTotal"></span>
+            <div class="subtitle-1 justify-md-center" v-else>
+              <p>จำนวนสารบัญ 
+                <span class="pink--text subtitle-1 font-weight-bold" v-text="sarabunTotal"></span>
               </p>
               <p>ชุดหนังสือ 
-                <span class="pink--text subtitle-1" v-text="bookSelected.book_category"></span>
+                <span class="pink--text subtitle-1 font-weight-bold" v-text="bookSelected.book_category"></span>
               </p>
-            <v-btn
-              :href="bookSelected.book_link_pdf"
-              target="_blank"
-              class="mr-3"
-              color="primary"
-              >
-              <v-icon>mdi-file-pdf</v-icon>
-              <div>PDF</div> 
-            </v-btn>
-            <v-btn
-              :href="bookSelected.book_link_text"
-              target="_blank"
-              color="primary"
-              >
-              <v-icon class="mr-1">mdi-book-open-page-variant</v-icon>
-              <div>TEXT</div> 
-            </v-btn>
+              <v-btn
+                :href="bookSelected.book_link_pdf"
+                target="_blank"
+                class="mr-3"
+                color="primary"
+                >
+                <v-icon>mdi-file-pdf</v-icon>
+                <div>PDF</div> 
+              </v-btn>
+              <v-btn
+                :href="bookSelected.book_link_text"
+                target="_blank"
+                color="primary"
+                >
+                <v-icon class="mr-1">mdi-book-open-page-variant</v-icon>
+                <div>TEXT</div> 
+              </v-btn>
             </div>
           </v-col>
         </v-row>
       </v-card-text>
+      <!-- <form @submit.prevent="noop" class="mx-auto">
+        <v-text-field
+          max-width="200"
+          v-model="wordSearch"
+          v-on:keyup="searchSarabun"
+          label="ค้นหาสารบัญ"
+        ></v-text-field>
+        <v-btn
+          :disabled="!wordSearch"
+          color="primary"
+          text
+          class="mt-3"
+          @click="searchSarabun"
+        >
+          <v-icon class="" >mdi-magnify</v-icon> 
+        </v-btn>
+      </form> -->
       <v-card
-        max-width="800"
         class="mx-auto elevation-10"
       >
         <v-list>
           <v-subheader 
             class="primary--text title d-flex justify-center font-weight-bold"
-            v-text="'สารบัญ'"
-          ></v-subheader>
-          <div v-if="loading===true">
+          >
+            <h4 class="sara">สารบัญ</h4>
+          </v-subheader>
+          <div v-for="(n,i) in 5" :key="i">
             <v-skeleton-loader
-              v-for="(n,i) in 3" :key="i"
-              ref="skeleton"
+              v-if="loading"
               type="list-item"
+              :loading="loading"
+              transition="fade-transition"
               class="mx-auto"
             ></v-skeleton-loader>
           </div>
           
-            
           <v-list-item-group
             active-class="primary--text"
-            >
+          >
             <template v-for="(item, i) in sarabunSelected">
               <v-list-item :key="item.search_index">
                 <template v-slot:default="{ active }">
@@ -127,7 +150,7 @@
                   </v-list-item-avatar>
 
                   <v-list-item-content>
-                    <v-list-item-title v-text="item.search_index"></v-list-item-title>
+                    <v-list-item-title v-text="item.search_index" style="line-height: unset;"></v-list-item-title>
                   </v-list-item-content>
                   
                   <v-list-item-action v-if="active">
@@ -153,76 +176,32 @@
               ></v-divider>
             </template>
           </v-list-item-group>
-          <v-divider></v-divider>
-          <!-- v-intersect="onIntersect" -->
           <v-row>
-            <v-col cols="12">
-            <v-skeleton-loader
-              v-for="n in 3"
-              :key="n"
-              type="list-item"
-              class="mx-auto"
-            ></v-skeleton-loader>
+            <v-col cols="12" v-if="sarabunSelected.length>0 && sarabunSelected.length < sarabunTotal">
+              <v-skeleton-loader
+                v-for="n in 3"
+                :key="n"
+                type="list-item"
+                class="mx-auto"
+                v-intersect="nextLoading"
+              ></v-skeleton-loader>
             </v-col>
           </v-row>
            
         </v-list>
       </v-card>
-
-      <!-- <v-card-text>
-        <div> 
-          <v-data-table
-            :loading="loading" 
-            loading-text="Loading... Please wait"
-            :headers="headers"
-            :items="sarabunSelected"
-            :page.sync="page"
-            :items-per-page="itemsPerPage"
-            hide-default-footer
-            class="elevation-1 mt-3"
-            dense
-            mx-width="500"
-            >
-            <template v-slot:item.actions="{ item }">
-              <v-btn 
-                :href="item.link_pdf" 
-                target="_blank" text icon>
-                <v-icon color="red">
-                  mdi-file-pdf
-                </v-icon>
-                <span>PDF</span>
-              </v-btn>
-              <v-btn
-                @click="readText(item.search_index,item.search_details)"
-                text icon
-                >
-                <v-icon color="blue">
-                  mdi-book-open-page-variant
-                </v-icon>
-                <span>TEXT</span>
-              </v-btn>
-            </template>
-          </v-data-table>
-          
-          <div class="text-center pt-2">
-            <v-pagination 
-              v-model="page" 
-              :length="pages"
-            ></v-pagination>
-          </div>
-        </div>
-      </v-card-text> -->
     </v-card>
     <v-dialog
       v-model="dialogReadText"
-      >
-      <v-card>
-        <v-card-title class="d-flex justify-center">
-          {{textSarabun}}
+      max-width="800" 
+      class="elevation-10"
+    >
+      <v-card >
+        <v-card-title class="d-flex justify-center" v-html="textSarabun">
         </v-card-title>
-        <v-card-text style="white-space: pre-wrap;" class="d-flex justify-center">
-          {{textDetail}}
+        <v-card-text style="white-space: pre-wrap;" class="d-flex justify-center" v-html="textDetail">
         </v-card-text>
+        <input type="hidden" id="textDetail" style="white-space: pre-wrap; " :value="textDetail">
         <v-card-actions class="justify-end">
           <v-btn
             color="primary"
@@ -231,7 +210,6 @@
           >
             {{word_copy}}
           </v-btn>
-          <input type="hidden" id="textDetail" :value="textSarabun+' '+textDetail">
           <v-btn
             color="primary"
             text
@@ -246,97 +224,108 @@
 </template>
 
 <script>
-export default {
-  props: {
-    book_name: String
-  },
-  data() {
-    return {
-      dialogReadText: false,
-      page: 1,
-      itemsPerPage: 50,
-      page_count:0,
-      headers: [
-        {
-          text: 'สารบัญ',
-          align: 'start',
-          value: 'search_index',
-          sortable: false,
-        },
-        {
-          text: 'อ่าน', 
-          value: 'actions',
-          align: 'end',
-          sortable: false,
-        },
-      ],
-      textSarabun:"",
-      textDetail:``,
-      word_copy:'คัดลอก',
-    }
-  },
-  created() {
-    this.$store.dispatch('setbook_index',this.book_name)
-    this.$store.dispatch('setPagenation', {limit:this.itemsPerPage, offset:0, book_name: this.book_name})
-  },
-  watch: {
-    page(val){
-      let offset = 0
-      if(val===1)
-        offset =0
-      else 
-        offset = val*this.itemsPerPage-this.itemsPerPage;
-
-      this.$store.dispatch('clearSarabun')
-      this.$store.dispatch('setPagenation', {limit:this.itemsPerPage, offset:offset, book_name: this.book_name})
-      // console.log('offset'+offset)
+  export default {
+    props: {
+      id: String
     },
-  },
-   methods: {
-    readText(sarabun,detail){
-      this.dialogReadText = !this.dialogReadText
-      this.textSarabun = sarabun
-      this.textDetail = detail
-      this.word_copy = 'คัดลอก'
-    },
-    copyTextDetail () {
-      let textDetailToCopy = document.querySelector('#textDetail')
-      textDetailToCopy.setAttribute('type', 'text')    
-      textDetailToCopy.select()
-
-      try {
-        var successful = document.execCommand('copy');
-        var msg = successful ? 'คัดลอกแล้ว' : 'คัดลอกไม่สำเร็จ';
-        this.word_copy = `${msg}`
-      } catch (err) {
-      alert('Oops, unable to copy');
+    data() {
+      return {
+        dialogReadText: false,
+        itemsPerPage: 50,
+        textSarabun:"",
+        textDetail:``,
+        word_copy:'คัดลอก',
+        wordSearch:"",
       }
-
-      /* unselect the range */
-      textDetailToCopy.setAttribute('type', 'hidden')
-      window.getSelection().removeAllRanges()
     },
-  },
-  computed: {
-      bookSelected(){
-        return this.$store.getters.getBookSelected
+    created() {
+      this.$store.dispatch('setbook_index',this.id)
+      this.$store.dispatch('setPagenation', {limit:this.itemsPerPage, offset:0, book_id: this.id})
+    },
+    methods: {
+      readText(sarabun,detail){
+        this.dialogReadText = !this.dialogReadText
+        this.textSarabun = sarabun
+        this.textDetail = detail
+        this.word_copy = 'คัดลอก'
       },
-      sarabunSelected(){
-        return this.$store.getters.getSarabun
+      copyTextDetail () {
+        let textDetailToCopy = document.querySelector('#textDetail')
+        textDetailToCopy.setAttribute('type', 'text')    
+        textDetailToCopy.select()
+
+        try {
+          var successful = document.execCommand('copy');
+          var msg = successful ? 'คัดลอกแล้ว' : 'คัดลอกไม่สำเร็จ';
+          this.word_copy = `${msg}`
+        } catch (err) {
+          alert('Oops, unable to copy');
+        }
+
+        /* unselect the range */
+        textDetailToCopy.setAttribute('type', 'hidden')
+        window.getSelection().removeAllRanges()
       },
-      sarabunTotal(){
-        return this.$store.getters.getTotalSarabun     
+      nextLoading(){
+        let timesLoaded = Math.ceil(this.$store.getters.getSarabun.length/this.itemsPerPage) 
+        if(timesLoaded<this.pages){
+          timesLoaded += 1
+          let offset = 0
+          offset = timesLoaded*this.itemsPerPage-this.itemsPerPage;
+          this.$store.dispatch('setContinueToLoad', {limit:this.itemsPerPage, offset:offset, book_id : this.id})
+          console.log('offset'+offset)
+        }
       },
-      pages(){
-        return Math.ceil(this.sarabunTotal/this.itemsPerPage)
-      },
-      loading(){
-        return this.$store.getters.getoverlay     
+      // searchSarabun(e){
+      //   if (e.keyCode === 13) {
+      //     this.wordSearch
+      //   }     
+      // },
+      // noop () {
+      //   do nothing ?
+      // },
+    },
+    computed: {
+        bookSelected(){
+          return this.$store.getters.getBookSelected
+        },
+        sarabunSelected(){
+          return this.$store.getters.getSarabun
+        },
+        sarabunTotal(){
+          return this.$store.getters.getTotalSarabun     
+        },
+        pages(){
+          return Math.ceil(this.sarabunTotal/this.itemsPerPage)
+        },
+        loading(){
+          return this.$store.getters.getoverlay     
+        },
       }
-    }
-}
+  }
 </script>
 
 <style>
+  @import url('https://fonts.googleapis.com/css2?family=Sarabun&display=swap');
 
+  .v-application .font-weight-bold {  
+    font-family: 'Sarabun', sans-serif;
+    font-size: 1.5rem;
+  }
+
+  .all {
+    font-family: 'Sarabun', sans-serif;
+  }
+
+  p {
+    font-family: 'Sarabun', sans-serif;
+  }
+  
+  .sara {
+    font-family: 'Sarabun', sans-serif;
+  }
+  
+  .v-application .subtitle-1 {
+    font-family: 'Sarabun', sans-serif !important;
+  }
 </style>
