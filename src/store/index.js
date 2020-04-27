@@ -16,7 +16,6 @@ export default new Vuex.Store({
     bookSelected:{},
     sarabunSelected:[],
     totalsSarabun:0,
-    offset:0,
     search_random:[],
     flag:1,
   },
@@ -29,6 +28,9 @@ export default new Vuex.Store({
     },
     SET_INDEXS_INFENIT(state, payload){
       payload.forEach(x=>{state.indexs.push(x)})
+    },
+    SET_SARABUN_INFENIT(state, payload){
+      payload.forEach(x=>{state.sarabunSelected.push(x)})
     },
     SET_INDEXS(state, payload){
       state.indexs=payload
@@ -54,10 +56,7 @@ export default new Vuex.Store({
     SET_BOOK_SELECTED(state, payload){
       state.bookSelected = payload
     },
-    SET_PAGENATION(state, payload){
-      state.offset = payload
-    },
-    SET_SEARCH_RANDOM(state,payload){
+    SET_SEARCH_RANDOM(state, payload){
       state.search_random = payload
     },
     SET_FLAG(state){
@@ -65,6 +64,9 @@ export default new Vuex.Store({
     },
     CLEAR_FLAG(state){
       state.flag=1
+    },
+    SET_FLAG_BOOK(state, payload){
+      state.flag += payload
     },
     
   },
@@ -168,13 +170,13 @@ export default new Vuex.Store({
       })
       .catch(err => console.log(err))
     },
-    setbook_index({commit},name){
+    setbook_index({commit}, id){
       commit('SET_OVERLAY', true)
-      callApi.getData(`?path=/books/${name}`)
+      callApi.getData(`?path=/books/${id}`)
         .then(res=>{
           let data = res.data
           commit('SET_OVERLAY', false)
-          commit('SET_BOOK_SELECTED', data.items[0])
+          commit('SET_BOOK_SELECTED', data)
         })
         .catch(err => console.log(err))
     },
@@ -182,10 +184,11 @@ export default new Vuex.Store({
     setBookSelected({commit}, selected){
       commit('SET_BOOK_SELECTED', selected)
     },
-    setPagenation({commit, state}, {limit, offset, book_name}){
+    setPagenation({commit, state}, {limit, offset, book_id}){
+      console.log(book_id)
       commit('SET_OVERLAY', true)
       callApi.getData(
-        `?path=/indexs&limit=${limit}&offset=${offset}&query={"search_heading":"${book_name}"}`
+        `?path=/indexs&limit=${limit}&offset=${offset}&query={"book_id":"${book_id}"}`
       ).then(res=>{
           let data = res.data
           commit('SET_SARABUN', data.items)
@@ -194,6 +197,18 @@ export default new Vuex.Store({
             commit('SET_SARABUN_TOTAL', data.nitems);
         })
         .catch(err => console.log(err))
+    },
+    setContinueToLoad({commit, state}, {limit, offset, book_id}){
+      if(offset>state.flag){
+        commit('SET_FLAG_BOOK', limit)
+        callApi.getData(
+          `?path=/indexs&limit=${limit}&offset=${offset}&query={"book_id":"${book_id}"}`
+        ).then(res=>{
+            let data = res.data
+            commit('SET_SARABUN_INFENIT', data.items)
+        }).catch(err => console.log(err))
+      }else{return}
+      
     },
    
 

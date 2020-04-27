@@ -271,9 +271,8 @@ export default {
         window.getSelection().removeAllRanges()
       },
     clickedSendbook(bookname2) {
-        this.$store.dispatch('setbook_index',bookname2)
-        let openBook = this.$router.resolve({path: `/book/${bookname2}`});
-        window.open(openBook.href, '_blank')
+      let openBook = this.$router.resolve({path: `/book/${bookname2}`});
+      window.open(openBook.href, '_blank')
     },
     filter (item, queryText, itemText) {
       if (item.header) return false
