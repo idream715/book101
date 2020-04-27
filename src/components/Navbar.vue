@@ -1,7 +1,8 @@
 <template>
   <div>
     <!-- หน้า Home -->
-    <div v-if="on" class="homep" align="center">
+    <!-- เเถบเมนูหน้าคอม -->
+    <div v-if="on" class="homep">
       <div v-if="opn" align="end">
         <v-btn dark router-link to="/Books" text>
           <v-icon class="mr-2"></v-icon>หนังสือธรรมะ
@@ -18,6 +19,7 @@
           <v-icon class="mr-2"></v-icon>เกี่ยวกับ
         </v-btn>
       </div>
+      <!-- แถบเมนูโทรศัพท์ -->
       <div v-else align="end" class="mr-5">
           <v-app-bar-nav-icon dark @click.stop="drawer = !drawer"></v-app-bar-nav-icon>
           <v-navigation-drawer v-model="drawer" absolute right temporary color="blue lighten-2">
@@ -51,21 +53,21 @@
             </v-list>
           </v-navigation-drawer>
       </div>
-      
-      <div class="d-flex" align="center" justify="center">
-        <v-row v-if="pz" align="center" justify="center">
+
+      <div>
+        <v-row>
           <v-col>
             <v-row>
-              <v-col cols="5" >
-                <v-img class="ml-12 mt-12" alt="logo" contain min-width="175" 
+              <v-col cols="12" sm="6" md="12" align="center">
+                <v-img class="mt-12" alt="logo" contain min-width="175" 
                   src="@/assets/logo1.png" width="45" />
               </v-col>
-              <v-col cols="5">
-                <v-row align="center" justify="center">
-                  <v-col cols="12">
+              <v-col cols="12" sm="6" md="12">
+                <v-row>
+                  <v-col cols="12" align="center">
                     <h1 style="color:white" class="mt-8">คำสอนคุณครูไม่ใหญ่</h1>
                   </v-col>
-                  <v-col cols="12">
+                  <v-col cols="12" align="center">
                     <v-combobox  v-model="words_search" :filter="filter" :hide-no-data="!search" :items="items" :search-input.sync="search"  hide-selected  :label="label_search"  multiple small-chips  solo style="width:325px">
                       <template v-slot:no-data>
                         <v-list-item>
@@ -82,11 +84,9 @@
                       </template>
                     </v-combobox>
                   </v-col>
-                  <v-col cols="5">
-                    <v-btn @click="clicksearch_home" class="mb-4" dark color="blue lighten-1"><v-icon class="mr-3">mdi-magnify</v-icon>ค้นหา</v-btn>
-                  </v-col>
-                  <v-col cols="5">
-                    <v-btn @click="searchrandom" class="mb-4" dark color="blue lighten-1">อ่านอะไรดี</v-btn>
+                  <v-col cols="12" align="center">
+                    <v-btn @click="clicksearch_home" class="mr-10" dark color="blue lighten-1"><v-icon class="mr-3">mdi-magnify</v-icon>ค้นหา</v-btn>
+                    <v-btn @click="searchrandom" class="" dark color="blue lighten-1">อ่านอะไรดี</v-btn>
                   </v-col>
                 </v-row>
               </v-col>
@@ -94,53 +94,6 @@
           </v-col> 
         </v-row>
 
-        <v-row v-else align="center" justify="center">
-          <v-col cols="12">
-            <v-img class="mt-3" alt="logo" contain min-width="200" 
-              src="@/assets/logo1.png" width="45" />
-            <h1 style="color:white" class="mt-8">คำสอนคุณครูไม่ใหญ่</h1>
-          </v-col>
-          <v-col cols="12">
-            <v-combobox v-if="hp" v-model="words_search" :filter="filter" :hide-no-data="!search" :items="items" :search-input.sync="search"  hide-selected  label="ค้นหาการ์ด"  multiple small-chips  solo style="width:325px">
-                <template v-slot:no-data>
-                  <v-list-item>
-                    <span class="subheading">ต้องการค้นหา</span>
-                    <v-chip :color="`${colors[nonce - 1]} lighten-3`" label small >{{ search }} </v-chip>
-                    <span class="subheading">กรุณากด</span><kbd>enter</kbd>
-                  </v-list-item>
-                </template>
-                <template v-slot:selection="{ attrs, item, parent, selected }">
-                  <v-chip  v-if="item === Object(item)" v-bind="attrs" :color="`${item.color} lighten-3`" :input-value="selected" label small >
-                    <span class="pr-2">{{ item.text }} </span>
-                    <v-icon small @click="parent.selectItem(item)">mdi-close</v-icon>
-                  </v-chip>
-                </template>
-              </v-combobox>
-              
-            <v-combobox v-else v-model="words_search" :filter="filter" :hide-no-data="!search" :items="items" :search-input.sync="search"  hide-selected  :label="label_search"  multiple small-chips  solo style="width:325px">
-                <template v-slot:no-data>
-                  <v-list-item>
-                    <span class="subheading">ต้องการค้นหา</span>
-                    <v-chip :color="`${colors[nonce - 1]} lighten-3`" label small >{{ search }} </v-chip>
-                    <span class="subheading">กรุณากด</span><kbd>enter</kbd>
-                  </v-list-item>
-                </template>
-                <template v-slot:selection="{ attrs, item, parent, selected }">
-                  <v-chip  v-if="item === Object(item)" v-bind="attrs" :color="`${item.color} lighten-3`" :input-value="selected" label small >
-                    <span class="pr-2">{{ item.text }} </span>
-                    <v-icon small @click="parent.selectItem(item)">mdi-close</v-icon>
-                  </v-chip>
-                </template>
-              </v-combobox>
-          </v-col>
-          <v-col cols="4" sm="2" md="2" lg="1">
-            <v-btn @click="clicksearch_home" class="mb-4" dark color="blue lighten-1"><v-icon class="mr-3">mdi-magnify</v-icon>ค้นหา</v-btn>
-          </v-col> 
-          <v-col cols="4" sm="2" md="2" lg="1">
-            <v-btn v-if="hp" @click="searchrandom" class="mb-4" dark color="blue lighten-1">กดสุ่มการ์ด</v-btn>
-            <v-btn v-else @click="searchrandom" class="mb-4" dark color="blue lighten-1">อ่านอะไรดี</v-btn>
-          </v-col> 
-        </v-row>
       </div>
       
     </div>
@@ -202,7 +155,7 @@
           <v-card class="d-flex justify-center" flat>
             <v-card class="max-width-auto"  flat>
               <v-card-text class="headline lighten-2 ">{{item.search_index}}</v-card-text>
-              <v-list-item-title class="grey--text "><v-btn text @click="clickedSendbook(item.book_id)">จากหนังสือ:{{item.search_heading}}</v-btn></v-list-item-title>
+              <v-list-item-title class="grey--text "><v-btn text color="primary" @click="clickedSendbook(item.book_id)"><v-icon small class="mr-2">mdi-book-open-page-variant</v-icon>จากหนังสือ:{{item.search_heading}}</v-btn></v-list-item-title>
             <div >
               <v-card-text style="font-size: 17px; white-space: pre-wrap;" >{{item.search_details}}</v-card-text>
             </div>
@@ -242,7 +195,7 @@ export default {
     colors: ['green', 'purple', 'indigo', 'cyan', 'teal', 'orange'],
     editing: null,
     index: -1,
-    items: [{ header: 'สูงสุด ๕ คำ' }],
+    items: [{ header: 'สามารถใสคำได้สูงสุด 5 คำ' }],
     nonce: 1,
     menu: false,
     x: 0,      
@@ -284,14 +237,11 @@ export default {
         
     },
     opn () {
-      console.log (!this.$vuetify.breakpoint.xsOnly)
+      // console.log (!this.$vuetify.breakpoint.xsOnly)
       return !this.$vuetify.breakpoint.xsOnly
     },
     wn () {
       return this.$vuetify.breakpoint.xsOnly
-    },
-    pz () {
-      return this.$vuetify.breakpoint.smOnly
     },
     random(){
       return this.$store.getters.getsearchrandom
@@ -308,7 +258,7 @@ export default {
         this.$router.push('/Indexs');
         this.$store.dispatch('setFirstIndexsFromApi',{words:this.words_search,page:"0"})
       }else{
-        this.label_search = 'กรุณาใสคำที่ต้องการค้นหา'
+        this.label_search = 'กรุณาใส่คำที่ต้องการค้นหา'
       }
     },
     searchrandom(){
