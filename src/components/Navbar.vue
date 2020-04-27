@@ -99,7 +99,7 @@
             <h1 style="color:white" class="mt-8">คำสอนคุณครูไม่ใหญ่</h1>
           </v-col>
           <v-col cols="12">
-            <v-combobox v-if="hp" v-model="words_search" :filter="filter" :hide-no-data="!search" :items="items" :search-input.sync="search"  hide-selected  :label="label_search"  multiple small-chips  solo style="width:325px">
+            <v-combobox  v-model="words_search" :filter="filter" :hide-no-data="!search" :items="items" :search-input.sync="search"  hide-selected  :label="label_search"  multiple small-chips  solo style="width:325px">
                 <template v-slot:no-data>
                   <v-list-item>
                     <span class="subheading">ต้องการค้นหา</span>
@@ -258,8 +258,9 @@ export default {
     },
     hp () {
       if (this.$route.name === 'Home2') {
-        this.label_search = 'ค้นหาการ์ด'
+        return true
       }
+        return false
         
     },
     opn () {
