@@ -66,17 +66,19 @@
                     <h1 style="color:white" class="mt-8">คำสอนคุณครูไม่ใหญ่</h1>
                   </v-col>
                   <v-col cols="12">
-                    <v-combobox v-model="words_search" :items="items" :search-input.sync="search" hide-selected hint="สูงสุด 5 เเท็ก"
-                      :label="label_search" multiple persistent-hint chips solo style="width:325px;">
+                    <v-combobox  v-model="words_search" :filter="filter" :hide-no-data="!search" :items="items" :search-input.sync="search"  hide-selected  :label="label_search"  multiple small-chips  solo style="width:325px">
                       <template v-slot:no-data>
                         <v-list-item>
-                          <v-list-item-content>
-                            <v-list-item-title align="center" justify="center">
-                              ยืนยันคำว่า"<strong>{{ search }}</strong>"กรุณากด<kbd>enter</kbd> 
-                              <v-btn class="ml-4" dark color="blue lighten-1" @click="clicksearch_home"><v-icon >mdi-magnify</v-icon></v-btn>
-                            </v-list-item-title>
-                          </v-list-item-content>
+                          <span class="subheading">ต้องการค้นหา</span>
+                          <v-chip :color="`${colors[nonce - 1]} lighten-3`" label small >{{ search }} </v-chip>
+                          <span class="subheading">กรุณากด</span><kbd>enter</kbd>
                         </v-list-item>
+                      </template>
+                      <template v-slot:selection="{ attrs, item, parent, selected }">
+                        <v-chip  v-if="item === Object(item)" v-bind="attrs" :color="`${item.color} lighten-3`" :input-value="selected" label small >
+                          <span class="pr-2">{{ item.text }} </span>
+                          <v-icon small @click="parent.selectItem(item)">mdi-close</v-icon>
+                        </v-chip>
                       </template>
                     </v-combobox>
                   </v-col>
@@ -104,7 +106,7 @@
                   <v-list-item>
                     <span class="subheading">ต้องการค้นหา</span>
                     <v-chip :color="`${colors[nonce - 1]} lighten-3`" label small >{{ search }} </v-chip>
-                    <span class="subheading">กรุณากด</span>
+                    <span class="subheading">กรุณากด</span><kbd>enter</kbd>
                   </v-list-item>
                 </template>
                 <template v-slot:selection="{ attrs, item, parent, selected }">
@@ -232,7 +234,9 @@ export default {
   }),
   created(){
       this.words_search = []
-      this.label_search = 'ค้นหาธรรมะหลวงพ่อ'
+   
+        this.label_search = 'ค้นหาธรรมะหลวงพ่อ'
+      
       this.$store.dispatch('clear')
   },
   computed:{
@@ -327,7 +331,6 @@ export default {
         .indexOf(query.toString().toLowerCase()) > -1
     },
     clickedSendbook(bookname2) {
-        this.$store.dispatch('setbook_index',bookname2)
         let openBook = this.$router.resolve({path: `/book/${bookname2}`});
         window.open(openBook.href, '_blank')
     },
@@ -352,7 +355,7 @@ export default {
               }
 
               return v
-        })
+            })
      
     },
     group () {

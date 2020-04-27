@@ -2,9 +2,9 @@
   <div class="indexs">
     <v-container  >
        
-      <v-row class="row" align="center" justify="center">
+      <v-row class="mb-1" align="center" justify="center">
             
-          <v-col cols="12" md="10" class="">
+          <v-col cols="12" md="10" class="pb-1">
               <v-combobox
                 v-model="search__pageindex"
                 :filter="filter"
@@ -27,7 +27,7 @@
                     >
                       {{ search }}
                     </v-chip>
-                    <span class="subheading">กรุณากด</span>
+                    <span class="subheading">กรุณากด</span><kbd>enter</kbd>
                   </v-list-item>
                 </template>
                 <template v-slot:selection="{ attrs, item, parent, selected }">
@@ -50,17 +50,15 @@
                 </template>
               </v-combobox>
           </v-col>
-          <v-col cols="12" md="2" class="">
-            <v-btn color="primary" outlined @click="clicksearch(getwords)" align="center" justify="center">
-              <v-icon class="mb-2" >mdi-magnify</v-icon> <p class="mt-2">ค้นหา</p>
+          <v-col cols="12" md="2" class="mb-5">
+            <v-btn color="primary" outlined @click="clicksearch(getwords)"  align="center" justify="center">
+              <v-icon class="mb-2" >mdi-magnify</v-icon> <p class="mt-1">ค้นหา</p>
             </v-btn>
           </v-col>
-        
       </v-row>
+         <v-col v-if="setoverlay===false" cols="6" align="start" justify="center" class="pt-1">พบ {{getTotalIndexs}} รายการ</v-col>
 
        <v-row v-if="setoverlay===false">
-         <v-col cols="6" align="start" justify="center">พบ {{getTotalIndexs}} รายการ</v-col>
-         <v-col cols="6" align="end" justify="center"></v-col>
        </v-row>   
 
        <v-row v-if="setoverlay===false">
@@ -293,15 +291,19 @@ export default {
         this.$nextTick(() => this.words_pageindex.pop()) 
       }
       if (val.length === prev.length) return
+
         this.search__pageindex = val.map(v => {
           if (typeof v === 'string') {
             v = {
               text: v,
               color: this.colors[this.nonce - 1],
             }
+
             this.items.push(v)
+
             this.nonce++
           }
+
           return v
         })
     } 
