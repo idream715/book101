@@ -155,7 +155,7 @@
           <v-card class="d-flex justify-center" flat>
             <v-card class="max-width-auto"  flat>
               <v-card-text class="headline lighten-2 ">{{item.search_index}}</v-card-text>
-              <v-list-item-title class="grey--text "><v-btn text @click="clickedSendbook(item.book_id)">จากหนังสือ:{{item.search_heading}}</v-btn></v-list-item-title>
+              <v-list-item-title class="grey--text "><v-btn text color="primary" @click="clickedSendbook(item.book_id)"><v-icon small class="mr-2">mdi-book-open-page-variant</v-icon>จากหนังสือ:{{item.search_heading}}</v-btn></v-list-item-title>
             <div >
               <v-card-text style="font-size: 17px; white-space: pre-wrap;" >{{item.search_details}}</v-card-text>
             </div>
@@ -195,7 +195,7 @@ export default {
     colors: ['green', 'purple', 'indigo', 'cyan', 'teal', 'orange'],
     editing: null,
     index: -1,
-    items: [{ header: 'สูงสุด ๕ คำ' }],
+    items: [{ header: 'สามารถใสคำได้สูงสุด 5 คำ' }],
     nonce: 1,
     menu: false,
     x: 0,      
@@ -258,7 +258,7 @@ export default {
         this.$router.push('/Indexs');
         this.$store.dispatch('setFirstIndexsFromApi',{words:this.words_search,page:"0"})
       }else{
-        this.label_search = 'กรุณาใสคำที่ต้องการค้นหา'
+        this.label_search = 'กรุณาใส่คำที่ต้องการค้นหา'
       }
     },
     searchrandom(){

@@ -97,14 +97,15 @@
                         <v-list-item-title class="grey--text" align="end">{{i+1}}</v-list-item-title>
                       </v-col>
                     </v-row>
-                    <v-list-item-title class="grey--text"><v-btn text @click="clickedSendbook(index.book_id)">จากหนังสือ:{{index.search_heading}}</v-btn></v-list-item-title>
+                    
+                    <v-list-item-title><v-btn text color="primary" @click="clickedSendbook(index.book_id)"><v-icon small class="mr-2">mdi-book-open-page-variant</v-icon> จากหนังสือ:{{index.search_heading}}</v-btn></v-list-item-title>
                     <p v-html="text_render(index.mark_details)"></p>
                   </v-card-text>
                 </v-col>
                 <v-col cols="12" class="pa-1">
                   <v-card-actions class="d-flex justify-end pa-1">
                      <v-btn text color="orange" style="margin-right:10px;" target="_blank" :href="index.link_pdf">PDF</v-btn>
-                     <v-btn text color="red lighten-2" @click="dialogs(index.search_index,index.search_details,index.mark_details,index.search_heading)">Read All</v-btn>
+                     <v-btn text color="red lighten-2" @click="dialogs(index.search_index,index.search_details,index.mark_details,index.search_heading)">อ่านทั้งหมด</v-btn>
                   </v-card-actions>
                 </v-col>
             </v-card><hr>
@@ -180,7 +181,7 @@ export default {
         colors: ['green', 'purple', 'indigo', 'cyan', 'teal', 'orange'],
         editing: null,
         index: -1,
-        items: [{ header: 'สูงสุด ๕ คำ' }],
+        items: [{ header: 'สามารถใสคำได้สูงสุด 5 คำ' }],
         nonce: 1,
         menu: false,
         x: 0,      
@@ -325,6 +326,7 @@ p{
   overflow: hidden;
   text-overflow: ellipsis;
   font-size: 17px;
+  font-family: 'Sarabun', sans-serif;
 }
 .indexs{
   font-family: 'Sarabun', sans-serif;
@@ -332,6 +334,7 @@ p{
 .headline{
   font-family: 'Sarabun', sans-serif;
 }
+
 
 </style>
 
