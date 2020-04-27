@@ -2,43 +2,63 @@
   <div class="indexs">
     <v-container  >
        
-      <v-row class="row" align="center" justify="center">
+      <v-row class="mb-1" align="center" justify="center">
             
-          <v-col cols="12" md="10" class="">
-            <v-combobox
-              id="search_index"
-              v-model="search__pageindex"
-              :items="items"
-              :search-input.sync="search"
-              hide-selected
-              hint="Maximum of 5 tags"
-              label="Add some tags"
-              multiple
-              persistent-hint
-              small-chips
-            >
-              <template v-slot:no-data>
-                <v-list-item>
-                  <v-list-item-content>
-                    <v-list-item-title>
-                      No results matching "<strong>{{ search }}</strong>". Press <kbd>enter</kbd> to create a new one
-                    </v-list-item-title>
-                  </v-list-item-content>
-                </v-list-item>
-              </template>
-            </v-combobox>
+          <v-col cols="12" md="10" class="pb-1">
+              <v-combobox
+                v-model="search__pageindex"
+                :filter="filter"
+                :hide-no-data="!search"
+                :items="items"
+                :search-input.sync="search"
+                hide-selected
+                label="ค้นหาธรรมะ"
+                multiple
+                small-chips
+                solo
+              >
+                <template v-slot:no-data>
+                  <v-list-item>
+                    <span class="subheading">ต้องการค้นหา</span>
+                    <v-chip
+                      :color="`${colors[nonce - 1]} lighten-3`"
+                      label
+                      small
+                    >
+                      {{ search }}
+                    </v-chip>
+                    <span class="subheading">กรุณากด</span><kbd>enter</kbd>
+                  </v-list-item>
+                </template>
+                <template v-slot:selection="{ attrs, item, parent, selected }">
+                  <v-chip
+                    v-if="item === Object(item)"
+                    v-bind="attrs"
+                    :color="`${item.color} lighten-3`"
+                    :input-value="selected"
+                    label
+                    small
+                  >
+                    <span class="pr-2">
+                      {{ item.text }}
+                    </span>
+                    <v-icon
+                      small
+                      @click="parent.selectItem(item)"
+                    >mdi-close</v-icon>
+                  </v-chip>
+                </template>
+              </v-combobox>
           </v-col>
-          <v-col cols="12" md="2" class="">
-            <v-btn color="primary" outlined @click="clicksearch(getwords)" align="center" justify="center">
-              <v-icon class="mb-2" >mdi-magnify</v-icon> <p class="mt-2">Search</p>
+          <v-col cols="12" md="2" class="mb-5">
+            <v-btn color="primary" outlined @click="clicksearch(getwords)"  align="center" justify="center">
+              <v-icon class="mb-2" >mdi-magnify</v-icon> <p class="mt-1">ค้นหา</p>
             </v-btn>
           </v-col>
-        
       </v-row>
+         <v-col v-if="setoverlay===false" cols="6" align="start" justify="center" class="pt-1">พบ {{getTotalIndexs}} รายการ</v-col>
 
        <v-row v-if="setoverlay===false">
-         <v-col cols="6" align="start" justify="center">พบ {{getTotalIndexs}} รายการ</v-col>
-         <v-col cols="6" align="end" justify="center"></v-col>
        </v-row>   
 
        <v-row v-if="setoverlay===false">
@@ -74,7 +94,7 @@
                         <v-list-item-title class="headline mb-5 " v-html="index.mark_index"></v-list-item-title>
                       </v-col>
                       <v-col cols="2">
-                        <v-list-item-title align="end">รายการที่ {{i+1}}</v-list-item-title>
+                        <v-list-item-title class="grey--text" align="end">{{i+1}}</v-list-item-title>
                       </v-col>
                     </v-row>
                     <v-list-item-title class="grey--text"><v-btn text @click="clickedSendbook(index.book_id)">จากหนังสือ:{{index.search_heading}}</v-btn></v-list-item-title>
@@ -84,23 +104,31 @@
                 <v-col cols="12" class="pa-1">
                   <v-card-actions class="d-flex justify-end pa-1">
                      <v-btn text color="orange" style="margin-right:10px;" target="_blank" :href="index.link_pdf">PDF</v-btn>
-                     <v-btn text color="red lighten-2" @click="dialogs(index.search_index,index.search_details,index.mark_details)">Read All</v-btn>
+                     <v-btn text color="red lighten-2" @click="dialogs(index.search_index,index.search_details,index.mark_details,index.search_heading)">Read All</v-btn>
                   </v-card-actions>
                 </v-col>
             </v-card><hr>
           </div>
 
-          <v-dialog v-model="dialog" width="1500"  >
+          <v-dialog v-model="dialog" max-width="1100" align="center"   >
             <v-card>
-              <v-card-title class="headline lighten-2">{{head_content}}</v-card-title>
-                <v-card-text v-html="content_copy" style="font-size: 17px; white-space: pre-wrap;" ></v-card-text>
+              <v-card class="d-flex justify-center" flat>
+                <v-card class="max-width-auto"  flat>
+                  <v-card-text class="headline lighten-2 ">{{head_content}}</v-card-text>
+                  <v-list-item-title class="grey--text "><v-btn text @click="clickedSendbook(index.book_id)">จากหนังสือ:{{frombook}}</v-btn></v-list-item-title>
+                <div >
+                  <v-card-text  v-html="content_copy" style="font-size: 17px; white-space: pre-wrap;" ></v-card-text>
+                </div>
+                </v-card>  
+                
+              </v-card>
               <v-card-actions>
                 <v-spacer></v-spacer>
                 <v-btn color="primary" text @click.stop.prevent="copyTextDetail">{{word_copy}}</v-btn>
                 <v-btn color="primary" text @click="closs">ออก</v-btn>
-              <input type="hidden" id="textDetail" :value="content">
+                <input type="hidden" id="textDetail" :value="content">
               </v-card-actions>
-            </v-card>
+              </v-card>
           </v-dialog>
 
         </v-col>
@@ -120,7 +148,7 @@
           </v-col>
         </div>
 
-        <v-col cols="12" v-if="indexs.length>0 && indexs.length<getTotalIndexs">
+        <v-col cols="12" v-if=" indexs.length<getTotalIndexs">
           <v-card >
               
             <v-skeleton-loader
@@ -144,11 +172,19 @@ export default {
         content:"",
         content_copy:"",
         head_content:"",
+        frombook:"",
         search:"",
-        page:0,
-        items: ['บุญ', 'วิชชา'],
-        word_copy:'คัดลอก'
-       
+        word_copy:'คัดลอก',
+        activator: null,
+        attach: null,
+        colors: ['green', 'purple', 'indigo', 'cyan', 'teal', 'orange'],
+        editing: null,
+        index: -1,
+        items: [{ header: 'สูงสุด ๕ คำ' }],
+        nonce: 1,
+        menu: false,
+        x: 0,      
+        y: 0,
  
       }
     },
@@ -168,9 +204,6 @@ export default {
     getTotalIndexs(){
       return this.$store.getters.getTotalIndexs
     },
-    pages(){ 
-      return Math.ceil(this.getTotalIndexs/5)
-    },
     search__pageindex: {
 			get: function() {
 				let words = this.$store.getters.getwords_search
@@ -182,11 +215,12 @@ export default {
     }
   },
   methods:{
-    dialogs(head,content,content_copy){
+    dialogs(head,content,content_copy,book){
       this.dialog=!this.dialog
       this.content=content
       this.content_copy=content_copy
       this.head_content=head
+      this.frombook=book
     },
     closs(){
       this.dialog=!this.dialog
@@ -212,25 +246,16 @@ export default {
        }
     },
     clicksearch(input){
-      this.page = 0
       this.$store.dispatch('setFirstIndexsFromApi',{words:input,page:0,infenit:false})
     },
     search_infenit(){
-      let page =Math.ceil(this.$store.getters.getIndexs.length/5) 
-      if(page<=this.pages){
-      page += 1
-      console.log(page)
-      let remitcards = 5
-      let pageoffset = (remitcards*(page-1))
-      this.$store.dispatch('setFirstIndexsFromApi_infenit',{words:this.getwords,page:pageoffset,infenit:true})
-      }
+      let offset = this.$store.getters.getIndexs.length
+      this.$store.dispatch('setFirstIndexsFromApi_infenit',{words:this.getwords,page:offset,})
     },
     copyTextDetail () {
-        
         let textDetailToCopy = document.querySelector('#textDetail')
         textDetailToCopy.setAttribute('type', 'text')    
         textDetailToCopy.select()
-
         try {
           var successful = document.execCommand('copy');
           var msg = successful ? 'คัดลอกแล้ว' : 'คัดลอกไม่สำเร็จ';
@@ -247,14 +272,41 @@ export default {
       let openBook = this.$router.resolve({path: `/book/${bookname2}`});
       window.open(openBook.href, '_blank')
     },
-  },
-   watch: {
-    search__pageindex (val) {
-      if (val.length > 5) {
-        this.$nextTick(() => this.search__pageindex.pop())
-      }
-    },
+    filter (item, queryText, itemText) {
+      if (item.header) return false
 
+        const hasValue = val => val != null ? val : ''
+
+        const text = hasValue(itemText)
+        const query = hasValue(queryText)
+
+        return text.toString()
+        .toLowerCase()
+        .indexOf(query.toString().toLowerCase()) > -1
+    },
+  },
+  watch: {
+    search__pageindex (val,prev) {
+      if (val.length > 5) {
+        this.$nextTick(() => this.words_pageindex.pop()) 
+      }
+      if (val.length === prev.length) return
+
+        this.search__pageindex = val.map(v => {
+          if (typeof v === 'string') {
+            v = {
+              text: v,
+              color: this.colors[this.nonce - 1],
+            }
+
+            this.items.push(v)
+
+            this.nonce++
+          }
+
+          return v
+        })
+    } 
   },   
 }
 </script>

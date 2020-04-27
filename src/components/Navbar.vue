@@ -66,17 +66,19 @@
                     <h1 style="color:white" class="mt-8">คำสอนคุณครูไม่ใหญ่</h1>
                   </v-col>
                   <v-col cols="12">
-                    <v-combobox v-model="words_search" :items="items" :search-input.sync="search" hide-selected hint="สูงสุด 5 เเท็ก"
-                      :label="label_search" multiple persistent-hint chips solo style="width:325px;">
+                    <v-combobox  v-model="words_search" :filter="filter" :hide-no-data="!search" :items="items" :search-input.sync="search"  hide-selected  :label="label_search"  multiple small-chips  solo style="width:325px">
                       <template v-slot:no-data>
                         <v-list-item>
-                          <v-list-item-content>
-                            <v-list-item-title align="center" justify="center">
-                              ยืนยันคำว่า"<strong>{{ search }}</strong>"กรุณากด<kbd>enter</kbd> 
-                              <v-btn class="ml-4" dark color="blue lighten-1" @click="clicksearch_home"><v-icon >mdi-magnify</v-icon></v-btn>
-                            </v-list-item-title>
-                          </v-list-item-content>
+                          <span class="subheading">ต้องการค้นหา</span>
+                          <v-chip :color="`${colors[nonce - 1]} lighten-3`" label small >{{ search }} </v-chip>
+                          <span class="subheading">กรุณากด</span><kbd>enter</kbd>
                         </v-list-item>
+                      </template>
+                      <template v-slot:selection="{ attrs, item, parent, selected }">
+                        <v-chip  v-if="item === Object(item)" v-bind="attrs" :color="`${item.color} lighten-3`" :input-value="selected" label small >
+                          <span class="pr-2">{{ item.text }} </span>
+                          <v-icon small @click="parent.selectItem(item)">mdi-close</v-icon>
+                        </v-chip>
                       </template>
                     </v-combobox>
                   </v-col>
@@ -99,32 +101,21 @@
             <h1 style="color:white" class="mt-8">คำสอนคุณครูไม่ใหญ่</h1>
           </v-col>
           <v-col cols="12">
-            <v-combobox v-if="hp" v-model="words_search" :items="items" :search-input.sync="search" hide-selected hint="สูงสุด 5 เเท็ก"
-              label="ค้นหาการ์ด" multiple persistent-hint chips solo style="width:325px;">
-              <template v-slot:no-data>
-                <v-list-item>
-                  <v-list-item-content>
-                    <v-list-item-title align="center" justify="center">
-                      ยืนยันคำว่า"<strong>{{ search }}</strong>"กรุณากด<kbd>enter</kbd> 
-                      <v-btn class="ml-4" dark color="blue lighten-1" @click="clicksearch_home"><v-icon >mdi-magnify</v-icon></v-btn>
-                    </v-list-item-title>
-                  </v-list-item-content>
-                </v-list-item>
-              </template>
-            </v-combobox>
-            <v-combobox v-else v-model="words_search" :items="items" :search-input.sync="search" hide-selected hint="สูงสุด 5 เเท็ก"
-              label="ค้นหาธรรมะหลวงพ่อ" multiple persistent-hint chips solo style="width:325px;">
-              <template v-slot:no-data>
-                <v-list-item>
-                  <v-list-item-content>
-                    <v-list-item-title align="center" justify="center">
-                      ยืนยันคำว่า"<strong>{{ search }}</strong>"กรุณากด<kbd>enter</kbd> 
-                      <v-btn class="ml-4" dark color="blue lighten-1" @click="clicksearch_home"><v-icon >mdi-magnify</v-icon></v-btn>
-                    </v-list-item-title>
-                  </v-list-item-content>
-                </v-list-item>
-              </template>
-            </v-combobox>
+            <v-combobox  v-model="words_search" :filter="filter" :hide-no-data="!search" :items="items" :search-input.sync="search"  hide-selected  :label="label_search"  multiple small-chips  solo style="width:325px">
+                <template v-slot:no-data>
+                  <v-list-item>
+                    <span class="subheading">ต้องการค้นหา</span>
+                    <v-chip :color="`${colors[nonce - 1]} lighten-3`" label small >{{ search }} </v-chip>
+                    <span class="subheading">กรุณากด</span><kbd>enter</kbd>
+                  </v-list-item>
+                </template>
+                <template v-slot:selection="{ attrs, item, parent, selected }">
+                  <v-chip  v-if="item === Object(item)" v-bind="attrs" :color="`${item.color} lighten-3`" :input-value="selected" label small >
+                    <span class="pr-2">{{ item.text }} </span>
+                    <v-icon small @click="parent.selectItem(item)">mdi-close</v-icon>
+                  </v-chip>
+                </template>
+              </v-combobox>
           </v-col>
           <v-col cols="4" sm="2" md="2" lg="1">
             <v-btn @click="clicksearch_home" class="mb-4" dark color="blue lighten-1"><v-icon class="mr-3">mdi-magnify</v-icon>ค้นหา</v-btn>
@@ -190,26 +181,28 @@
       <v-progress-circular indeterminate size="64"></v-progress-circular>
     </v-overlay>
 
-    <v-dialog v-model="dialog" width="1000"  >
-      <v-card v-for="(item,i) in random" :key="i" :value="item">
-        <v-card-title class="headline lighten-2" primary-title>{{ item.search_index }}</v-card-title>
-        <v-card-text class="grey--text">จากหนังสือ:{{item.search_heading}}</v-card-text>
-        <v-card-text style="font-size: 17px; white-space: pre-wrap;">{{ item.search_details }}</v-card-text>
-        <v-card-actions>
-          <v-spacer></v-spacer>
-          <v-btn color="primary" text @click="searchrandom">สุ่มเพิ่ม</v-btn>
-          <v-btn color="primary" text @click="closs">ออก</v-btn>
-        </v-card-actions>
-      </v-card>
-    </v-dialog>
+     <v-dialog v-model="dialog" max-width="1100" align="center"   >
+        <v-card v-for="(item,i) in random" :key="i" :value="item">
+          <v-card class="d-flex justify-center" flat>
+            <v-card class="max-width-auto"  flat>
+              <v-card-text class="headline lighten-2 ">{{item.search_index}}</v-card-text>
+              <v-list-item-title class="grey--text "><v-btn text @click="clickedSendbook(item.book_id)">จากหนังสือ:{{item.search_heading}}</v-btn></v-list-item-title>
+            <div >
+              <v-card-text style="font-size: 17px; white-space: pre-wrap;" >{{item.search_details}}</v-card-text>
+            </div>
+            </v-card>  
+          </v-card>
+          <v-card-actions>
+            <v-spacer></v-spacer>
+            <v-btn color="primary" text @click="searchrandom">ซุ่ม</v-btn>
+            <v-btn color="primary" text @click="closs">ออก</v-btn>
+          </v-card-actions>
+          </v-card>
+      </v-dialog>
 
    <v-overlay v-if="setoverlay===true && on">
       <v-progress-circular indeterminate size="64"></v-progress-circular>
     </v-overlay>
-
-    
-
-
 
   </div>
 </template>
@@ -223,15 +216,26 @@ export default {
     fab: false,
     title: '',
     search: null,
-    items: [],
     dialog: false,
     group: null,
     model: '',
-    words_search:'',
+    words_search:[],
     label_search:'',
+    activator: null,
+    attach: null,
+    colors: ['green', 'purple', 'indigo', 'cyan', 'teal', 'orange'],
+    editing: null,
+    index: -1,
+    items: [{ header: 'สูงสุด ๕ คำ' }],
+    nonce: 1,
+    menu: false,
+    x: 0,      
+    y: 0,
   }),
   created(){
-      this.words_search = ''
+      this.words_search = []
+   
+        this.label_search = 'ค้นหาธรรมะหลวงพ่อ'
       
       this.$store.dispatch('clear')
   },
@@ -260,7 +264,8 @@ export default {
       if (this.$route.name === 'Home2') {
         return true
       }
-        return false 
+        return false
+        
     },
     opn () {
       console.log (!this.$vuetify.breakpoint.xsOnly)
@@ -283,13 +288,12 @@ export default {
 
   methods:{
     clicksearch_home(){
-      if(this.words_search===''){
-        this.label_search = 'กรุณาใสคำที่ต้องการค้นหา'
+      if(!(this.words_search.length===0)){
+        this.$router.push('/Indexs');
+        this.$store.dispatch('setFirstIndexsFromApi',{words:this.words_search,page:"0"})
       }else{
-        this.$router.push('/Indexs')}
-        this.$store.dispatch('clearindex')
-        this.$store.dispatch('setFirstIndexsFromApi',{words:this.words_search,page:"0",infenit:false})
-
+        this.label_search = 'กรุณาใสคำที่ต้องการค้นหา'
+      }
     },
     searchrandom(){
       this.$store.dispatch('clear')
@@ -314,13 +318,45 @@ export default {
       this.$store.dispatch('clearSarabun')
       this.$store.dispatch('clearTotalsSarabun')
     },
+    filter (item, queryText, itemText) {
+      if (item.header) return false
+
+        const hasValue = val => val != null ? val : ''
+
+        const text = hasValue(itemText)
+        const query = hasValue(queryText)
+
+        return text.toString()
+        .toLowerCase()
+        .indexOf(query.toString().toLowerCase()) > -1
+    },
+    clickedSendbook(bookname2) {
+        let openBook = this.$router.resolve({path: `/book/${bookname2}`});
+        window.open(openBook.href, '_blank')
+    },
   },
   watch:{
-    words_search (val) {
+    words_search (val,prev) {
       if (val.length > 5) {
-        // หน้า home
         this.$nextTick(() => this.words_search.pop()) 
-      }
+         }
+        if (val.length === prev.length) return
+
+            this.words_search = val.map(v => {
+              if (typeof v === 'string') {
+                v = {
+                  text: v,
+                  color: this.colors[this.nonce - 1],
+                }
+
+                this.items.push(v)
+
+                this.nonce++
+              }
+
+              return v
+            })
+     
     },
     group () {
       this.drawer = false
