@@ -101,7 +101,23 @@
             <h1 style="color:white" class="mt-8">คำสอนคุณครูไม่ใหญ่</h1>
           </v-col>
           <v-col cols="12">
-            <v-combobox  v-model="words_search" :filter="filter" :hide-no-data="!search" :items="items" :search-input.sync="search"  hide-selected  :label="label_search"  multiple small-chips  solo style="width:325px">
+            <v-combobox v-if="hp" v-model="words_search" :filter="filter" :hide-no-data="!search" :items="items" :search-input.sync="search"  hide-selected  label="ค้นหาการ์ด"  multiple small-chips  solo style="width:325px">
+                <template v-slot:no-data>
+                  <v-list-item>
+                    <span class="subheading">ต้องการค้นหา</span>
+                    <v-chip :color="`${colors[nonce - 1]} lighten-3`" label small >{{ search }} </v-chip>
+                    <span class="subheading">กรุณากด</span><kbd>enter</kbd>
+                  </v-list-item>
+                </template>
+                <template v-slot:selection="{ attrs, item, parent, selected }">
+                  <v-chip  v-if="item === Object(item)" v-bind="attrs" :color="`${item.color} lighten-3`" :input-value="selected" label small >
+                    <span class="pr-2">{{ item.text }} </span>
+                    <v-icon small @click="parent.selectItem(item)">mdi-close</v-icon>
+                  </v-chip>
+                </template>
+              </v-combobox>
+              
+            <v-combobox v-else v-model="words_search" :filter="filter" :hide-no-data="!search" :items="items" :search-input.sync="search"  hide-selected  :label="label_search"  multiple small-chips  solo style="width:325px">
                 <template v-slot:no-data>
                   <v-list-item>
                     <span class="subheading">ต้องการค้นหา</span>
@@ -194,7 +210,7 @@
           </v-card>
           <v-card-actions>
             <v-spacer></v-spacer>
-            <v-btn color="primary" text @click="searchrandom">ซุ่ม</v-btn>
+            <v-btn color="primary" text @click="searchrandom">อ่านต่อ</v-btn>
             <v-btn color="primary" text @click="closs">ออก</v-btn>
           </v-card-actions>
           </v-card>
