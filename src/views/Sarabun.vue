@@ -1,6 +1,12 @@
 <template>
   <div name="sarabun" class="all">
-    <v-card flat>
+    <v-card flat max-width="800" class="mx-auto">
+      <v-skeleton-loader
+        v-if="loading===true"
+        max-width="600"
+        type="heading"
+        class="mx-auto d-flex justify-center mt-5"
+      ></v-skeleton-loader>
       <v-card-title class="justify-center">
         <div class="font-weight-bold">
           {{bookSelected.book_name}}
@@ -68,7 +74,7 @@
               ></v-skeleton-loader>
             </div>
             <div class="subtitle-1 justify-md-center" v-else>
-              <p v-if="sarabunTotal">จำนวนสารบัญ 
+              <p>จำนวนสารบัญ 
                 <span class="pink--text subtitle-1 font-weight-bold" v-text="sarabunTotal"></span>
               </p>
               <p>ชุดหนังสือ 
@@ -95,25 +101,42 @@
           </v-col>
         </v-row>
       </v-card-text>
+      <!-- <form @submit.prevent="noop" class="mx-auto">
+        <v-text-field
+          max-width="200"
+          v-model="wordSearch"
+          v-on:keyup="searchSarabun"
+          label="ค้นหาสารบัญ"
+        ></v-text-field>
+        <v-btn
+          :disabled="!wordSearch"
+          color="primary"
+          text
+          class="mt-3"
+          @click="searchSarabun"
+        >
+          <v-icon class="" >mdi-magnify</v-icon> 
+        </v-btn>
+      </form> -->
       <v-card
-        max-width="800"
         class="mx-auto elevation-10"
-        v-if="sarabunTotal"
       >
         <v-list>
           <v-subheader 
             class="primary--text title d-flex justify-center font-weight-bold"
-          ><h4 class="sara">สารบัญ</h4></v-subheader>
-          <div v-if="loading===true">
+          >
+            <h4 class="sara">สารบัญ</h4>
+          </v-subheader>
+          <div v-for="(n,i) in 5" :key="i">
             <v-skeleton-loader
-              v-for="(n,i) in 10" :key="i"
+              v-if="loading"
               type="list-item"
-              transition="scale-transition"
+              :loading="loading"
+              transition="fade-transition"
               class="mx-auto"
             ></v-skeleton-loader>
           </div>
           
-            
           <v-list-item-group
             active-class="primary--text"
           >
@@ -212,6 +235,7 @@ export default {
       textSarabun:"",
       textDetail:``,
       word_copy:'คัดลอก',
+      wordSearch:"",
     }
   },
   created() {
@@ -252,6 +276,14 @@ export default {
         console.log('offset'+offset)
       }
     },
+    // searchSarabun(e){
+    //   if (e.keyCode === 13) {
+    //     this.wordSearch
+    //   }     
+    // },
+    // noop () {
+    //   do nothing ?
+    // },
   },
   computed: {
       bookSelected(){
