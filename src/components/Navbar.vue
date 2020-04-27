@@ -56,7 +56,7 @@
         <v-row v-if="pz" align="center" justify="center">
           <v-col>
             <v-row>
-              <v-col cols="5" >
+              <v-col cols="5">
                 <v-img class="ml-12 mt-12" alt="logo" contain min-width="175" 
                   src="@/assets/logo1.png" width="45" />
               </v-col>
@@ -263,7 +263,7 @@ export default {
         return false 
     },
     opn () {
-      console.log (!this.$vuetify.breakpoint.xsOnly)
+      // console.log (!this.$vuetify.breakpoint.xsOnly)
       return !this.$vuetify.breakpoint.xsOnly
     },
     wn () {
