@@ -150,7 +150,7 @@
                   </v-list-item-avatar>
 
                   <v-list-item-content>
-                    <v-list-item-title v-text="item.search_index"></v-list-item-title>
+                    <v-list-item-title v-text="item.search_index" style="line-height: unset;"></v-list-item-title>
                   </v-list-item-content>
                   
                   <v-list-item-action v-if="active">
@@ -224,85 +224,85 @@
 </template>
 
 <script>
-export default {
-  props: {
-    id: String
-  },
-  data() {
-    return {
-      dialogReadText: false,
-      itemsPerPage: 50,
-      textSarabun:"",
-      textDetail:``,
-      word_copy:'คัดลอก',
-      wordSearch:"",
-    }
-  },
-  created() {
-    this.$store.dispatch('setbook_index',this.id)
-    this.$store.dispatch('setPagenation', {limit:this.itemsPerPage, offset:0, book_id: this.id})
-  },
-  methods: {
-    readText(sarabun,detail){
-      this.dialogReadText = !this.dialogReadText
-      this.textSarabun = sarabun
-      this.textDetail = detail
-      this.word_copy = 'คัดลอก'
+  export default {
+    props: {
+      id: String
     },
-    copyTextDetail () {
-      let textDetailToCopy = document.querySelector('#textDetail')
-      textDetailToCopy.setAttribute('type', 'text')    
-      textDetailToCopy.select()
-
-      try {
-        var successful = document.execCommand('copy');
-        var msg = successful ? 'คัดลอกแล้ว' : 'คัดลอกไม่สำเร็จ';
-        this.word_copy = `${msg}`
-      } catch (err) {
-        alert('Oops, unable to copy');
-      }
-
-      /* unselect the range */
-      textDetailToCopy.setAttribute('type', 'hidden')
-      window.getSelection().removeAllRanges()
-    },
-    nextLoading(){
-      let timesLoaded = Math.ceil(this.$store.getters.getSarabun.length/this.itemsPerPage) 
-      if(timesLoaded<this.pages){
-        timesLoaded += 1
-        let offset = 0
-        offset = timesLoaded*this.itemsPerPage-this.itemsPerPage;
-        this.$store.dispatch('setContinueToLoad', {limit:this.itemsPerPage, offset:offset, book_id : this.id})
-        console.log('offset'+offset)
+    data() {
+      return {
+        dialogReadText: false,
+        itemsPerPage: 50,
+        textSarabun:"",
+        textDetail:``,
+        word_copy:'คัดลอก',
+        wordSearch:"",
       }
     },
-    // searchSarabun(e){
-    //   if (e.keyCode === 13) {
-    //     this.wordSearch
-    //   }     
-    // },
-    // noop () {
-    //   do nothing ?
-    // },
-  },
-  computed: {
-      bookSelected(){
-        return this.$store.getters.getBookSelected
+    created() {
+      this.$store.dispatch('setbook_index',this.id)
+      this.$store.dispatch('setPagenation', {limit:this.itemsPerPage, offset:0, book_id: this.id})
+    },
+    methods: {
+      readText(sarabun,detail){
+        this.dialogReadText = !this.dialogReadText
+        this.textSarabun = sarabun
+        this.textDetail = detail
+        this.word_copy = 'คัดลอก'
       },
-      sarabunSelected(){
-        return this.$store.getters.getSarabun
+      copyTextDetail () {
+        let textDetailToCopy = document.querySelector('#textDetail')
+        textDetailToCopy.setAttribute('type', 'text')    
+        textDetailToCopy.select()
+
+        try {
+          var successful = document.execCommand('copy');
+          var msg = successful ? 'คัดลอกแล้ว' : 'คัดลอกไม่สำเร็จ';
+          this.word_copy = `${msg}`
+        } catch (err) {
+          alert('Oops, unable to copy');
+        }
+
+        /* unselect the range */
+        textDetailToCopy.setAttribute('type', 'hidden')
+        window.getSelection().removeAllRanges()
       },
-      sarabunTotal(){
-        return this.$store.getters.getTotalSarabun     
+      nextLoading(){
+        let timesLoaded = Math.ceil(this.$store.getters.getSarabun.length/this.itemsPerPage) 
+        if(timesLoaded<this.pages){
+          timesLoaded += 1
+          let offset = 0
+          offset = timesLoaded*this.itemsPerPage-this.itemsPerPage;
+          this.$store.dispatch('setContinueToLoad', {limit:this.itemsPerPage, offset:offset, book_id : this.id})
+          console.log('offset'+offset)
+        }
       },
-      pages(){
-        return Math.ceil(this.sarabunTotal/this.itemsPerPage)
-      },
-      loading(){
-        return this.$store.getters.getoverlay     
-      },
-    }
-}
+      // searchSarabun(e){
+      //   if (e.keyCode === 13) {
+      //     this.wordSearch
+      //   }     
+      // },
+      // noop () {
+      //   do nothing ?
+      // },
+    },
+    computed: {
+        bookSelected(){
+          return this.$store.getters.getBookSelected
+        },
+        sarabunSelected(){
+          return this.$store.getters.getSarabun
+        },
+        sarabunTotal(){
+          return this.$store.getters.getTotalSarabun     
+        },
+        pages(){
+          return Math.ceil(this.sarabunTotal/this.itemsPerPage)
+        },
+        loading(){
+          return this.$store.getters.getoverlay     
+        },
+      }
+  }
 </script>
 
 <style>
