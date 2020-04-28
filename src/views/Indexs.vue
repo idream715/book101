@@ -105,7 +105,7 @@
                 <v-col cols="12" class="pa-1">
                   <v-card-actions class="d-flex justify-end pa-1">
                      <v-btn text color="orange" style="margin-right:10px;" target="_blank" :href="index.link_pdf">PDF</v-btn>
-                     <v-btn text color="red lighten-2" @click="dialogs(index.search_index,index.search_details,index.mark_details,index.search_heading)">อ่านทั้งหมด</v-btn>
+                     <v-btn text color="red lighten-2" @click="dialogs(index.search_index,index.search_details,index.mark_details,index.search_heading,index.book_id)">อ่านทั้งหมด</v-btn>
                   </v-card-actions>
                 </v-col>
             </v-card><hr>
@@ -116,7 +116,7 @@
               <v-card class="d-flex justify-center" flat>
                 <v-card class="max-width-auto"  flat>
                   <v-card-text class="headline lighten-2 ">{{head_content}}</v-card-text>
-                  <v-list-item-title class="grey--text "><v-btn text @click="clickedSendbook(index.book_id)">จากหนังสือ:{{frombook}}</v-btn></v-list-item-title>
+                  <v-list-item-title class="grey--text "><v-btn text color="primary" @click="clickedSendbook(book_id)"><v-icon small class="mr-2">mdi-book-open-page-variant</v-icon>จากหนังสือ:{{frombook}}</v-btn></v-list-item-title>
                 <div >
                   <v-card-text  v-html="content_copy" style="font-size: 17px; white-space: pre-wrap;" ></v-card-text>
                 </div>
@@ -175,6 +175,7 @@ export default {
         content_copy:"",
         head_content:"",
         frombook:"",
+        book_id:"",
         search:"",
         word_copy:'คัดลอก',
         activator: null,
@@ -217,12 +218,13 @@ export default {
     }
   },
   methods:{
-    dialogs(head,content,content_copy,book){
+    dialogs(head,content,content_copy,book,id){
       this.dialog=!this.dialog
       this.content=content
       this.content_copy=content_copy
       this.head_content=head
       this.frombook=book
+      this.book_id=id
     },
     closs(){
       this.dialog=!this.dialog
