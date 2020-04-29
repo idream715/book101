@@ -5,55 +5,48 @@
       <v-row class="mb-1" align="center" justify="center">
             
           <v-col cols="12" md="10" class="pb-1">
-              <v-combobox
-                v-model="search_pageindex"
-                :filter="filter"
-                :hide-no-data="!search"
-                :items="items"
-                :search-input.sync="search"
-                hide-selected
-                :label="label_search"
-                multiple
-                small-chips
-                solo
-                :delimiters="space"
-              >
-                <template v-slot:no-data>
-                  <v-list-item>
-                    
-                    <span class="subheading mr-1">กด</span><kbd ><v-icon color="white" class="mb-2">mdi-keyboard-space</v-icon></kbd>
-                    <span class="subheading mr-1">(spacebar,เว้นวรรค) ที่แป้นพิมพ์เพื่อยืนยัน </span>
-                    <v-chip
-                      :color="`${colors[nonce - 1]} lighten-3`"
-                      label
-                      small
+                    <v-combobox 
+                      v-model="search_pageindex" 
+                      :filter="filter" 
+                      :hide-no-data="!search" 
+                      :items="items" 
+                      :search-input.sync="search"  
+                      hide-selected  
+                      :label="label_search"  
+                      multiple 
+                      small-chips  
+                      solo 
+                      :delimiters="space"
                     >
-                      {{ search }}
-                    </v-chip>
-                  </v-list-item>
-                </template>
-                <template v-slot:selection="{ attrs, item, parent, selected }">
-                  <v-chip
-                    v-if="item === Object(item)"
-                    v-bind="attrs"
-                    :color="`${item.color} lighten-3`"
-                    :input-value="selected"
-                    label
-                    small
-                  >
-                    <span class="pr-2">
-                      {{ item.text }}
-                    </span>
-                    <v-icon
-                      small
-                      @click="parent.selectItem(item)"
-                    >mdi-close</v-icon>
-                  </v-chip>
-                </template>
-              </v-combobox>
+                      <template v-slot:no-data>
+                        <v-list-item>
+                          <span class="subheading mr-1">กด</span><kbd ><v-icon color="white" class="mb-2">mdi-keyboard-space</v-icon></kbd>
+                          <span class="subheading mr-1">(spacebar,เว้นวรรค) ที่แป้นพิมพ์เพื่อยืนยัน </span>
+                          <v-chip
+                            :color="`${colors[nonce - 1]} lighten-3`"
+                            label
+                            small
+                          >
+                            {{ search }}
+                          </v-chip>                        
+                        </v-list-item>
+                      </template>
+                      <template v-slot:selection="{ attrs, item, parent, selected }">
+                        <v-chip  
+                          v-if="item === Object(item)" 
+                          v-bind="attrs" 
+                          :color="`${item.color} lighten-3`" 
+                          :input-value="selected" 
+                          label 
+                          small >
+                          <span class="pr-2">{{ item.text }} </span>
+                          <v-icon small @click="parent.selectItem(item)">mdi-close</v-icon>
+                        </v-chip>
+                      </template>
+                    </v-combobox>
           </v-col>
           <v-col cols="12" md="2" class="mb-5">
-            <v-btn @click="clicksearch(getwords)" class="mr-10" dark color="blue lighten-1"><v-icon class="mr-3">mdi-magnify</v-icon>ค้นหา</v-btn>
+            <v-btn @click="clicksearch(search_pageindex)" class="mr-10" dark color="blue lighten-1"><v-icon class="mr-3">mdi-magnify</v-icon>ค้นหา</v-btn>
           </v-col>
       </v-row>
          <v-col v-if="setoverlay===false" cols="6" align="start" justify="center" class="pt-1">พบ {{getTotalIndexs}} รายการ</v-col>
@@ -70,7 +63,7 @@
           >
             <v-card-text  class="headline">
               <div class="mb-3">คำค้นหาของคุณไม่ตรงกับเอกสารใดๆ</div>
-              <p v-for="w in getwords" :key="w" class="headline" style="color:red;">
+              <p v-for="(w,i) in search_pageindex" :key="i" :value="w" class="headline" style="color:red;">
                 - {{w.text}}
               </p>
               <div >
@@ -85,7 +78,7 @@
        </v-row>
 
        <v-row id="top" v-if="setoverlay===false"> 
-        <v-col cols="12">
+        <v-col cols="12" >
 
           <div v-for="(index,i) in indexs" :key="i" :value="index">
             <v-card  height="" flat>
@@ -204,18 +197,15 @@ export default {
     indexs(){
       return this.$store.getters.getIndexs
     },
-    getwords(){
-      return this.$store.getters.getwords_search
-    },
     getTotalIndexs(){
       return this.$store.getters.getTotalIndexs
     },
     search_pageindex: {
-			get: function() {
+			get() {
 				let words = this.$store.getters.getwords_search
 				return words
 			},
-			set: function(value) {
+			set(value) {
         this.$store.dispatch('setwordssearch',value)
       },
     }
@@ -231,6 +221,7 @@ export default {
     },
     closs(){
       this.dialog=!this.dialog
+      window.getSelection().removeAllRanges()
       this.word_copy = 'คัดลอก'
       this.content=""
       this.head_content=""
@@ -255,7 +246,7 @@ export default {
        }
     },
     clicksearch(input){
-      if(!(input.length===0)){
+      if(input.length!==0){
       this.$store.dispatch('setFirstIndexsFromApi',{words:input,page:0})
       }else{
         this.label_search='กรุณาใส่คำที่่ต้องการค้นหา'
@@ -263,7 +254,7 @@ export default {
     },
     search_infenit(){
       let offset = this.$store.getters.getIndexs.length
-      this.$store.dispatch('setFirstIndexsFromApi_infenit',{words:this.getwords,page:offset,})
+      this.$store.dispatch('setFirstIndexsFromApi_infenit',{words:this.search_pageindex,page:offset,})
     },
     copyTextDetail () {
         this.selectText(this.$refs.textCopy); // e.g. <div ref="text">
@@ -309,25 +300,25 @@ export default {
   },
   watch: {
     search_pageindex (val,prev) {
-      if (val.length > 5) {
-        this.$nextTick(() => this.search_pageindex.pop()) 
-      }
       if (val.length === prev.length) return
-
-        this.search_pageindex = val.map(v => {
-          if (typeof v === 'string') {
-            v = {
-              text: v,
-              color: this.colors[this.nonce - 1],
-            }
-
-            this.items.push(v)
-
-            this.nonce++
+      
+      if (val.length > 5) {
+        this.$nextTick(() =>this.search_pageindex.pop())
+      }
+      this.search_pageindex = val.map(v => {
+        if (typeof v === 'string') {
+          v = {
+            text: v,
+            color: this.colors[this.nonce - 1],
           }
 
-          return v
-        })
+          this.items.push(v)
+
+          this.nonce++
+        }
+
+        return v
+      })
     } 
   },   
 }

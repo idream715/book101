@@ -62,17 +62,41 @@
                     <h1 style="color:white;text-shadow:2px 2px 8px #444444;" class="mt-8">คำสอนคุณครูไม่ใหญ่</h1>
                   </v-col>
                   <v-col cols="12" align="center">
-                    <v-combobox  v-model="words_search" :filter="filter" :hide-no-data="!search" :items="items" :search-input.sync="search"  hide-selected  :label="label_search"  multiple small-chips  solo style="width:325px" :delimiters="space" >
+                    <v-combobox 
+                      v-model="words_search" 
+                      :filter="filter" 
+                      :hide-no-data="!search" 
+                      :items="items" 
+                      :search-input.sync="search"  
+                      hide-selected  
+                      :label="label_search"  
+                      multiple 
+                      small-chips  
+                      solo 
+                      style="width:325px" 
+                      :delimiters="space"
+                    >
                       <template v-slot:no-data>
                         <v-list-item>
-                          <span class="subheading">ยืนยัน</span>
-                          <v-chip :color="`${colors[nonce - 1]} lighten-3`" label small >{{ search }} </v-chip>
-                          <span class="subheading">กด </span><kbd>spacebar</kbd>
-                          <span class="subheading"> ที่แป้นพิมพ์</span>
+                          <span class="subheading mr-1">กด</span><kbd ><v-icon color="white" class="mb-2">mdi-keyboard-space</v-icon></kbd>
+                          <span class="subheading mr-1">(spacebar,เว้นวรรค) ที่แป้นพิมพ์เพื่อยืนยัน </span>
+                          <v-chip
+                            :color="`${colors[nonce - 1]} lighten-3`"
+                            label
+                            small
+                          >
+                            {{ search }}
+                          </v-chip>                        
                         </v-list-item>
                       </template>
                       <template v-slot:selection="{ attrs, item, parent, selected }">
-                        <v-chip  v-if="item === Object(item)" v-bind="attrs" :color="`${item.color} lighten-3`" :input-value="selected" label small >
+                        <v-chip  
+                          v-if="item === Object(item)" 
+                          v-bind="attrs" 
+                          :color="`${item.color} lighten-3`" 
+                          :input-value="selected" 
+                          label 
+                          small >
                           <span class="pr-2">{{ item.text }} </span>
                           <v-icon small @click="parent.selectItem(item)">mdi-close</v-icon>
                         </v-chip>
@@ -80,7 +104,7 @@
                     </v-combobox>
                   </v-col>
                   <v-col cols="12" align="center">
-                    <v-btn id="search"  @click="clicksearch_home(getwords)" class="mr-10" dark color="blue lighten-1"><v-icon class="mr-3">mdi-magnify</v-icon>ค้นหา</v-btn>
+                    <v-btn id="search"  @click="clicksearch_home(words_search)" class="mr-10" dark color="blue lighten-1"><v-icon class="mr-3">mdi-magnify</v-icon>ค้นหา</v-btn>
                     <v-btn @click="searchrandom" class="" dark color="blue lighten-1">อ่านอะไรดี</v-btn>
                   </v-col>
                 </v-row>
@@ -194,13 +218,11 @@ export default {
     x: 0,      
     y: 0,
     space:[' '],
+    words_search:[],
 
   }),
   created(){
-      this.words_search = []
-   
-        this.label_search = 'ค้นหาคำสอน(หนังสือ)'
-      
+      this.label_search = 'ค้นหาคำสอน(หนังสือ)'
       this.$store.dispatch('clear')
   },
   computed:{
@@ -248,25 +270,13 @@ export default {
     setoverlay(){
       return this.$store.getters.getoverlay
     },
-    getwords(){
-      return this.$store.getters.getwords_search
-    },
-    words_search: {
-			get: function() {
-				let words = this.$store.getters.getwords_search
-				return words
-			},
-			set: function(value) {
-        this.$store.dispatch('setwordssearch',value)
-      },
-    }
     
 
   },
 
   methods:{
     clicksearch_home(input){
-      if(!(input.length===0)){
+      if(input.length!==0){
         this.$router.push('/Indexs');
         this.$store.dispatch('setFirstIndexsFromApi',{words:input,page:0})
       }else{
@@ -315,26 +325,22 @@ export default {
   },
   watch:{
     words_search (val,prev) {
+      if (val.length === prev.length) return
+
       if (val.length > 5) {
         this.$nextTick(() => this.words_search.pop()) 
-         }
-        if (val.length === prev.length) return
-
-            this.words_search = val.map(v => {
-              if (typeof v === 'string') {
-                v = {
-                  text: v,
-                  color: this.colors[this.nonce - 1],
-                }
-
-                this.items.push(v)
-
-                this.nonce++
-              }
-
-              return v
-            })
-     
+      }
+      this.words_search = val.map(v => {
+        if (typeof v === 'string') {
+            v = {
+              text: v,
+              color: this.colors[this.nonce - 1],
+            }
+            this.items.push(v)
+            this.nonce++
+        }
+        return v
+      })
     },
     group () {
       this.drawer = false

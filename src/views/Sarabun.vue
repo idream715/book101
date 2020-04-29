@@ -226,6 +226,7 @@
     methods: {
       readText(sarabun,detail){
         this.dialogReadText = !this.dialogReadText
+        window.getSelection().removeAllRanges()
         this.textSarabun = sarabun
         this.textDetail = detail
         this.word_copy = 'คัดลอก'
