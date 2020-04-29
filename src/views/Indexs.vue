@@ -91,21 +91,21 @@
                   <v-card-text class="pa-1">
                     <v-row>
                       <v-col cols="10">
-                        <v-list-item-title class="headline mb-5 " v-html="index.mark_index"></v-list-item-title>
+                        <v-list-item-title class=" mb-1 " v-html="index.mark_index" style="line-height:2;font-size:24px;"></v-list-item-title>
                       </v-col>
                       <v-col cols="2">
                         <v-list-item-title class="grey--text" align="end">{{i+1}}</v-list-item-title>
                       </v-col>
                     </v-row>
                     
-                    <v-list-item-title><v-btn text color="primary" @click="clickedSendbook(index.book_id)"><v-icon small class="mr-2">mdi-book-open-page-variant</v-icon> จากหนังสือ:{{index.search_heading}}</v-btn></v-list-item-title>
+                    <v-list-item-title class="mb-2"><v-btn text color="primary lighten-1" @click="clickedSendbook(index.book_id)"><v-icon small class="mr-2">mdi-book-open-page-variant</v-icon> จากหนังสือ:{{index.search_heading}}</v-btn></v-list-item-title>
                     <p v-html="text_render(index.mark_details)"></p>
                   </v-card-text>
                 </v-col>
                 <v-col cols="12" class="pa-1">
                   <v-card-actions class="d-flex justify-end pa-1">
-                     <v-btn text color="orange" style="margin-right:10px;" target="_blank" :href="index.link_pdf">PDF</v-btn>
-                     <v-btn text color="red lighten-2" @click="dialogs(index.search_index,index.search_details,index.mark_details,index.search_heading,index.book_id)">อ่านทั้งหมด</v-btn>
+                     <v-btn text color="red" style="margin-right:10px;" target="_blank" :href="index.link_pdf">PDF</v-btn>
+                     <v-btn text color="blue lighten-1" @click="dialogs(index.mark_index,index.search_details,index.mark_details,index.search_heading,index.book_id)">อ่านทั้งหมด</v-btn>
                   </v-card-actions>
                 </v-col>
             </v-card><hr>
@@ -115,8 +115,8 @@
             <v-card>
               <v-card class="d-flex justify-center" flat>
                 <v-card class="max-width-auto"  flat>
-                  <v-card-text class="headline lighten-2 ">{{head_content}}</v-card-text>
-                  <v-list-item-title class="grey--text "><v-btn text color="primary" @click="clickedSendbook(book_id)"><v-icon small class="mr-2">mdi-book-open-page-variant</v-icon>จากหนังสือ:{{frombook}}</v-btn></v-list-item-title>
+                  <v-card-text class=" lighten-2 " style="line-height:2;font-size:24px;" v-html="head_content" ></v-card-text>
+                  <v-list-item-title class="grey--text "><v-btn text color="primary lighten-1" @click="clickedSendbook(book_id)"><v-icon small class="mr-2">mdi-book-open-page-variant</v-icon>จากหนังสือ:{{frombook}}</v-btn></v-list-item-title>
                 <div >
                   <v-card-text ref="textCopy" v-html="content_copy" style="font-size: 17px; white-space: pre-wrap;" ></v-card-text>
                 </div>
@@ -125,8 +125,8 @@
               </v-card>
               <v-card-actions>
                 <v-spacer></v-spacer>
-                <v-btn color="primary" text @click="copyTextDetail">{{word_copy}}</v-btn>
-                <v-btn color="primary" text @click="closs">ออก</v-btn>
+                <v-btn color="primary lighten-1" text @click="copyTextDetail">{{word_copy}}</v-btn>
+                <v-btn color="primary lighten-1" text @click="closs">ออก</v-btn>
 
               </v-card-actions>
               </v-card>
