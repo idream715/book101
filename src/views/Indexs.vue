@@ -21,7 +21,7 @@
                       <template v-slot:no-data>
                         <v-list-item>
                           <span class="subheading mr-1">กด</span><kbd ><v-icon color="white" class="mb-2">mdi-keyboard-space</v-icon></kbd>
-                          <span class="subheading mr-1">(spacebar,เว้นวรรค) ที่แป้นพิมพ์เพื่อยืนยัน </span>
+                          <span class="subheading mr-1">{{text_exp}}</span>
                           <v-chip
                             :color="`${colors[nonce - 1]} lighten-3`"
                             label
@@ -188,6 +188,12 @@ export default {
       }
     },
   computed:{
+    text_exp(){
+      if (this.$vuetify.breakpoint.xsOnly){
+        return 'ที่แป้นพิมพ์เพื่อยืนยัน'
+      }
+        return  '(spacebar,เว้นวรรค) ที่แป้นพิมพ์เพื่อยืนยัน'
+    },
     notfound(){
       return this.$store.getters.getnotfound
     },
