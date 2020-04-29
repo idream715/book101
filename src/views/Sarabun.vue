@@ -101,23 +101,6 @@
           </v-col>
         </v-row>
       </v-card-text>
-      <!-- <form @submit.prevent="noop" class="mx-auto">
-        <v-text-field
-          max-width="200"
-          v-model="wordSearch"
-          v-on:keyup="searchSarabun"
-          label="ค้นหาสารบัญ"
-        ></v-text-field>
-        <v-btn
-          :disabled="!wordSearch"
-          color="primary"
-          text
-          class="mt-3"
-          @click="searchSarabun"
-        >
-          <v-icon class="" >mdi-magnify</v-icon> 
-        </v-btn>
-      </form> -->
       <v-card
         class="mx-auto elevation-10"
       >
@@ -199,9 +182,8 @@
       <v-card >
         <v-card-title class="d-flex justify-center" v-html="textSarabun">
         </v-card-title>
-        <v-card-text style="white-space: pre-wrap;" class="d-flex justify-center" v-html="textDetail">
+        <v-card-text style="white-space: pre-wrap;" class="d-flex justify-center" ref="textCopy" v-html="textDetail">
         </v-card-text>
-        <input type="hidden" id="textDetail" style="white-space: pre-wrap; " :value="textDetail">
         <v-card-actions class="justify-end">
           <v-btn
             color="primary"
@@ -235,7 +217,6 @@
         textSarabun:"",
         textDetail:``,
         word_copy:'คัดลอก',
-        wordSearch:"",
       }
     },
     created() {
@@ -250,9 +231,7 @@
         this.word_copy = 'คัดลอก'
       },
       copyTextDetail () {
-        let textDetailToCopy = document.querySelector('#textDetail')
-        textDetailToCopy.setAttribute('type', 'text')    
-        textDetailToCopy.select()
+        this.selectText(this.$refs.textCopy); // e.g. <div ref="text">
 
         try {
           var successful = document.execCommand('copy');
@@ -261,10 +240,6 @@
         } catch (err) {
           alert('Oops, unable to copy');
         }
-
-        /* unselect the range */
-        textDetailToCopy.setAttribute('type', 'hidden')
-        window.getSelection().removeAllRanges()
       },
       nextLoading(){
         let timesLoaded = Math.ceil(this.$store.getters.getSarabun.length/this.itemsPerPage) 
@@ -275,14 +250,20 @@
           this.$store.dispatch('setContinueToLoad', {limit:this.itemsPerPage, offset:offset, book_id : this.id})
         }
       },
-      // searchSarabun(e){
-      //   if (e.keyCode === 13) {
-      //     this.wordSearch
-      //   }     
-      // },
-      // noop () {
-      //   do nothing ?
-      // },
+      selectText(element) {
+        var range;
+        if (document.selection) {
+          // IE
+          range = document.body.createTextRange();
+          range.moveToElementText(element);
+          range.select();
+        } else if (window.getSelection) {
+          range = document.createRange();
+          range.selectNode(element);
+          window.getSelection().removeAllRanges();
+          window.getSelection().addRange(range);
+        }
+      },
     },
     computed: {
         bookSelected(){
