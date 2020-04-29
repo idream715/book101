@@ -49,15 +49,17 @@
       <div>
         <v-row>
           <v-col>
-            <v-row>
+            <v-row :class="ml12">
               <v-col cols="12" sm="6" md="12" align="center">
-                <v-img class="mt-12" alt="logo" contain min-width="175" 
-                  src="@/assets/logo1.png" width="45" />
+              <!-- <v-col class="d-flex flex-column align-sm-end align-md-center"> -->
+                <v-img class="mt-12" alt="logo" contain max-height="150"
+                  src="@/assets/logo1.png" />
               </v-col>
               <v-col cols="12" sm="6" md="12">
-                <v-row>
+              <!-- <v-col class="d-flex flex-column align-sm-start align-md-center"> -->
+                <v-row :class="mr12">
                   <v-col cols="12" align="center">
-                    <h1 style="color:white" class="mt-8">คำสอนคุณครูไม่ใหญ่</h1>
+                    <h1 style="color:white;text-shadow:2px 2px 8px #444444;" class="mt-8">คำสอนคุณครูไม่ใหญ่</h1>
                   </v-col>
                   <v-col cols="12" align="center">
                     <v-combobox  v-model="words_search" :filter="filter" :hide-no-data="!search" :items="items" :search-input.sync="search"  hide-selected  :label="label_search"  multiple small-chips  solo style="width:325px" :delimiters="space" >
@@ -196,7 +198,9 @@ export default {
   }),
   created(){
       this.words_search = []
-      this.label_search = 'ค้นหาคำสอน'
+   
+        this.label_search = 'ค้นหาคำสอน(หนังสือ)'
+      
       this.$store.dispatch('clear')
   },
   computed:{
@@ -211,6 +215,18 @@ export default {
     on () {
       if (this.$route.name === 'Home' || this.$route.name ===  'Home2') {
         return true
+      }
+        return false
+    },
+    mr12 (){
+      if (this.$vuetify.breakpoint.smOnly){
+        return 'mr-12'
+      }
+        return false
+    },
+    ml12 (){
+      if (this.$vuetify.breakpoint.smOnly){
+        return 'ml-12'
       }
         return false
     },

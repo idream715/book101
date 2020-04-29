@@ -1,6 +1,6 @@
 
 <template>
-    <div>
+    <div class="about">
         <v-content>
             <v-container fluid>
                 <v-row class="flex justify-center">
@@ -24,13 +24,16 @@
                 </v-row>
                 <v-card class="mx-auto mb-5" max-width="1200">
                          <v-card-text>
-                             <h2 class="title font-weight-black">คำสอนคุณครูไม่ใหญ่</h2>
+                             <h2 class="font-weight-black">คำสอนคุณครูไม่ใหญ่</h2>
                              <br>
-                             <p class="subtitle-1">
-                                 คำสอนของหลวงพ่อธัมมชโย (คุณครูไม่ใหญ่) คือ        ธรรมะอันลึกซึ้งและทรงคุณค่า ที่ท่านกลั่นกรองออกมาด้วยถ้อยคำที่ง่ายต่อการเข้าใจมีความแจ่มแจ้งชัดเจน เปี่ยมไปด้วยข้อคิดและช่วยตอกย้ำสัมมาทิฐิให้แก่ทุกคน ที่สำคัญหากใครนำไปใช้ในการดำเนินชีวิตจะเกิดประโยชน์อย่างยิ่งทั้งใน โลกนี้และโลกหน้า ด้วยเหตุนี้ ทีมงานจึงนำคำสอนของคุณครูไม่ใหญ่ที่เป็นรูปแบบหนังสือมาจัดทำในรูปแบบเว็บของไซต์ เพื่อความสะดวกในการค้นหาธรรมะ แต่ยังคงรูปแบบของหน้าหนังสือไว้และสามารถดาวโหลดไฟล์หนังสือธรรมะเก็บไว้อ่านในโอกาสต่างๆได้
+                             <p class="subtitle-1" >
+                                 คำสอนของหลวงพ่อธัมมชโย (คุณครูไม่ใหญ่) คือ ธรรมะอันลึกซึ้งและทรงคุณค่าที่ท่านศึกษามาจากพระธรรมคำสอนของพระสัมมาสัมพุทธเจ้าและจากธรรมะปฏิบัติ กลั่นกรองออกมาด้วยถ้อยคำที่ง่ายต่อการเข้าใจ มีความแจ่มแจ้ง ชัดเจน เปี่ยมไปด้วยข้อคิด และช่วยตอกย้ำสัมมาทิฐิให้แก่ทุกคน ที่สำคัญหากใครได้นำไปใช้ในการดำเนินชีวิตจะเกิดประโยชน์อย่างยิ่งต่อตนเองทั้งในโลกนี้และโลกหน้า
                             </p>                                
                              <p class="subtitle-1">
-                                หวังเป็นอย่างยิ่งว่า คำสอนคุณครูไม่ใหญ่ จะเป็นกัลยาณมิตรให้แก่ ทุกท่าน ประดุจแสงแห่งธรรมที่นำชีวิตไปสู่เส้นทางที่ถูกต้อง ดีงาม เต็มเปี่ยม ไปด้วยความสุข และได้ใช้ชีวิตอย่างคุ้มค่าสมกับที่มีบุญได้เกิดมาพบพระ พุทธศาสนาที่แผ่ร่มเงาให้เราร่มเย็นจนถึงทุกวันนี้  
+                                ด้วยเหตุนี้ ทีมงานจึงรวบรวมหนังสือทุกเล่มของหลวงพ่อธัมมชโย มาจัดทำในรูปแบบของเว็บไซต์ เพื่อสะดวกและง่ายต่อการค้นหาธรรมะในหัวข้อที่ต้องการ ทั้งนี้ยังคงรูปแบบของหน้าหนังสือไว้ และยังสามารถดาวโหลดไฟล์หนังสือเก็บไว้อ่านได้อีกด้วย
+                             </p>
+                             <p class="subtitle-1">
+                                 หวังเป็นอย่างยิ่งว่า เว็บไซต์นี้จะตอบโจทก์ในการค้นหาโอวาทหลวงพ่อธัมมชโย เพื่อนำไปใช้งานสำหรับท่านที่สนใจ 
                              </p>
                          </v-card-text>
                      </v-card>
@@ -104,40 +107,18 @@
                  </v-card>             -->
             </v-container>
         </v-content>
-        <!-- <v-footer padless > 
-            <v-card
-                flat
-                tile
-                class="white--text text-center "
-                absolute
-            >
-            <v-card-text>
-                <v-btn
-                v-for="icon in icons"
-                :key="icon"
-                class="mx-4 "
-                icon
-                >
-                    <v-icon size="24px">{{ icon }}</v-icon>
-                </v-btn>
-            </v-card-text>
-            <v-divider></v-divider>
-            <v-card-text > &copy;
-                {{ new Date().getFullYear() }} — <strong>Created by  RGT-101BOOK</strong>
-            </v-card-text>
-            </v-card>
-        </v-footer> -->
         <v-footer padless class=" text-center mt-5">
             <v-card-text>
-                <p>หนังสือและเนื้อหาต่างๆ โดย กองวิชาการ 01</p>
-                <p>จัดทำเป็น Web โดย ทีมงาน RGT</p>
+                <p class="mt-5 subtitle-1" style="line-hight:unset;">หนังสือและเนื้อหาต่างๆ โดย กองวิชาการ 01</p>
+                <p class="subtitle-1">จัดทำเป็น Web โดย ทีมงาน RGT</p>
+                <p>TEAM DESIGN</p>
+                <p>DREAM-iTOUCH-KRIT-PUT-TUALEK</p>
             </v-card-text>
-            <v-divider></v-divider>
             <v-col
             class="text-center "
             cols="12"
             > &copy; 
-            {{ new Date().getFullYear() }} — <strong>Designed by  RGT-101BOOK</strong>
+            {{ new Date().getFullYear() }} — <strong>Designed by  RGT-101BOOK & DCI-TECHNO 2020</strong>
             </v-col>
         </v-footer>
     </div>
@@ -159,12 +140,16 @@
 
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Sarabun&display=swap');
-.h1,h2 {
+h2 {
     font-family: 'Sarabun', sans-serif;
 }
-.p{
+p{
     font-family: 'Sarabun', sans-serif;
+    text-indent: 50px;
     
+}
+.about {
+    font-family: 'Sarabun', sans-serif;
 }
 
 </style>

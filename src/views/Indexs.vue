@@ -64,19 +64,21 @@
        <v-row v-if="setoverlay===false">
           <v-card
             class="mx-auto"
-            max-width="344"
+            max-width="100%"
             flat
             v-if="notfound===true"
           >
-            <v-card-text style="color:red;" class="headline">
-              <div>การค้นหาของคุณไม่ตรงกับเอกสารใดๆ</div>
-              <p class="headline">
-                {{getwords}}
+            <v-card-text  class="headline">
+              <div class="mb-3">คำค้นหาของคุณไม่ตรงกับเอกสารใดๆ</div>
+              <p v-for="w in getwords" :key="w" class="headline" style="color:red;">
+                - {{w.text}}
               </p>
-              <div>
-                คำแนะนำ :<br>
-                -ลองใชคำอื่นๆ<br>
-                -ลองใช้คำที่กว้างขึ้น
+              <div >
+                 คำแนะนำ :<br>
+                <p>- ตรวจดูให้แน่ใจว่าสะกดถูกต้องทุกคำ</p> 
+                <p>- ลองใช้คำอื่นๆ</p> 
+                <p>- ลองใช้คำที่กว้างขึ้น</p> 
+                <p>- ลองใช้คำที่น้อยลง</p> 
               </div>
             </v-card-text>
           </v-card>
