@@ -217,7 +217,6 @@
         textSarabun:"",
         textDetail:``,
         word_copy:'คัดลอก',
-        wordSearch:"",
       }
     },
     created() {
