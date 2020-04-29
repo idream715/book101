@@ -24,7 +24,7 @@
                 </v-row>
                 <v-card class="mx-auto mb-5" max-width="1200">
                          <v-card-text>
-                             <h2 class="title font-weight-black">คำสอนคุณครูไม่ใหญ่</h2>
+                             <h2 class="font-weight-black">คำสอนคุณครูไม่ใหญ่</h2>
                              <br>
                              <p class="subtitle-1" >
                                  คำสอนของหลวงพ่อธัมมชโย (คุณครูไม่ใหญ่) คือ ธรรมะอันลึกซึ้งและทรงคุณค่าที่ท่านศึกษามาจากพระธรรมคำสอนของพระสัมมาสัมพุทธเจ้าและจากธรรมะปฏิบัติ กลั่นกรองออกมาด้วยถ้อยคำที่ง่ายต่อการเข้าใจ มีความแจ่มแจ้ง ชัดเจน เปี่ยมไปด้วยข้อคิด และช่วยตอกย้ำสัมมาทิฐิให้แก่ทุกคน ที่สำคัญหากใครได้นำไปใช้ในการดำเนินชีวิตจะเกิดประโยชน์อย่างยิ่งต่อตนเองทั้งในโลกนี้และโลกหน้า
@@ -107,29 +107,6 @@
                  </v-card>             -->
             </v-container>
         </v-content>
-        <!-- <v-footer padless > 
-            <v-card
-                flat
-                tile
-                class="white--text text-center "
-                absolute
-            >
-            <v-card-text>
-                <v-btn
-                v-for="icon in icons"
-                :key="icon"
-                class="mx-4 "
-                icon
-                >
-                    <v-icon size="24px">{{ icon }}</v-icon>
-                </v-btn>
-            </v-card-text>
-            <v-divider></v-divider>
-            <v-card-text > &copy;
-                {{ new Date().getFullYear() }} — <strong>Created by  RGT-101BOOK</strong>
-            </v-card-text>
-            </v-card>
-        </v-footer> -->
         <v-footer padless class=" text-center mt-5">
             <v-card-text>
                 <p class="mt-5 subtitle-1" style="line-hight:unset;">หนังสือและเนื้อหาต่างๆ โดย กองวิชาการ 01</p>
@@ -163,7 +140,7 @@
 
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Sarabun&display=swap');
-h1,h2 {
+h2 {
     font-family: 'Sarabun', sans-serif;
 }
 p{
