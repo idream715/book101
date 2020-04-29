@@ -196,7 +196,7 @@ export default {
   created(){
       this.words_search = []
    
-        this.label_search = 'ค้นหาธรรมะหลวงพ่อ'
+        this.label_search = 'ค้นหาคำสอน(หนังสือ)'
       
       this.$store.dispatch('clear')
   },
