@@ -94,7 +94,7 @@ export default new Vuex.Store({
       commit('CLEAR_FLAG')
       let tags = []
       words.forEach(element => {
-        let tag = `{"search_details":{"$regex":"${element.text}"}}`
+        let tag = `{"search_all":{"$regex":"${element.text}"}}`
         tags.push(tag)
       });
       commit('SET_OVERLAY', true)
@@ -130,7 +130,7 @@ export default new Vuex.Store({
         commit('SET_WORDS_SEARCH',words)
         let tags = []
         words.forEach(element => {
-          let tag = `{"search_details":{"$regex":"${element.text}"}}`
+          let tag = `{"search_all":{"$regex":"${element.text}"}}`
           tags.push(tag)
         });
         callApi.getData(`?path=/indexs&limit=10&offset=${page}&query={"$and":[${tags}]} `)

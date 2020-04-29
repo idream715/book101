@@ -6,7 +6,7 @@
             
           <v-col cols="12" md="10" class="pb-1">
               <v-combobox
-                v-model="search__pageindex"
+                v-model="search_pageindex"
                 :filter="filter"
                 :hide-no-data="!search"
                 :items="items"
@@ -16,10 +16,13 @@
                 multiple
                 small-chips
                 solo
+                :delimiters="space"
               >
                 <template v-slot:no-data>
                   <v-list-item>
-                    <span class="subheading">ต้องการค้นหา</span>
+                    
+                    <span class="subheading mr-1">กด</span><kbd ><v-icon color="white" class="mb-2">mdi-keyboard-space</v-icon></kbd>
+                    <span class="subheading mr-1">(spacebar,เว้นวรรค) ที่แป้นพิมพ์เพื่อยืนยัน </span>
                     <v-chip
                       :color="`${colors[nonce - 1]} lighten-3`"
                       label
@@ -27,7 +30,6 @@
                     >
                       {{ search }}
                     </v-chip>
-                    <span class="subheading">กรุณากด</span><kbd>enter</kbd>
                   </v-list-item>
                 </template>
                 <template v-slot:selection="{ attrs, item, parent, selected }">
@@ -51,9 +53,7 @@
               </v-combobox>
           </v-col>
           <v-col cols="12" md="2" class="mb-5">
-            <v-btn color="primary" outlined @click="clicksearch(getwords)"  align="center" justify="center">
-              <v-icon class="mb-2" >mdi-magnify</v-icon> <p class="mt-1">ค้นหา</p>
-            </v-btn>
+            <v-btn @click="clicksearch(getwords)" class="mr-10" dark color="blue lighten-1"><v-icon class="mr-3">mdi-magnify</v-icon>ค้นหา</v-btn>
           </v-col>
       </v-row>
          <v-col v-if="setoverlay===false" cols="6" align="start" justify="center" class="pt-1">พบ {{getTotalIndexs}} รายการ</v-col>
@@ -118,16 +118,16 @@
                   <v-card-text class="headline lighten-2 ">{{head_content}}</v-card-text>
                   <v-list-item-title class="grey--text "><v-btn text color="primary" @click="clickedSendbook(book_id)"><v-icon small class="mr-2">mdi-book-open-page-variant</v-icon>จากหนังสือ:{{frombook}}</v-btn></v-list-item-title>
                 <div >
-                  <v-card-text  v-html="content_copy" style="font-size: 17px; white-space: pre-wrap;" ></v-card-text>
+                  <v-card-text ref="textCopy" v-html="content_copy" style="font-size: 17px; white-space: pre-wrap;" ></v-card-text>
                 </div>
                 </v-card>  
                 
               </v-card>
               <v-card-actions>
                 <v-spacer></v-spacer>
-                <v-btn color="primary" text @click.stop.prevent="copyTextDetail">{{word_copy}}</v-btn>
+                <v-btn color="primary" text @click="copyTextDetail">{{word_copy}}</v-btn>
                 <v-btn color="primary" text @click="closs">ออก</v-btn>
-                <input type="hidden" id="textDetail" :value="content">
+
               </v-card-actions>
               </v-card>
           </v-dialog>
@@ -170,7 +170,7 @@ export default {
   data () {
       return {
         dialog: false,
-        label_search:"ค้นหาธรรมะ",
+        label_search:"ค้นหาคำสอน",
         content:"",
         content_copy:"",
         head_content:"",
@@ -188,6 +188,7 @@ export default {
         menu: false,
         x: 0,      
         y: 0,
+        space:[' '],
  
       }
     },
@@ -207,7 +208,7 @@ export default {
     getTotalIndexs(){
       return this.$store.getters.getTotalIndexs
     },
-    search__pageindex: {
+    search_pageindex: {
 			get: function() {
 				let words = this.$store.getters.getwords_search
 				return words
@@ -233,6 +234,8 @@ export default {
       this.head_content=""
     },
     text_render(input){
+      if(!input.includes("<mark>")) return input
+
        let text = input.split("html")
        if(text.length>1){
         let t = input.split("html").slice(1).join(' ')
@@ -251,7 +254,7 @@ export default {
     },
     clicksearch(input){
       if(!(input.length===0)){
-      this.$store.dispatch('setFirstIndexsFromApi',{words:input,page:0,infenit:false})
+      this.$store.dispatch('setFirstIndexsFromApi',{words:input,page:0})
       }else{
         this.label_search='กรุณาใส่คำที่่ต้องการค้นหา'
       }
@@ -261,20 +264,15 @@ export default {
       this.$store.dispatch('setFirstIndexsFromApi_infenit',{words:this.getwords,page:offset,})
     },
     copyTextDetail () {
-        let textDetailToCopy = document.querySelector('#textDetail')
-        textDetailToCopy.setAttribute('type', 'text')    
-        textDetailToCopy.select()
+        this.selectText(this.$refs.textCopy); // e.g. <div ref="text">
+
         try {
           var successful = document.execCommand('copy');
           var msg = successful ? 'คัดลอกแล้ว' : 'คัดลอกไม่สำเร็จ';
           this.word_copy = `${msg}`
         } catch (err) {
-        alert('Oops, unable to copy');
+          alert('Oops, unable to copy');
         }
-
-        /* unselect the range */
-        textDetailToCopy.setAttribute('type', 'hidden')
-        window.getSelection().removeAllRanges()
       },
     clickedSendbook(bookname2) {
       let openBook = this.$router.resolve({path: `/book/${bookname2}`});
@@ -292,15 +290,29 @@ export default {
         .toLowerCase()
         .indexOf(query.toString().toLowerCase()) > -1
     },
+    selectText(element) {
+        var range;
+        if (document.selection) {
+          // IE
+          range = document.body.createTextRange();
+          range.moveToElementText(element);
+          range.select();
+        } else if (window.getSelection) {
+          range = document.createRange();
+          range.selectNode(element);
+          window.getSelection().removeAllRanges();
+          window.getSelection().addRange(range);
+        }
+    },
   },
   watch: {
-    search__pageindex (val,prev) {
+    search_pageindex (val,prev) {
       if (val.length > 5) {
-        this.$nextTick(() => this.words_pageindex.pop()) 
+        this.$nextTick(() => this.search_pageindex.pop()) 
       }
       if (val.length === prev.length) return
 
-        this.search__pageindex = val.map(v => {
+        this.search_pageindex = val.map(v => {
           if (typeof v === 'string') {
             v = {
               text: v,

@@ -60,12 +60,13 @@
                     <h1 style="color:white" class="mt-8">คำสอนคุณครูไม่ใหญ่</h1>
                   </v-col>
                   <v-col cols="12" align="center">
-                    <v-combobox  v-model="words_search" :filter="filter" :hide-no-data="!search" :items="items" :search-input.sync="search"  hide-selected  :label="label_search"  multiple small-chips  solo style="width:325px">
+                    <v-combobox  v-model="words_search" :filter="filter" :hide-no-data="!search" :items="items" :search-input.sync="search"  hide-selected  :label="label_search"  multiple small-chips  solo style="width:325px" :delimiters="space" >
                       <template v-slot:no-data>
                         <v-list-item>
-                          <span class="subheading">ต้องการค้นหา</span>
+                          <span class="subheading">ยืนยัน</span>
                           <v-chip :color="`${colors[nonce - 1]} lighten-3`" label small >{{ search }} </v-chip>
-                          <span class="subheading">กรุณากด</span><kbd>enter</kbd>
+                          <span class="subheading">กด </span><kbd>spacebar</kbd>
+                          <span class="subheading"> ที่แป้นพิมพ์</span>
                         </v-list-item>
                       </template>
                       <template v-slot:selection="{ attrs, item, parent, selected }">
@@ -77,7 +78,7 @@
                     </v-combobox>
                   </v-col>
                   <v-col cols="12" align="center">
-                    <v-btn @click="clicksearch_home" class="mr-10" dark color="blue lighten-1"><v-icon class="mr-3">mdi-magnify</v-icon>ค้นหา</v-btn>
+                    <v-btn id="search"  @click="clicksearch_home(getwords)" class="mr-10" dark color="blue lighten-1"><v-icon class="mr-3">mdi-magnify</v-icon>ค้นหา</v-btn>
                     <v-btn @click="searchrandom" class="" dark color="blue lighten-1">อ่านอะไรดี</v-btn>
                   </v-col>
                 </v-row>
@@ -178,9 +179,7 @@ export default {
     title: '',
     search: null,
     dialog: false,
-    group: null,
-    model: '',
-    words_search:[],
+    group: null,  
     label_search:'',
     activator: null,
     attach: null,
@@ -192,12 +191,12 @@ export default {
     menu: false,
     x: 0,      
     y: 0,
+    space:[' '],
+
   }),
   created(){
       this.words_search = []
-   
-        this.label_search = 'ค้นหาธรรมะหลวงพ่อ'
-      
+      this.label_search = 'ค้นหาคำสอน'
       this.$store.dispatch('clear')
   },
   computed:{
@@ -233,14 +232,27 @@ export default {
     setoverlay(){
       return this.$store.getters.getoverlay
     },
+    getwords(){
+      return this.$store.getters.getwords_search
+    },
+    words_search: {
+			get: function() {
+				let words = this.$store.getters.getwords_search
+				return words
+			},
+			set: function(value) {
+        this.$store.dispatch('setwordssearch',value)
+      },
+    }
+    
 
   },
 
   methods:{
-    clicksearch_home(){
-      if(!(this.words_search.length===0)){
+    clicksearch_home(input){
+      if(!(input.length===0)){
         this.$router.push('/Indexs');
-        this.$store.dispatch('setFirstIndexsFromApi',{words:this.words_search,page:"0"})
+        this.$store.dispatch('setFirstIndexsFromApi',{words:input,page:0})
       }else{
         this.label_search = 'กรุณาใส่คำที่่ต้องการค้นหา'
       }
