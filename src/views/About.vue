@@ -118,7 +118,7 @@
             class="text-center "
             cols="12"
             > &copy; 
-            {{ new Date().getFullYear() }} — <strong>Designed by  RGT-101BOOK & DCI-TECHNO 2020</strong>
+            2563 — <strong>Designed by  RGT-101BOOK & DCI-TECHNO 2563</strong>
             </v-col>
         </v-footer>
     </div>
