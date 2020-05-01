@@ -225,7 +225,7 @@ export default {
 
   }),
   created(){
-      this.label_search = 'ค้นหาคำสอน(หนังสือ)'
+      this.label_search = 'ค้นหาคำสอน (หนังสือ)'
       this.$store.dispatch('clear')
   },
   computed:{
