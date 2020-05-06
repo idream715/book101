@@ -13,6 +13,9 @@
       </div>
       <!-- แถบเมนูโทรศัพท์ -->
       <div v-else align="end" class="mr-5">
+        <v-btn dark router-link to="/Books" text>
+          <v-icon>mdi-book</v-icon>
+        </v-btn>
         <v-menu
         bottom
         left
@@ -30,9 +33,7 @@
         <v-list>
           <v-list-item>  
             <v-list-item-title>
-              <v-btn router-link to="/Books" text>
-                <v-icon class="mr-2"></v-icon><v-icon class="mr-4">mdi-book</v-icon>หนังสือธรรมะ
-              </v-btn>
+              
             </v-list-item-title>
           </v-list-item>
           <v-list-item>  
@@ -50,12 +51,12 @@
         <v-row>
           <v-col>
             <v-row :class="ml12">
-              <v-col cols="12" sm="6" md="12" align="center">
+              <v-col cols="12" sm="4" md="12" align="center">
               <!-- <v-col class="d-flex flex-column align-sm-end align-md-center"> -->
                 <v-img class="mt-12" alt="logo" contain max-height="150"
                   src="@/assets/logo1.png" />
               </v-col>
-              <v-col cols="12" sm="6" md="12">
+              <v-col cols="12" sm="8" md="12">
               <!-- <v-col class="d-flex flex-column align-sm-start align-md-center"> -->
                 <v-row :class="mr12">
                   <v-col cols="12" align="center">
