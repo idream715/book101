@@ -11,7 +11,15 @@ export default {
     }, 
   created(){
       this.$store.dispatch('clear')
+      this.track()
   },
+  methods: {
+    track () {
+      this.$gtag.pageview({
+        page_path: '/',
+      })
+    }
+  }
 }
 </script>
 

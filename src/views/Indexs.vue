@@ -186,7 +186,10 @@ export default {
         space:[' '],
  
       }
-    },
+  },
+  created(){
+    this.track()
+  },
   computed:{
     text_exp(){
       if (this.$vuetify.breakpoint.xsOnly){
@@ -217,6 +220,11 @@ export default {
     }
   },
   methods:{
+    track () {
+      this.$gtag.pageview({
+        page_path: '/indexs',
+      })
+    },
     dialogs(head,content,content_copy,book,id){
       this.dialog=!this.dialog
       this.content=content

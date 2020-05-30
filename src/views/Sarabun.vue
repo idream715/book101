@@ -220,10 +220,16 @@
       }
     },
     created() {
+      this.track(this.id)
       this.$store.dispatch('setbook_index',this.id)
       this.$store.dispatch('setPagenation', {limit:this.itemsPerPage, offset:0, book_id: this.id})
     },
     methods: {
+      track (id) {
+        this.$gtag.pageview({
+          page_path: `/book/${id}`,
+        })
+      },
       readText(sarabun,detail){
         this.dialogReadText = !this.dialogReadText
         window.getSelection().removeAllRanges()

@@ -83,6 +83,7 @@ export default {
     if(this.books.length === 0 ){
       this.$store.dispatch('getBookFromApi')
     }
+    this.track()
   },
   computed:{
     books(){
@@ -104,6 +105,11 @@ export default {
     
   },
   methods: {
+    track () {
+      this.$gtag.pageview({
+        page_path: '/books',
+      })
+    },
     bookSelect(selected){
       //new tab
       let openBook = this.$router.resolve({path: `/book/${selected['#']}`});
