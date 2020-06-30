@@ -43,10 +43,15 @@
                           <v-icon small @click="parent.selectItem(item)">mdi-close</v-icon>
                         </v-chip>
                       </template>
+                      <template v-if="itMobile" v-slot:append-outer >
+                        <v-btn @click="clicksearch(search_pageindex)" class="pb-3" dark icon color="blue lighten-1">
+                          <v-icon>mdi-magnify</v-icon>
+                        </v-btn>
+                      </template>
                     </v-combobox>
           </v-col>
           <v-col cols="12" md="2" class="mb-5">
-            <v-btn @click="clicksearch(search_pageindex)" class="mr-10" dark color="blue lighten-1"><v-icon class="mr-3">mdi-magnify</v-icon>ค้นหา</v-btn>
+            <v-btn v-if="!itMobile" @click="clicksearch(search_pageindex)" class="mr-10" dark color="blue lighten-1"><v-icon class="mr-3">mdi-magnify</v-icon>ค้นหา</v-btn>
           </v-col>
       </v-row>
          <v-col v-if="setoverlay===false" cols="6" align="start" justify="center" class="pt-1">พบ {{getTotalIndexs}} รายการ</v-col>
@@ -191,6 +196,9 @@ export default {
     this.track()
   },
   computed:{
+    itMobile (){
+      return this.$vuetify.breakpoint.xsOnly
+    },
     text_exp(){
       if (this.$vuetify.breakpoint.xsOnly){
         return 'ที่แป้นพิมพ์เพื่อยืนยัน'
