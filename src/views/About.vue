@@ -124,11 +124,11 @@
                 <p>DREAM-iTOUCH-KRIT-PUT-TUALEK</p>
             </v-card-text> -->
             <v-col
-            class="text-center "
+            class="text-center caption"
             cols="12"
             > &copy; 
             <!-- 2563 — <strong>Designed by  RGT-101BOOK & DCI-TECHNO 2563</strong> -->
-            2563 — ผู้เรียบเรียงและเผยแพร่ในระบบคอมพิวเตอร์ : <strong>ขวัญจิตต์ จิตสินธุ</strong>
+            2563 — ผู้เรียบเรียงและเผยแพร่ในระบบคอมพิวเตอร์ : ขวัญจิตต์ จิตสินธุ
             </v-col>
         </v-footer>
     </div>
