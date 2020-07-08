@@ -127,7 +127,8 @@
             class="text-center "
             cols="12"
             > &copy; 
-            2563 — <strong>Designed by  RGT-101BOOK & DCI-TECHNO 2563</strong>
+            <!-- 2563 — <strong>Designed by  RGT-101BOOK & DCI-TECHNO 2563</strong> -->
+            2563 — ผู้เรียบเรียงและเผยแพร่ในระบบคอมพิวเตอร์ : <strong>ขวัญจิตต์ จิตสินธุ</strong>
             </v-col>
         </v-footer>
     </div>
