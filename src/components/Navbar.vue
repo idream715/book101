@@ -67,8 +67,9 @@
                       :filter="filter" 
                       :hide-no-data="!search" 
                       :items="items" 
+                      :menu-props="{ top: true, closeOnClick: false, offsetY: true }"
                       :search-input.sync="search"  
-                      hide-selected  
+                      hide-selected
                       :label="label_search"  
                       multiple 
                       small-chips  
