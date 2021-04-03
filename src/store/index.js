@@ -74,7 +74,7 @@ export default new Vuex.Store({
     // GET
     getBookFromApi({ commit }){
       commit('SET_OVERLAY', true)
-      callApi.getData(`?path=/books&limit=50`)
+      callApi.getData(`?path=/books&limit=100`)
         .then(res=>{
           let data = res.data
           commit('SET_OVERLAY', false)
