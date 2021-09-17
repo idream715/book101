@@ -1,7 +1,7 @@
 
 <template>
     <div class="about">
-        <v-content>
+        <v-main>
             <v-container fluid>
                 <v-row class="flex justify-center">
                     <v-col 
@@ -106,7 +106,7 @@
                     </v-card-text>
                  </v-card>             -->
             </v-container>
-        </v-content>
+        </v-main>
         <v-footer padless class=" text-center mt-5">
             <v-card-text>
                 <p class="mt-5 subtitle-1" style="line-hight:unset;">หนังสือและเนื้อหาต่างๆ โดย กองวิชาการ 01</p>

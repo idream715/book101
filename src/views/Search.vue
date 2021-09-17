@@ -163,30 +163,47 @@
 <script>
 export default {
   data () {
-      return {
-        dialog: false,
-        label_search:"ค้นหาคำสอน",
-        content:"",
-        content_copy:"",
-        head_content:"",
-        frombook:"",
-        book_id:"",
-        search:"",
-        word_copy:'คัดลอก',
-        activator: null,
-        attach: null,
-        colors: ['green', 'purple', 'indigo', 'cyan', 'teal', 'orange'],
-        editing: null,
-        index: -1,
-        items: [{ header: 'สามารถใส่คำค้นหาได้สูงสุด 5 คำ' }],
-        nonce: 1,
-        menu: false,
-        x: 0,      
-        y: 0,
-        space:[' '],
- 
+    return {
+      dialog: false,
+      label_search:"ค้นหาคำสอน",
+      content:"",
+      content_copy:"",
+      head_content:"",
+      frombook:"",
+      book_id:"",
+      search:"",
+      word_copy:'คัดลอก',
+      activator: null,
+      attach: null,
+      colors: ['green', 'purple', 'indigo', 'cyan', 'teal', 'orange'],
+      editing: null,
+      index: -1,
+      items: [{ header: 'สามารถใส่คำค้นหาได้สูงสุด 5 คำ' }],
+      nonce: 1,
+      menu: false,
+      x: 0,      
+      y: 0,
+      space:[' '],
+
+    }
+  },
+  created () {
+    let queryString = this.$route.query
+    if ('word1' in queryString) {
+      let input = []
+
+      for (const [key, value] of Object.entries(queryString)) {
+        console.log(key)
+        let attribute = {
+          color: "pink",
+          text: value
+        }
+        input.push(attribute)
       }
-    },
+
+      this.$store.dispatch('setFirstIndexsFromApi',{words:input,page:0})
+    }
+  },
   computed:{
     text_exp(){
       if (this.$vuetify.breakpoint.xsOnly){

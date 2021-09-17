@@ -49,7 +49,7 @@
               @click="bookSelect(n)"
               >
               <v-img 
-                :src="n.book_link_jpg" 
+                :src="n.Dhamma01Master_dm_link_cover" 
                 height="200px" 
                 width="500px"
               >
@@ -60,7 +60,7 @@
                   caption
                 "
               >
-                {{n.book_name}}
+                {{n.Dhamma01Master_dm_name}}
               </v-card-text>
             </v-card>
           </v-col>
@@ -90,7 +90,7 @@ export default {
     },
     filterBooks(){
       if(this.filBookCategoty){
-        return this.books.filter(el => el.book_category === this.filBookCategoty)
+        return this.books.filter(el => el.Dhamma01Category_dc_name === this.filBookCategoty)
       }else{
         return this.books
       }
@@ -99,14 +99,15 @@ export default {
       return this.$store.getters.getoverlay     
     },
     items(){
-      return Array.from(new Set(this.$store.getters.getBooks.map(a => a.book_category)))   
+      return Array.from(new Set(this.$store.getters.getBooks.map(a => a.Dhamma01Category_dc_name)))   
     },
     
   },
   methods: {
     bookSelect(selected){
       //new tab
-      let openBook = this.$router.resolve({path: `/book/${selected['#']}`});
+      console.log(selected)
+      let openBook = this.$router.resolve({path: `/book/${selected['Dhamma01Master_dm_id']}`});
       window.open(openBook.href, '_blank');
     },
     setOpenDialog(val){

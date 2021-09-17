@@ -9,7 +9,7 @@
       ></v-skeleton-loader>
       <v-card-title class="justify-center">
         <div class="font-weight-bold">
-          {{bookSelected.book_name}}
+          {{bookSelected.Dhamma01Master_dm_name}}
         </div>
       </v-card-title>
       <v-card-text >
@@ -46,7 +46,7 @@
             <v-img
               v-else
               width="250"
-              :src="bookSelected.book_link_jpg"
+              :src="bookSelected.Dhamma01Master_dm_link_cover"
               class="elevation-10"
             ></v-img>
           </v-col>
@@ -78,10 +78,10 @@
                 <span class="pink--text subtitle-1 font-weight-bold" v-text="sarabunTotal"></span>
               </p>
               <p>ชุดหนังสือ 
-                <span class="pink--text subtitle-1 font-weight-bold" v-text="bookSelected.book_category"></span>
+                <span class="pink--text subtitle-1 font-weight-bold" v-text="bookSelected.Dhamma01Category_dc_name"></span>
               </p>
               <v-btn
-                :href="bookSelected.book_link_pdf"
+                :href="bookSelected.Dhamma01Master_dm_link_pdf"
                 target="_blank"
                 class="mr-3"
                 color="primary"
@@ -90,7 +90,7 @@
                 <div>PDF</div> 
               </v-btn>
               <v-btn
-                :href="bookSelected.book_link_text"
+                :href="bookSelected.Dhamma01Master_dm_link_text"
                 target="_blank"
                 color="primary"
                 >
@@ -124,7 +124,7 @@
             active-class="primary--text"
           >
             <template v-for="(item, i) in sarabunSelected">
-              <v-list-item :key="item.search_index">
+              <v-list-item :key="item.dd_id">
                 <template v-slot:default="{ active }">
                   <v-list-item-avatar>
                     <v-list-item-title
@@ -133,20 +133,20 @@
                   </v-list-item-avatar>
 
                   <v-list-item-content>
-                    <v-list-item-title v-text="item.search_index" style="line-height: unset;"></v-list-item-title>
+                    <v-list-item-title v-text="item.dd_heading" style="line-height: unset;"></v-list-item-title>
                   </v-list-item-content>
                   
                   <v-list-item-action v-if="active">
-                    <v-btn :href="item.link_pdf" target="_blank" icon>
-                      <v-icon :color="item.link_pdf ? 'red' : 'grey'">mdi-file-pdf</v-icon>
+                    <v-btn :href="item.dd_link_pdf" target="_blank" icon>
+                      <v-icon :color="item.dd_link_pdf ? 'red' : 'grey'">mdi-file-pdf</v-icon>
                     </v-btn>
                   </v-list-item-action>
                   <v-list-item-action v-if="active">
                   <v-btn
-                      @click="readText(item.search_index,item.search_details)"
+                      @click="readText(item.dd_heading,item.dd_detail)"
                       text icon
                       >
-                      <v-icon :color="item.search_details ? 'blue': 'grey'">
+                      <v-icon :color="item.dd_detail ? 'blue': 'grey'">
                         mdi-book-open-page-variant
                       </v-icon>
                     </v-btn>
@@ -221,7 +221,7 @@
     },
     created() {
       this.$store.dispatch('setbook_index',this.id)
-      this.$store.dispatch('setPagenation', {limit:this.itemsPerPage, offset:0, book_id: this.id})
+      this.$store.dispatch('setFirstSarabun', {limit:this.itemsPerPage, offset:0, book_id: this.id})
     },
     methods: {
       readText(sarabun,detail){

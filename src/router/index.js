@@ -16,6 +16,11 @@ Vue.use(VueRouter)
     component: () => import(/* webpackChunkName: "about" */ '../views/Indexs.vue')
   },
   {
+    path: '/search',
+    name: 'Indexs',
+    component: () => import(/* webpackChunkName: "search" */ '../views/Search.vue')
+  },
+  {
     path: '/books',
     name: 'Books',
     // route level code-splitting

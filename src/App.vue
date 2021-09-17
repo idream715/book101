@@ -3,10 +3,10 @@
     <v-app>
     <navbar></navbar>
     
-    <v-content id="app">
+    <v-main id="app">
       <router-view/>
      
-    </v-content>
+    </v-main>
     
   </v-app>
   </div>
