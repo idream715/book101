@@ -93,14 +93,14 @@
                       </v-col>
                     </v-row>
                     
-                    <v-list-item-title class="mb-2"><v-btn text color="primary lighten-1" @click="clickedSendbook(index.book_id)"><v-icon small class="mr-2">mdi-book-open-page-variant</v-icon> จากหนังสือ:{{index.search_heading}}</v-btn></v-list-item-title>
+                    <v-list-item-title class="mb-2"><v-btn text color="primary lighten-1" @click="clickedSendbook(index.dm_id)"><v-icon small class="mr-2">mdi-book-open-page-variant</v-icon> จากหนังสือ:{{index.search_heading}}</v-btn></v-list-item-title>
                     <p v-html="text_render(index.mark_details)"></p>
                   </v-card-text>
                 </v-col>
                 <v-col cols="12" class="pa-1">
                   <v-card-actions class="d-flex justify-end pa-1">
-                     <v-btn text color="red" style="margin-right:10px;" target="_blank" :href="index.link_pdf">PDF</v-btn>
-                     <v-btn text color="blue lighten-1" @click="dialogs(index.mark_index,index.search_details,index.mark_details,index.search_heading,index.book_id)">อ่านทั้งหมด</v-btn>
+                     <v-btn text color="red" style="margin-right:10px;" target="_blank" :href="index.dd_link_pdf">PDF</v-btn>
+                     <v-btn text color="blue lighten-1" @click="dialogs(index.mark_index,index.dd_detail,index.mark_details,index.dm_name,index.dm_id)">อ่านทั้งหมด</v-btn>
                   </v-card-actions>
                 </v-col>
             </v-card><hr>

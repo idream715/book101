@@ -177,10 +177,10 @@
         <v-card v-for="(item,i) in random" :key="i" :value="item">
           <v-card class="d-flex justify-center" flat>
             <v-card class="max-width-auto"  flat>
-              <v-card-text class="headline lighten-2 ">{{item.search_index}}</v-card-text>
-              <v-list-item-title class="grey--text  "><v-btn text color="primary lighten-1" @click="clickedSendbook(item.book_id)"><v-icon small class="mr-2">mdi-book-open-page-variant</v-icon>จากหนังสือ:{{item.search_heading}}</v-btn></v-list-item-title>
+              <v-card-text class="headline lighten-2 ">{{item.dd_heading}}</v-card-text>
+              <v-list-item-title class="grey--text  "><v-btn text color="primary lighten-1" @click="clickedSendbook(item.dm_id)"><v-icon small class="mr-2">mdi-book-open-page-variant</v-icon>จากหนังสือ:{{item.dm_name}}</v-btn></v-list-item-title>
             <div >
-              <v-card-text style="font-size: 17px; white-space: pre-wrap;" >{{item.search_details}}</v-card-text>
+              <v-card-text style="font-size: 17px; white-space: pre-wrap;" >{{item.dd_detail}}</v-card-text>
             </div>
             </v-card>  
           </v-card>
