@@ -57,10 +57,13 @@ export default new Vuex.Store({
       state.bookSelected = payload
     },
     SET_SEARCH_RANDOM(state, payload){
-      state.search_random = payload
+      state.search_random.push(payload)
     },
     SET_FLAG(state){
       state.flag+=10
+    },
+    CLEAR_SEARCH_RANDOM(state){
+      state.search_random = []
     },
     CLEAR_FLAG(state){
       state.flag=1
@@ -232,7 +235,7 @@ export default new Vuex.Store({
       commit('SET_INDEXS', [])
       commit('SET_WORDS_SEARCH', [])
       commit('SET_NOTFOUND', false)
-      commit('SET_SEARCH_RANDOM',[])
+      commit('CLEAR_SEARCH_RANDOM')
     },
     clearSarabun({commit}){
       commit('SET_SARABUN', [])
