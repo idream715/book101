@@ -103,6 +103,7 @@ export default new Vuex.Store({
 
       let body = {
         keywords: tags,
+        type: 'books',
         limit: 10,
         offset: page,
         pageNo: 0
@@ -120,7 +121,7 @@ export default new Vuex.Store({
             let marks = []
             array1.forEach(index => {
               let render = index
-              array2.forEach(word=>{render = render.replace(word.text,`<mark>${word.text}</mark>`)})
+              array2.forEach(word=>{render = render.replaceAll(word.text,`<mark>${word.text}</mark>`)})
               marks.push(render)
             })
             return marks
@@ -147,6 +148,7 @@ export default new Vuex.Store({
 
         let body = {
           keywords: tags,
+          type: 'books',
           limit: 10,
           offset: page,
           pageNo: 0
@@ -162,7 +164,7 @@ export default new Vuex.Store({
               array1.forEach(index => {
                 let render = index
                 array2.forEach(word=>{
-                  render = render.replace(word.text,`<mark>${word.text}</mark>`)
+                  render = render.replaceAll(word.text,`<mark>${word.text}</mark>`)
                 })
                 marks.push(render)
               })
