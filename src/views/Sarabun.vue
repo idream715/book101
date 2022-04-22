@@ -123,41 +123,39 @@
           <v-list-item-group
             active-class="primary--text"
           >
-            <template v-for="(item, i) in sarabunSelected">
-              <v-list-item :key="item.dd_id">
-                <template v-slot:default="{ active }">
-                  <v-list-item-avatar>
-                    <v-list-item-title
-                      v-text="i+1+'.'"
-                    ></v-list-item-title>
-                  </v-list-item-avatar>
+            <v-list-item v-for="(item, i) in sarabunSelected" :key="item.dd_id">
+              <template v-slot:default="{ active }">
+                <v-list-item-avatar>
+                  <v-list-item-title
+                    v-text="i+1+'.'"
+                  ></v-list-item-title>
+                </v-list-item-avatar>
 
-                  <v-list-item-content>
-                    <v-list-item-title v-text="item.dd_heading" style="line-height: unset;"></v-list-item-title>
-                  </v-list-item-content>
-                  
-                  <v-list-item-action v-if="active">
-                    <v-btn :href="item.dd_link_pdf" target="_blank" icon>
-                      <v-icon :color="item.dd_link_pdf ? 'red' : 'grey'">mdi-file-pdf</v-icon>
-                    </v-btn>
-                  </v-list-item-action>
-                  <v-list-item-action v-if="active">
-                  <v-btn
-                      @click="readText(item.dd_heading,item.dd_detail)"
-                      text icon
-                      >
-                      <v-icon :color="item.dd_detail ? 'blue': 'grey'">
-                        mdi-book-open-page-variant
-                      </v-icon>
-                    </v-btn>
-                  </v-list-item-action>
-                </template>
-              </v-list-item>
-              <v-divider
-                v-if="i + 1 < sarabunSelected.length"
-                :key="i"
-              ></v-divider>
-            </template>
+                <v-list-item-content>
+                  <v-list-item-title v-text="item.dd_heading" style="line-height: unset;"></v-list-item-title>
+                </v-list-item-content>
+                
+                <v-list-item-action v-if="active">
+                  <v-btn :href="item.dd_link_pdf" target="_blank" icon>
+                    <v-icon :color="item.dd_link_pdf ? 'red' : 'grey'">mdi-file-pdf</v-icon>
+                  </v-btn>
+                </v-list-item-action>
+                <v-list-item-action v-if="active">
+                <v-btn
+                    @click="readText(item.dd_heading,item.dd_detail)"
+                    text icon
+                    >
+                    <v-icon :color="item.dd_detail ? 'blue': 'grey'">
+                      mdi-book-open-page-variant
+                    </v-icon>
+                  </v-btn>
+                </v-list-item-action>
+              </template>
+            </v-list-item>
+            <v-divider
+              v-if="i + 1 < sarabunSelected.length"
+              :key="i"
+            ></v-divider>
           </v-list-item-group>
           <v-row>
             <v-col cols="12" v-if="sarabunSelected.length>0 && sarabunSelected.length < sarabunTotal">

@@ -11,6 +11,11 @@ Vue.use(VueRouter)
     component: Home
   },
   {
+    path: '/cards-search',
+    name: 'Home',
+    component: Home
+  },
+  {
     path: '/indexs',
     name: 'Indexs',
     component: () => import(/* webpackChunkName: "about" */ '../views/Indexs.vue')
@@ -40,9 +45,9 @@ Vue.use(VueRouter)
     component: () => import('../views/About.vue')
   },
   {
-    path: '/home2',
-    name: 'Home2',
-    component: () => import('@/views/Home2.vue')
+    path: '/cards',
+    name: 'Cards',
+    component: () => import('@/views/Cards.vue')
   },
   
 ]

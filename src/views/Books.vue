@@ -49,7 +49,7 @@
               @click="bookSelect(n)"
               >
               <v-img 
-                :src="n.Dhamma01Master_dm_link_cover" 
+                :src="n.Dhamma01Master_dm_link_cover_thumbnail" 
                 height="200px" 
                 width="500px"
               >
@@ -116,6 +116,7 @@ export default {
   }
 }
 </script>
+
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Sarabun&display=swap');
 

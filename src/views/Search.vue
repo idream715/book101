@@ -93,7 +93,7 @@
                       </v-col>
                     </v-row>
                     
-                    <v-list-item-title class="mb-2"><v-btn text color="primary lighten-1" @click="clickedSendbook(index.dm_id)"><v-icon small class="mr-2">mdi-book-open-page-variant</v-icon> จากหนังสือ:{{index.search_heading}}</v-btn></v-list-item-title>
+                    <v-list-item-title class="mb-2"><v-btn text color="primary lighten-1" @click="clickedSendbook(index.dm_id)"><v-icon small class="mr-2">mdi-book-open-page-variant</v-icon> จากหนังสือ:{{index.dm_name}}</v-btn></v-list-item-title>
                     <p v-html="text_render(index.mark_details)"></p>
                   </v-card-text>
                 </v-col>

@@ -4,6 +4,12 @@
     <!-- เเถบเมนูหน้าคอม -->
     <div v-if="on" class="homep">
       <div v-if="opn" align="end">
+        <v-btn v-if="checkHome" dark router-link to="/Cards" text>
+          <v-icon class="mr-2">mdi-card-search</v-icon>การ์ดธรรมะ
+        </v-btn>
+        <v-btn v-else dark router-link to="/" text>
+          <v-icon class="mr-2">mdi-home</v-icon>หน้าหลัก
+        </v-btn>
         <v-btn dark router-link to="/Books" text>
           <v-icon class="mr-2">mdi-book</v-icon>หนังสือธรรมะ
         </v-btn>
@@ -28,6 +34,20 @@
         </template>
 
         <v-list>
+          <v-list-item v-if="checkHome">  
+            <v-list-item-title>
+              <v-btn router-link to="/Cards" text>
+                <v-icon class="mr-2"></v-icon><v-icon class="mr-4">mdi-card-search</v-icon>การ์ดธรรมะ
+              </v-btn>
+            </v-list-item-title>
+          </v-list-item>
+          <v-list-item v-else>  
+            <v-list-item-title>
+              <v-btn router-link to="/" text>
+                <v-icon class="mr-2"></v-icon><v-icon class="mr-4">mdi-home</v-icon>หน้าหลัก
+              </v-btn>
+            </v-list-item-title>
+          </v-list-item>
           <v-list-item>  
             <v-list-item-title>
               <v-btn router-link to="/Books" text>
@@ -59,7 +79,7 @@
               <!-- <v-col class="d-flex flex-column align-sm-start align-md-center"> -->
                 <v-row :class="mr12">
                   <v-col cols="12" align="center">
-                    <h1 style="color:white;text-shadow:2px 2px 8px #444444;" class="mt-8">คำสอนคุณครูไม่ใหญ่</h1>
+                    <h1 style="color:white;text-shadow:2px 2px 8px #444444;" class="mt-8">{{ headingWords }}</h1>
                   </v-col>
                   <v-col cols="12" align="center">
                     <v-combobox 
@@ -70,7 +90,7 @@
                       :menu-props="{ top: true, closeOnClick: false, offsetY: true }"
                       :search-input.sync="search"  
                       hide-selected
-                      :label="label_search"  
+                      :label="labelSearch"  
                       multiple 
                       small-chips  
                       solo 
@@ -134,7 +154,7 @@
               src="@/assets/logo1.png" width="45" />
             <v-btn text router-link to="/">
               <h1 v-if="wn" style="color:white;font-size:18px;"></h1>
-              <h1 v-else style="color:white;font-size:24px; font-family: 'Sarabun', sans-serif;">คำสอนคุณครูไม่ใหญ่</h1>
+              <h1 v-else style="color:white;font-size:24px; font-family: 'Sarabun', sans-serif;">{{ headingWords }}</h1>
             </v-btn>
           </div>
         </v-toolbar-title>
@@ -209,8 +229,7 @@ export default {
     title: '',
     search: null,
     dialog: false,
-    group: null,  
-    label_search:'',
+    group: null,
     activator: null,
     attach: null,
     colors: ['green', 'purple', 'indigo', 'cyan', 'teal', 'orange'],
@@ -226,8 +245,9 @@ export default {
 
   }),
   created(){
-      this.label_search = 'ค้นหาคำสอน (หนังสือ)'
       this.$store.dispatch('clear')
+  },
+  mounted () {
   },
   computed:{
     text_exp(){
@@ -245,10 +265,24 @@ export default {
       }
     },
     on () {
-      if (this.$route.name === 'Home' || this.$route.name ===  'Home2') {
+      if (this.$route.name === 'Home' || this.$route.name ===  'Cards') {
         return true
       }
         return false
+    },
+    headingWords () {
+      if (this.$route.name === 'Cards') {
+        return 'การ์ดคำสอนคุณครูไม่ใหญ่'
+      } else {
+        return 'คำสอนคุณครูไม่ใหญ่'
+      }
+    },
+    labelSearch () {
+      if(this.$route.name ===  'Cards') {
+        return 'ค้นหาคำสอน (การ์ด)'
+      } else {
+        return 'ค้นหาคำสอน (หนังสือ)'
+      }
     },
     mr12 (){
       if (this.$vuetify.breakpoint.smOnly){
@@ -264,6 +298,12 @@ export default {
     },
     close () {
       if (this.$route.name === 'Indexs') {
+        return true
+      }
+        return false 
+    },
+    checkHome () {
+      if (this.$route.name === 'Home') {
         return true
       }
         return false 
@@ -290,7 +330,7 @@ export default {
         this.$router.push('/Indexs');
         this.$store.dispatch('setFirstIndexsFromApi',{words:input,page:0})
       }else{
-        this.label_search = 'กรุณาใส่คำที่่ต้องการค้นหา'
+        this.labelSearch = 'กรุณาใส่คำที่่ต้องการค้นหา'
       }
     },
     searchrandom(){
