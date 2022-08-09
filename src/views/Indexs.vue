@@ -217,6 +217,13 @@ export default {
     }
   },
   methods:{
+    track () {
+      this.$gtag.event('view_search_results', {
+        'event_category': 'engagement',
+        'event_label': 'search_results',
+        'value': 'search_term'
+      })
+    },
     dialogs(head,content,content_copy,book,id){
       this.dialog=!this.dialog
       this.content=content
