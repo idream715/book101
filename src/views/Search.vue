@@ -1,21 +1,21 @@
 <template>
   <div class="indexs">
     <v-container  >
-       
+
       <v-row class="mb-1" align="center" justify="center">
-            
+
           <v-col cols="12" md="10" class="pb-1">
-              <v-combobox 
-                v-model="search_pageindex" 
-                :filter="filter" 
-                :hide-no-data="!search" 
-                :items="items" 
-                :search-input.sync="search"  
-                hide-selected  
-                :label="label_search"  
-                multiple 
-                small-chips  
-                solo 
+              <v-combobox
+                v-model="search_pageindex"
+                :filter="filter"
+                :hide-no-data="!search"
+                :items="items"
+                :search-input.sync="search"
+                hide-selected
+                :label="label_search"
+                multiple
+                small-chips
+                solo
                 :delimiters="space"
               >
                 <template v-slot:no-data>
@@ -28,16 +28,16 @@
                       small
                     >
                       {{ search }}
-                    </v-chip>                        
+                    </v-chip>
                   </v-list-item>
                 </template>
                 <template v-slot:selection="{ attrs, item, parent, selected }">
-                  <v-chip  
-                    v-if="item === Object(item)" 
-                    v-bind="attrs" 
-                    :color="`${item.color} lighten-3`" 
-                    :input-value="selected" 
-                    label 
+                  <v-chip
+                    v-if="item === Object(item)"
+                    v-bind="attrs"
+                    :color="`${item.color} lighten-3`"
+                    :input-value="selected"
+                    label
                     small >
                     <span class="pr-2">{{ item.text }} </span>
                     <v-icon small @click="parent.selectItem(item)">mdi-close</v-icon>
@@ -52,7 +52,7 @@
          <v-col v-if="setoverlay===false" cols="6" align="start" justify="center" class="pt-1">พบ {{getTotalIndexs}} รายการ</v-col>
 
        <v-row v-if="setoverlay===false">
-       </v-row>   
+       </v-row>
 
        <v-row v-if="setoverlay===false">
           <v-card
@@ -68,16 +68,16 @@
               </p>
               <div >
                  คำแนะนำ :<br>
-                <p>- ตรวจดูให้แน่ใจว่าสะกดถูกต้องทุกคำ</p> 
-                <p>- ลองใช้คำอื่นๆ</p> 
-                <p>- ลองใช้คำที่กว้างขึ้น</p> 
-                <p>- ลองใช้คำที่น้อยลง</p> 
+                <p>- ตรวจดูให้แน่ใจว่าสะกดถูกต้องทุกคำ</p>
+                <p>- ลองใช้คำอื่นๆ</p>
+                <p>- ลองใช้คำที่กว้างขึ้น</p>
+                <p>- ลองใช้คำที่น้อยลง</p>
               </div>
             </v-card-text>
           </v-card>
        </v-row>
 
-       <v-row id="top" v-if="setoverlay===false"> 
+       <v-row id="top" v-if="setoverlay===false">
         <v-col cols="12" >
 
           <div v-for="(index,i) in indexs" :key="i" :value="index">
@@ -92,7 +92,7 @@
                         <v-list-item-title class="grey--text" align="end">{{i+1}}</v-list-item-title>
                       </v-col>
                     </v-row>
-                    
+
                     <v-list-item-title class="mb-2"><v-btn text color="primary lighten-1" @click="clickedSendbook(index.dm_id)"><v-icon small class="mr-2">mdi-book-open-page-variant</v-icon> จากหนังสือ:{{index.dm_name}}</v-btn></v-list-item-title>
                     <p v-html="text_render(index.mark_details)"></p>
                   </v-card-text>
@@ -115,8 +115,8 @@
                 <div >
                   <v-card-text ref="textCopy" v-html="content_copy" style="font-size: 17px; white-space: pre-wrap;" ></v-card-text>
                 </div>
-                </v-card>  
-                
+                </v-card>
+
               </v-card>
               <v-card-actions>
                 <v-spacer></v-spacer>
@@ -129,31 +129,31 @@
 
         </v-col>
       </v-row><br>
-     
+
         <div v-if="setoverlay===true">
           <v-col cols="12" v-for="(item,i) in 10" :key="i">
             <v-card >
-              
+
                 <v-skeleton-loader
                   ref="skeleton"
                   type= "article, actions"
                   class="mx-auto"
                 ></v-skeleton-loader>
-               
+
             </v-card><br>
           </v-col>
         </div>
 
         <v-col cols="12" v-if=" indexs.length<getTotalIndexs">
           <v-card >
-              
+
             <v-skeleton-loader
               ref="skeleton"
               type= "article, actions"
               class="mx-auto"
               v-intersect="search_infenit"
             ></v-skeleton-loader>
-               
+
           </v-card><br>
         </v-col>
     </v-container>
@@ -181,7 +181,7 @@ export default {
       items: [{ header: 'สามารถใส่คำค้นหาได้สูงสุด 5 คำ' }],
       nonce: 1,
       menu: false,
-      x: 0,      
+      x: 0,
       y: 0,
       space:[' '],
 
@@ -324,7 +324,7 @@ export default {
   watch: {
     search_pageindex (val,prev) {
       if (val.length === prev.length) return
-      
+
       if (val.length > 5) {
         this.$nextTick(() =>this.search_pageindex.pop())
       }
@@ -342,8 +342,8 @@ export default {
 
         return v
       })
-    } 
-  },   
+    }
+  },
 }
 </script>
 <style>

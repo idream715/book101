@@ -1,7 +1,7 @@
 <template>
   <div class="books">
       <v-container>
-        
+
         <v-overlay v-model="loading">
           <v-progress-circular indeterminate size="64"></v-progress-circular>
         </v-overlay>
@@ -21,20 +21,20 @@
                 ></v-autocomplete>
               </v-col>
               <v-col cols="2" md="2" class="mb-8">
-                  <v-icon 
-                    color="primary" 
+                  <v-icon
+                    color="primary"
                     v-if="filBookCategoty"
-                    outlined 
-                    @click="filBookCategoty = null" 
+                    outlined
+                    @click="filBookCategoty = null"
                     >
-                    mdi-filter-remove 
-                  </v-icon> 
+                    mdi-filter-remove
+                  </v-icon>
               </v-col>
             </v-row>
           </v-container>
         </v-card>
         <v-row>
-          <v-col 
+          <v-col
             v-for="n in filterBooks"
             :key="n.book_name"
             cols="6"
@@ -42,25 +42,25 @@
             md="3"
             lg="2"
             xl="1"
-            > 
-            <v-card 
-              class="mx-auto" 
+            >
+            <v-card
+              class="mx-auto"
               max-width="160"
               @click="bookSelect(n)"
               >
-              <v-img 
-                :src="n.Dhamma01Master_dm_link_cover_thumbnail" 
-                height="200px" 
+              <v-img
+                :src="n.bookCoverThumbnails"
+                height="200px"
                 width="500px"
               >
               </v-img>
-              <v-card-text 
+              <v-card-text
                 class="
-                  text-truncate 
+                  text-truncate
                   caption
                 "
               >
-                {{n.Dhamma01Master_dm_name}}
+                {{n.bookName}}
               </v-card-text>
             </v-card>
           </v-col>
@@ -90,24 +90,24 @@ export default {
     },
     filterBooks(){
       if(this.filBookCategoty){
-        return this.books.filter(el => el.Dhamma01Category_dc_name === this.filBookCategoty)
+        return this.books.filter(el => el.categoryName === this.filBookCategoty)
       }else{
         return this.books
       }
     },
     loading(){
-      return this.$store.getters.getoverlay     
+      return this.$store.getters.getoverlay
     },
     items(){
-      return Array.from(new Set(this.$store.getters.getBooks.map(a => a.Dhamma01Category_dc_name)))   
+      return Array.from(new Set(this.$store.getters.getBooks.map(a => a.categoryName)))
     },
-    
+
   },
   methods: {
     bookSelect(selected){
       //new tab
       console.log(selected)
-      let openBook = this.$router.resolve({path: `/book/${selected['Dhamma01Master_dm_id']}`});
+      let openBook = this.$router.resolve({path: `/book/${selected['bookId']}`});
       window.open(openBook.href, '_blank');
     },
     setOpenDialog(val){

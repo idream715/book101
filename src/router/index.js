@@ -12,7 +12,7 @@ Vue.use(VueRouter)
   },
   {
     path: '/cards-search',
-    name: 'Home',
+    name: 'Cards-Home',
     component: Home
   },
   {
@@ -22,7 +22,7 @@ Vue.use(VueRouter)
   },
   {
     path: '/search',
-    name: 'Indexs',
+    name: 'Search',
     component: () => import(/* webpackChunkName: "search" */ '../views/Search.vue')
   },
   {
@@ -49,7 +49,16 @@ Vue.use(VueRouter)
     name: 'Cards',
     component: () => import('@/views/Cards.vue')
   },
-  
+  {
+    path: '/search-page',
+    name: 'SearchPage',
+    component: () => import('@/views/SearchPage.vue')
+  },
+  {
+    path: '/cards-results',
+    name: 'Cards Results',
+    component: () => import('@/views/CardsList.vue')
+  },
 ]
 
 const router = new VueRouter({

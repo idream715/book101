@@ -71,7 +71,7 @@ export default new Vuex.Store({
     SET_FLAG_BOOK(state, payload){
       state.flag += payload
     },
-    
+
   },
   actions: {
     // GET
@@ -115,9 +115,9 @@ export default new Vuex.Store({
           commit('SET_OVERLAY', false)
           if(data.nitems === 0){commit('SET_NOTFOUND', true)}else{commit('SET_NOTFOUND', false)}
           commit('SET_TOTALS_INDEXS', data.nItems)
-          let details = data.items.map(x=>x.dd_detail)
-          let index = data.items.map(x=>x.dd_heading)
-          function marks(array1,array2){        
+          let details = data.items.map(x=>x.chapterDetail)
+          let index = data.items.map(x=>x.chapterHeading)
+          function marks(array1,array2){
             let marks = []
             array1.forEach(index => {
               let render = index
@@ -127,7 +127,7 @@ export default new Vuex.Store({
             return marks
           }
           let indexmarked =  marks(index,words)
-          let detailsmarked = marks(details,words)  
+          let detailsmarked = marks(details,words)
           data.items.forEach((item,i) =>{
             item["mark_index"]= indexmarked[i]
             item["mark_details"]= detailsmarked[i]
@@ -157,9 +157,9 @@ export default new Vuex.Store({
         callApi.postData(`/search` , body)
           .then(res=>{
             let data = res.data
-            let details = data.items.map(x=>x.dd_detail)
-            let index = data.items.map(x=>x.dd_heading)
-            function marks(array1,array2){        
+            let details = data.items.map(x=>x.chapterDetail)
+            let index = data.items.map(x=>x.chapterHeading)
+            function marks(array1,array2){
               let marks = []
               array1.forEach(index => {
                 let render = index
@@ -171,14 +171,14 @@ export default new Vuex.Store({
               return marks
             }
             let indexmarked =  marks(index,words)
-            let detailsmarked = marks(details,words)  
+            let detailsmarked = marks(details,words)
             data.items.forEach((item,i) =>{
               item["mark_index"]= indexmarked[i]
               item["mark_details"]= detailsmarked[i]
             })
           commit('SET_INDEXS_INFENIT', data.items)
           }).catch(err => console.log(err))
-      }else{return}  
+      }else{return}
     },
     setsearchrandom({ commit },number){
       commit('SET_OVERLAY', true)
@@ -227,9 +227,9 @@ export default new Vuex.Store({
             commit('SET_SARABUN_INFENIT', data.items)
         }).catch(err => console.log(err))
       }else{return}
-      
+
     },
-   
+
 
     // clear state
     clear({commit}){
@@ -246,7 +246,7 @@ export default new Vuex.Store({
       commit('SET_SARABUN_TOTAL', 0)
       commit('SET_BOOK_SELECTED', {})
     },
-    
+
   },
   getters: {
     getTotalbooks(state){
@@ -255,7 +255,7 @@ export default new Vuex.Store({
     getBooks(state){
       return state.books
     },
-    
+
 
     getTotalIndexs(state){
       return state.totalsIndexs

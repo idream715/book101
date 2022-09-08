@@ -9,20 +9,20 @@
       ></v-skeleton-loader>
       <v-card-title class="justify-center">
         <div class="font-weight-bold">
-          {{bookSelected.Dhamma01Master_dm_name}}
+          {{ bookSelected.bookName }}
         </div>
       </v-card-title>
       <v-card-text >
         <v-row>
-          <v-col 
-            cols="12" 
-            sm="12" 
-            md="6" 
+          <v-col
+            cols="12"
+            sm="12"
+            md="6"
             class="
-              d-flex 
-              align-center 
-              align-sm-center 
-              align-md-end 
+              d-flex
+              align-center
+              align-sm-center
+              align-md-end
               flex-column
             "
             >
@@ -46,18 +46,18 @@
             <v-img
               v-else
               width="250"
-              :src="bookSelected.Dhamma01Master_dm_link_cover"
+              :src="bookSelected.bookCover"
               class="elevation-10"
             ></v-img>
           </v-col>
-          <v-col 
-            cols="12" 
+          <v-col
+            cols="12"
             sm="12"
-            md="6" 
+            md="6"
             class="
-              d-flex 
-              align-center 
-              align-md-start 
+              d-flex
+              align-center
+              align-md-start
               flex-column
             "
           >
@@ -74,28 +74,28 @@
               ></v-skeleton-loader>
             </div>
             <div class="subtitle-1 justify-md-center" v-else>
-              <p>จำนวนสารบัญ 
+              <p>จำนวนสารบัญ
                 <span class="pink--text subtitle-1 font-weight-bold" v-text="sarabunTotal"></span>
               </p>
-              <p>ชุดหนังสือ 
-                <span class="pink--text subtitle-1 font-weight-bold" v-text="bookSelected.Dhamma01Category_dc_name"></span>
+              <p>ชุดหนังสือ
+                <span class="pink--text subtitle-1 font-weight-bold" v-text="bookSelected.categoryName"></span>
               </p>
               <v-btn
-                :href="bookSelected.Dhamma01Master_dm_link_pdf"
+                :href="bookSelected.bookPdf"
                 target="_blank"
                 class="mr-3"
                 color="primary"
                 >
                 <v-icon>mdi-file-pdf</v-icon>
-                <div>PDF</div> 
+                <div>PDF</div>
               </v-btn>
               <v-btn
-                :href="bookSelected.Dhamma01Master_dm_link_text"
+                :href="bookSelected.bookText"
                 target="_blank"
                 color="primary"
                 >
                 <v-icon class="mr-1">mdi-book-open-page-variant</v-icon>
-                <div>TEXT</div> 
+                <div>TEXT</div>
               </v-btn>
             </div>
           </v-col>
@@ -105,7 +105,7 @@
         class="mx-auto elevation-10"
       >
         <v-list>
-          <v-subheader 
+          <v-subheader
             class="primary--text title d-flex justify-center font-weight-bold"
           >
             <h4 class="sara">สารบัญ</h4>
@@ -119,11 +119,11 @@
               class="mx-auto"
             ></v-skeleton-loader>
           </div>
-          
+
           <v-list-item-group
             active-class="primary--text"
           >
-            <v-list-item v-for="(item, i) in sarabunSelected" :key="item.dd_id">
+            <v-list-item v-for="(item, i) in sarabunSelected" :key="item.chapterId">
               <template v-slot:default="{ active }">
                 <v-list-item-avatar>
                   <v-list-item-title
@@ -132,20 +132,20 @@
                 </v-list-item-avatar>
 
                 <v-list-item-content>
-                  <v-list-item-title v-text="item.dd_heading" style="line-height: unset;"></v-list-item-title>
+                  <v-list-item-title v-text="item.chapterHeading" style="line-height: unset;"></v-list-item-title>
                 </v-list-item-content>
-                
+
                 <v-list-item-action v-if="active">
-                  <v-btn :href="item.dd_link_pdf" target="_blank" icon>
-                    <v-icon :color="item.dd_link_pdf ? 'red' : 'grey'">mdi-file-pdf</v-icon>
+                  <v-btn :href="item.chapterLinkPdf" target="_blank" icon>
+                    <v-icon :color="item.chapterLinkPdf ? 'red' : 'grey'">mdi-file-pdf</v-icon>
                   </v-btn>
                 </v-list-item-action>
                 <v-list-item-action v-if="active">
                 <v-btn
-                    @click="readText(item.dd_heading,item.dd_detail)"
+                    @click="readText(item.chapterHeading,item.chapterDetail)"
                     text icon
                     >
-                    <v-icon :color="item.dd_detail ? 'blue': 'grey'">
+                    <v-icon :color="item.chapterDetail ? 'blue': 'grey'">
                       mdi-book-open-page-variant
                     </v-icon>
                   </v-btn>
@@ -168,13 +168,13 @@
               ></v-skeleton-loader>
             </v-col>
           </v-row>
-           
+
         </v-list>
       </v-card>
     </v-card>
     <v-dialog
       v-model="dialogReadText"
-      max-width="800" 
+      max-width="800"
       class="elevation-10"
     >
       <v-card >
@@ -241,7 +241,7 @@
         }
       },
       nextLoading(){
-        let timesLoaded = Math.ceil(this.$store.getters.getSarabun.length/this.itemsPerPage) 
+        let timesLoaded = Math.ceil(this.$store.getters.getSarabun.length/this.itemsPerPage)
         if(timesLoaded<this.pages){
           timesLoaded += 1
           let offset = 0
@@ -272,13 +272,13 @@
           return this.$store.getters.getSarabun
         },
         sarabunTotal(){
-          return this.$store.getters.getTotalSarabun     
+          return this.$store.getters.getTotalSarabun
         },
         pages(){
           return Math.ceil(this.sarabunTotal/this.itemsPerPage)
         },
         loading(){
-          return this.$store.getters.getoverlay     
+          return this.$store.getters.getoverlay
         },
       }
   }
@@ -287,7 +287,7 @@
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Sarabun&display=swap');
 
-  .v-application .font-weight-bold {  
+  .v-application .font-weight-bold {
     font-family: 'Sarabun', sans-serif;
     font-size: 1.5rem;
   }
@@ -299,11 +299,11 @@
   p {
     font-family: 'Sarabun', sans-serif;
   }
-  
+
   .sara {
     font-family: 'Sarabun', sans-serif;
   }
-  
+
   .v-application .subtitle-1 {
     font-family: 'Sarabun', sans-serif !important;
   }
