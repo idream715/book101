@@ -124,7 +124,7 @@
             active-class="primary--text"
           >
             <v-list-item v-for="(item, i) in sarabunSelected" :key="item.chapterId">
-              <template v-slot:default="{ active }">
+              <template>
                 <v-list-item-avatar>
                   <v-list-item-title
                     v-text="i+1+'.'"
@@ -134,13 +134,23 @@
                 <v-list-item-content>
                   <v-list-item-title v-text="item.chapterHeading" style="line-height: unset;"></v-list-item-title>
                 </v-list-item-content>
+                <v-btn
+                  v-show="item.chapterLinkYouTube.length > 0"
+                  icon
+                  @click="showDialogYoutube(item.chapterLinkYouTube)"
+                >
+                  <v-icon color="red">mdi-youtube</v-icon>
+                </v-btn>
 
-                <v-list-item-action v-if="active">
+
+                <v-list-item-action>
+                </v-list-item-action>
+                <v-list-item-action>
                   <v-btn :href="item.chapterLinkPdf" target="_blank" icon>
-                    <v-icon :color="item.chapterLinkPdf ? 'red' : 'grey'">mdi-file-pdf</v-icon>
+                    <v-icon :color="item.chapterLinkPdf.length > 0 ? 'red' : 'grey'">mdi-file-pdf</v-icon>
                   </v-btn>
                 </v-list-item-action>
-                <v-list-item-action v-if="active">
+                <v-list-item-action>
                 <v-btn
                     @click="readText(item.chapterHeading,item.chapterDetail)"
                     text icon
@@ -172,34 +182,50 @@
         </v-list>
       </v-card>
     </v-card>
-    <v-dialog
-      v-model="dialogReadText"
-      max-width="800"
-      class="elevation-10"
-    >
-      <v-card >
-        <v-card-title class="d-flex justify-center" v-html="textSarabun">
-        </v-card-title>
-        <v-card-text style="white-space: pre-wrap;" class="d-flex justify-center" ref="textCopy" v-html="textDetail">
-        </v-card-text>
-        <v-card-actions class="justify-end">
-          <v-btn
-            color="primary"
-            text
-            @click.stop.prevent="copyTextDetail"
-          >
-            {{word_copy}}
-          </v-btn>
-          <v-btn
-            color="primary"
-            text
-            @click="dialogReadText = false"
-          >
-            ออก
-          </v-btn>
-        </v-card-actions>
-      </v-card>
-    </v-dialog>
+    <v-row justify="center">
+      <v-dialog persistent v-model="dialogYoutube" max-width="640">
+        <v-card class="max-width-auto info" flat>
+          <youtube
+            class="d-flex justify-center"
+            :video-id="videoId"
+            :player-vars="{ autoplay: 1 }"
+          ></youtube>
+          <v-card-actions>
+            <v-spacer></v-spacer>
+            <v-btn color="accent lighten-1" text target="_blank" :href="videoURL">เข้าสู่เว็บหลักYoutube</v-btn>
+            <v-btn color="accent lighten-1" text @click="closeDialogYoutube">ออก</v-btn>
+          </v-card-actions>
+        </v-card>
+      </v-dialog>
+      <v-dialog
+        v-model="dialogReadText"
+        max-width="800"
+        class="elevation-10"
+      >
+        <v-card >
+          <v-card-title class="d-flex justify-center" v-html="textSarabun">
+          </v-card-title>
+          <v-card-text style="white-space: pre-wrap;" class="d-flex justify-center" ref="textCopy" v-html="textDetail">
+          </v-card-text>
+          <v-card-actions class="justify-end">
+            <v-btn
+              color="primary"
+              text
+              @click.stop.prevent="copyTextDetail"
+            >
+              {{word_copy}}
+            </v-btn>
+            <v-btn
+              color="primary"
+              text
+              @click="dialogReadText = false"
+            >
+              ออก
+            </v-btn>
+          </v-card-actions>
+        </v-card>
+      </v-dialog>
+    </v-row>
   </div>
 </template>
 
@@ -215,6 +241,9 @@
         textSarabun:"",
         textDetail:``,
         word_copy:'คัดลอก',
+        dialogYoutube: false,
+        videoId: '',
+        videoURL: ''
       }
     },
     created() {
@@ -222,6 +251,22 @@
       this.$store.dispatch('setFirstSarabun', {limit:this.itemsPerPage, offset:0, book_id: this.id})
     },
     methods: {
+      showDialogYoutube (url) {
+
+        this.dialogYoutube = !this.dialogYoutube
+        const regExp = /^.*((youtu.be\/)|(v\/)|(\/u\/\w\/)|(embed\/)|(watch\?))\??v?=?([^#&?]*).*/
+        const match = url.match(regExp)
+
+        let vid = (match && match[7].length == 11) ? match[7] : false
+
+        this.videoURL = url
+        this.videoId = vid
+      },
+      closeDialogYoutube () {
+        this.dialogYoutube = !this.dialogYoutube
+        this.videoURL = ''
+        this.videoId = ''
+      },
       readText(sarabun,detail){
         this.dialogReadText = !this.dialogReadText
         window.getSelection().removeAllRanges()

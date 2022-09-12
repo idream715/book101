@@ -45,18 +45,13 @@ Vue.use(VueRouter)
     component: () => import('../views/About.vue')
   },
   {
-    path: '/cards',
-    name: 'Cards',
-    component: () => import('@/views/Cards.vue')
-  },
-  {
     path: '/search-page',
     name: 'SearchPage',
     component: () => import('@/views/SearchPage.vue')
   },
   {
-    path: '/cards-results',
-    name: 'Cards Results',
+    path: '/cards',
+    name: 'Cards',
     component: () => import('@/views/CardsList.vue')
   },
 ]

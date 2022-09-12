@@ -93,20 +93,45 @@
                       </v-col>
                     </v-row>
 
-                    <v-list-item-title class="mb-2"><v-btn text color="primary lighten-1" @click="clickedSendbook(index.dm_id)"><v-icon small class="mr-2">mdi-book-open-page-variant</v-icon> จากหนังสือ:{{index.dm_name}}</v-btn></v-list-item-title>
+                    <v-list-item-title class="mb-2"><v-btn text color="primary lighten-1" @click="clickedSendbook(index.bookId)"><v-icon small class="mr-2">mdi-book-open-page-variant</v-icon> จากหนังสือ:{{index.bookName}}</v-btn></v-list-item-title>
                     <p v-html="text_render(index.mark_details)"></p>
                   </v-card-text>
                 </v-col>
                 <v-col cols="12" class="pa-1">
                   <v-card-actions class="d-flex justify-end pa-1">
-                     <v-btn text color="red" style="margin-right:10px;" target="_blank" :href="index.dd_link_pdf">PDF</v-btn>
-                     <v-btn text color="blue lighten-1" @click="dialogs(index.mark_index,index.dd_detail,index.mark_details,index.dm_name,index.dm_id)">อ่านทั้งหมด</v-btn>
+                     <v-btn
+                      v-show="index.chapterLinkYouTube.length > 0"
+                      text
+                      color="red"
+                      style="margin-right:10px;"
+                      @click="showDialogYoutube(index.chapterLinkYouTube)"
+                      >
+                        <v-icon>mdi-youtube</v-icon>
+                      </v-btn>
+                     <v-btn text color="red" style="margin-right:10px;" target="_blank" :href="index.chapterLinkPdf">PDF</v-btn>
+                     <v-btn text color="blue lighten-1" @click="dialogs(index.mark_index,index.chapterDetail,index.mark_details,index.bookName,index.bookId)">อ่านทั้งหมด</v-btn>
                   </v-card-actions>
                 </v-col>
             </v-card><hr>
           </div>
+          <v-row justify="center">
+            <v-dialog persistent v-model="dialogYoutube" max-width="640">
+              <v-card class="max-width-auto" flat>
+                <youtube
+                  class="d-flex justify-center"
+                  :video-id="videoId"
+                  :player-vars="{ autoplay: 1 }"
+                ></youtube>
+                <v-card-actions>
+                  <v-spacer></v-spacer>
+                  <v-btn color="primary lighten-1" text target="_blank" :href="videoURL">เข้าสู่เว็บหลักYoutube</v-btn>
+                  <v-btn color="primary lighten-1" text @click="closeDialogYoutube">ออก</v-btn>
+                </v-card-actions>
+              </v-card>
+            </v-dialog>
+          </v-row>
 
-          <v-dialog v-model="dialog" max-width="1100" align="center"   >
+          <v-dialog v-model="dialog" max-width="1024" align="center">
             <v-card>
               <v-card class="d-flex justify-center" flat>
                 <v-card class="max-width-auto"  flat>
@@ -130,7 +155,7 @@
         </v-col>
       </v-row><br>
 
-        <div v-if="setoverlay===true">
+        <div v-if="setoverlay">
           <v-col cols="12" v-for="(item,i) in 10" :key="i">
             <v-card >
 
@@ -144,7 +169,7 @@
           </v-col>
         </div>
 
-        <v-col cols="12" v-if=" indexs.length<getTotalIndexs">
+        <v-col cols="12" v-if="indexs.length<getTotalIndexs">
           <v-card >
 
             <v-skeleton-loader
@@ -184,7 +209,9 @@ export default {
       x: 0,
       y: 0,
       space:[' '],
-
+      dialogYoutube: false,
+      videoId: '',
+      videoURL: ''
     }
   },
   created () {
@@ -249,6 +276,22 @@ export default {
       this.content=""
       this.head_content=""
     },
+    showDialogYoutube (url) {
+
+      this.dialogYoutube = !this.dialogYoutube
+      const regExp = /^.*((youtu.be\/)|(v\/)|(\/u\/\w\/)|(embed\/)|(watch\?))\??v?=?([^#&?]*).*/
+      const match = url.match(regExp)
+
+      let vid = (match && match[7].length == 11) ? match[7] : false
+
+      this.videoURL = url
+      this.videoId = vid
+    },
+    closeDialogYoutube () {
+      this.dialogYoutube = !this.dialogYoutube
+      this.videoURL = ''
+      this.videoId = ''
+    },
     text_render(input){
       if(!input.includes("<mark>")) return input
 
@@ -289,7 +332,7 @@ export default {
         } catch (err) {
           alert('Oops, unable to copy');
         }
-      },
+    },
     clickedSendbook(bookname2) {
       let openBook = this.$router.resolve({path: `/book/${bookname2}`});
       window.open(openBook.href, '_blank')

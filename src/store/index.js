@@ -6,18 +6,24 @@ Vue.use(Vuex)
 
 export default new Vuex.Store({
   state: {
-    totalsBooks:0,
-    books:[],
-    totalsIndexs:0,
-    indexs:[],
-    overlay:false,
-    notfound:false,
-    words_search:[],
-    bookSelected:{},
-    sarabunSelected:[],
-    totalsSarabun:0,
-    search_random:[],
-    flag:1,
+    totalsBooks: 0,
+    books: [],
+    totalsIndexs: 0,
+    indexs: [],
+    overlay: false,
+    notfound: false,
+    words_search: [],
+    bookSelected: {},
+    sarabunSelected: [],
+    totalsSarabun: 0,
+    search_random: [],
+    flag: 1,
+    // ------cards------ //
+    cards: [],
+    totalsCards: 0,
+    cardTags: [],
+    cardWordSearch: [],
+    cardToolbarFlag: '',
   },
   mutations: {
     SET_BOOKS(state, payload){
@@ -71,6 +77,37 @@ export default new Vuex.Store({
     SET_FLAG_BOOK(state, payload){
       state.flag += payload
     },
+    SET_CARDS(state, payload){
+      state.cards = payload
+    },
+    SET_TOTALS_CARDS(state, payload){
+      state.totalsCards = payload
+    },
+    SET_CARDS_TAGS(state, payload){
+      state.cardTags = payload
+    },
+    SET_CARDS_INFINITE(state, payload){
+      payload.forEach(x=>{state.cards.push(x)})
+    },
+    SET_CARDS_WORDS_SEARCH(state, payload){
+      state.cardWordSearch = payload
+    },
+    SET_FLAGS_CARD(state, payload){
+      state.flag += payload
+    },
+    SET_FLAGS_TOOLBAR(state, payload) {
+      switch(payload) {
+        case 0:
+          state.cardToolbarFlag = ''
+          break;
+        case 1:
+          state.cardToolbarFlag = 'filter'
+          break;
+        case 2:
+          state.cardToolbarFlag = 'search'
+          break;
+      }
+    },
 
   },
   actions: {
@@ -86,6 +123,29 @@ export default new Vuex.Store({
         })
         .catch(err => console.log(err))
     },
+    getCardFromApi({ commit }){
+      commit('SET_OVERLAY', true)
+      commit('CLEAR_FLAG')
+      callApi.getData(`/cards/all/?limit=48&offset=0`)
+        .then(res=>{
+          let data = res.data
+          commit('SET_NOTFOUND', false)
+          commit('SET_OVERLAY', false)
+          commit('SET_TOTALS_CARDS', data.nItems)
+          commit('SET_CARDS', data.items)
+        })
+        .catch(err => console.log(err))
+    },
+    getTagOfCards({ commit }){
+      commit('SET_OVERLAY', true)
+      callApi.getData(`/cards/tags/?limit=60&offset=0`)
+        .then(res=>{
+          let data = res.data
+          commit('SET_OVERLAY', false)
+          commit('SET_CARDS_TAGS', data.items)
+        })
+        .catch(err => console.log(err))
+    },
     // SET
       // PATH INDEXS
     setwordssearch({commit},words){
@@ -95,11 +155,7 @@ export default new Vuex.Store({
       commit('SET_INDEXS', [])
       commit('SET_WORDS_SEARCH',words)
       commit('CLEAR_FLAG')
-      let tags = []
-      words.forEach(element => {
-        let tag = element.text
-        tags.push(tag)
-      });
+      let tags = words.map(element => element.text);
 
       let body = {
         keywords: tags,
@@ -113,7 +169,7 @@ export default new Vuex.Store({
         .then(res=>{
           let data = res.data
           commit('SET_OVERLAY', false)
-          if(data.nitems === 0){commit('SET_NOTFOUND', true)}else{commit('SET_NOTFOUND', false)}
+          if(data.nItems === 0){commit('SET_NOTFOUND', true)}else{commit('SET_NOTFOUND', false)}
           commit('SET_TOTALS_INDEXS', data.nItems)
           let details = data.items.map(x=>x.chapterDetail)
           let index = data.items.map(x=>x.chapterHeading)
@@ -229,8 +285,111 @@ export default new Vuex.Store({
       }else{return}
 
     },
+      // PATH CARDS
+    setCardInfiniteScrolled({ commit }, { offset }){
+      commit('SET_OVERLAY', true)
+      callApi.getData(`/cards/all/?limit=48&offset=${offset}`)
+        .then(res=>{
+          let data = res.data
+          commit('SET_OVERLAY', false)
+          commit('SET_CARDS_INFINITE', data.items)
+          commit('SET_FLAGS_CARD', offset)
+        })
+        .catch(err => console.log(err))
+    },
+    setFilteredCards( { commit }, { words, offset }){
+      commit('SET_NOTFOUND', false)
+      commit('SET_OVERLAY', true)
+      commit('SET_CARDS', [])
+      commit('SET_TOTALS_CARDS', 0)
+      // commit('SET_CARDS_WORDS_SEARCH',words)
+      //
+      commit('CLEAR_FLAG')
 
+      let qs = ''
 
+      words.forEach(word => qs += '|' + word)
+
+      callApi.getData(
+        `/cards/all?limit=${offset}&qstr=${qs}`
+      ).then(res=>{
+          let data = res.data
+          commit('SET_FLAGS_TOOLBAR', 1)
+          commit('SET_OVERLAY', false)
+          commit('SET_TOTALS_CARDS', data.nItems)
+          commit('SET_CARDS', data.items)
+      }).catch(err => console.log(err))
+
+    },
+    setFilteredCardsContinue( { commit, state }, { words, offset }) {
+      if (offset > state.flag) {
+        commit('SET_OVERLAY', true)
+        commit('SET_FLAGS_CARD', 48)
+        let qs = ''
+
+        words.forEach(word => qs += '|' + word)
+
+        callApi.getData(
+          `/cards/all?limit=48&offset=${offset}&qstr=${qs}`
+        ).then(res=>{
+            let data = res.data
+            commit('SET_FLAGS_TOOLBAR', 1)
+            commit('SET_OVERLAY', false)
+            commit('SET_TOTALS_CARDS', data.nItems)
+            commit('SET_CARDS_INFINITE', data.items)
+        }).catch(err => console.log(err))
+      }
+    },
+    setSearchedCards( { commit }, { words }){
+      commit('SET_NOTFOUND', false)
+      commit('SET_OVERLAY', true)
+      commit('SET_CARDS', [])
+      commit('SET_TOTALS_CARDS', 0)
+      commit('CLEAR_FLAG')
+
+      const data = {
+        keywords: words,
+        type: 'cards',
+        limit: 48,
+        offset: 0,
+        pageNo: 0
+      }
+
+      callApi.postData(
+        `/search`, data
+      ).then(res=>{
+        let data = res.data
+        data.nItems === 0 ? commit('SET_NOTFOUND', true) : commit('SET_NOTFOUND', false)
+        commit('SET_FLAGS_TOOLBAR', 2)
+        commit('SET_OVERLAY', false)
+        commit('SET_TOTALS_CARDS', data.nItems)
+        commit('SET_CARDS', data.items)
+      }).catch(err => console.log(err))
+
+    },
+    setSearchedCardsContinue( { commit, state }, { words, offset }) {
+      if (offset > state.flag) {
+        commit('SET_OVERLAY', true)
+        commit('SET_FLAGS_CARD', 48)
+
+        const data = {
+          keywords: words,
+          type: 'cards',
+          limit: 48,
+          offset: offset,
+          pageNo: 0
+        }
+
+        callApi.postData(
+          `/search`, data
+        ).then(res=>{
+            let data = res.data
+            commit('SET_FLAGS_TOOLBAR', 2)
+            commit('SET_OVERLAY', false)
+            commit('SET_CARDS_INFINITE', data.items)
+        }).catch(err => console.log(err))
+      }
+    },
     // clear state
     clear({commit}){
       commit('SET_TOTALS_INDEXS', 0)
@@ -255,8 +414,15 @@ export default new Vuex.Store({
     getBooks(state){
       return state.books
     },
-
-
+    getTotalCards(state){
+      return state.totalsCards
+    },
+    getCards(state){
+      return state.cards
+    },
+    getCheckToolbar(state){
+      return state.cardToolbarFlag
+    },
     getTotalIndexs(state){
       return state.totalsIndexs
     },
@@ -282,6 +448,10 @@ export default new Vuex.Store({
 
     getsearchrandom(state){
       return state.search_random
+    },
+
+    getTags(state) {
+      return state.cardTags.map(x => x.tagName)
     },
 
     getSarabun(state){

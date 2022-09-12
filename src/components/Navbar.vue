@@ -30,6 +30,20 @@
       </v-app-bar>
 
     </div>
+    <div v-else-if="checkHome">
+      <v-app-bar
+        absolute
+        color="transparent"
+        elevate-on-scroll
+        scroll-target="#scrolling-techniques-7"
+      >
+        <v-spacer></v-spacer>
+        <v-btn color="white" rounded text @click="$vuetify.goTo('#features')">
+          <v-icon>mdi-information-outline</v-icon>
+          &nbsp;&nbsp;เกี่ยวกับ
+        </v-btn>
+      </v-app-bar>
+    </div>
     <!-- ปุ่ม to top -->
     <v-btn v-scroll="onScroll"  v-show="fab" fab fixed bottom right >
       <!-- <v-btn v-model="fab" color="blue darken-3" dark fab  >
@@ -88,7 +102,7 @@ export default {
       }
     },
     on () {
-      if (this.$route.name === 'Home' || this.$route.name ===  'Cards' || this.$route.name ===  'SearchPage') {
+      if (this.$route.name === 'Home' || this.$route.name ===  'SearchPage') {
         return true
       }
         return false

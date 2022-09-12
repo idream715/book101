@@ -11,7 +11,7 @@
         <v-icon class="mr-2">mdi-book</v-icon>หนังสือธรรมะ
       </v-btn>
       <v-btn dark router-link to="/About" text>
-        <v-icon class="mr-2">mdi-account-circle</v-icon>เกี่ยวกับ
+        <v-icon class="mr-2">mdi-information-outline</v-icon>เกี่ยวกับ
       </v-btn>
     </div>
     <!-- แถบเมนูโทรศัพท์ -->
@@ -55,7 +55,7 @@
         <v-list-item>
           <v-list-item-title>
             <v-btn router-link to="/About" text>
-              <v-icon class="mr-2"></v-icon><v-icon class="mr-4">mdi-account-circle</v-icon>เกี่ยวกับ
+              <v-icon class="mr-2"></v-icon><v-icon class="mr-4">mdi-information</v-icon>เกี่ยวกับ
             </v-btn>
           </v-list-item-title>
         </v-list-item>

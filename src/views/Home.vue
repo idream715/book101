@@ -1,29 +1,23 @@
 <template>
   <div class="home" align="center" justify="center">
     <section id="hero">
-      <v-parallax dark src="@/assets/blackground_search.jpg" height="750">
+      <v-parallax dark src="@/assets/blackground_search.jpg" height="960">
         <v-row align="center" justify="center">
           <v-col cols="10">
             <v-row align="center" justify="center">
-              <v-col cols="12" md="6" xl="8">
-                <h1 class="hot-head mb-4">DHAMMA01.com</h1>
+              <v-col cols="12" md="5" lg="6" xl="7">
+                <v-img alt="logo" contain max-height="100"
+                src="@/assets/logo1.png" />
+                <h1 :class="totitle">
+                  {{ title }}
+                </h1>
+                <h1 v-if="checkingMobile" class="hot-head mb-4">
+                  (คุณครูไม่ใหญ่)
+                </h1>
                 <h1 class="font-weight-light">
-                  <small>คำสอนของหลวงพ่อธัมมชโย (คุณครูไม่ใหญ่)</small><br />
                   <small>เป็นธรรมะที่ง่ายแต่ลึกซึ้งและทรงคุณค่ามาก </small><br />
                   <small>เป็นสิ่งที่ท่านศึกษามาจากคำสอนของ<br />พระสัมมาสัมพุทธเจ้า และ ผลของธรรมปฏิบัติ</small>
                 </h1>
-
-                <v-btn
-                  rounded
-                  outlined
-                  large
-                  dark
-                  @click="$vuetify.goTo('#features')"
-                  class="mt-5"
-                >
-                  กดเพื่อดูเนื้อหา
-                  <v-icon class="ml-2">mdi-arrow-down</v-icon>
-                </v-btn>
 
                 <!-- <div class="video d-flex align-center py-4">
                   <a @click.stop="dialog = true" class="playBut">
@@ -69,69 +63,102 @@
                 </div> -->
 
               </v-col>
-              <v-col cols="12" md="6" xl="4" class="hidden-sm-and-down">
+              <v-col cols="12" md="7" lg="6" xl="5">
                 <!-- <v-col class="d-flex flex-column align-sm-end align-md-center"> -->
-                <v-img class="mt-12" alt="logo" contain max-height="360"
-                  src="@/assets/logo1.png" />
+                  <v-item-group color="transparent">
+                    <v-row
+                    >
+                      <v-col
+                        cols="12"
+                        lg="6"
+                        xl="4"
+                        class="text-center py-4"
+                        v-for="(feature, i) in features"
+                        :key="i"
+                      >
+                        <v-item>
+                          <v-hover v-slot:default="{ hover }">
+                            <v-card
+                              class="card"
+                              shaped
+                              :elevation="hover ? 10 : 4"
+                              :class="{ up: hover }"
+                              @click.stop="routingTo(feature.routeTo)"
+                            >
+                              <v-card-title>
+                                  <v-icon
+                                    left
+                                    color="primary lighten-4"
+                                    :class="{ 'zoom-efect': hover }"
+                                  >
+                                    {{ feature.logo }}
+                                  </v-icon>
+                                <span>
+                                  {{ feature.title }}
+                                </span>
+                              </v-card-title>
+                            </v-card>
+                          </v-hover>
+                        </v-item>
+                      </v-col>
+                    </v-row>
+                  </v-item-group >
               </v-col>
             </v-row>
           </v-col>
         </v-row>
         <div class="svg-border-waves text-white">
-          <v-img src="@/assets/img/borderWaves.svg" />
+          <v-img src="@/assets/borderWaves.svg" />
         </div>
       </v-parallax>
-      <v-container v-show="true" fluid id="features" class="mt-2">
-        <v-row align="center" justify="center">
-          <v-col cols="10">
-            <v-row align="center" justify="space-around">
-              <v-col cols="12" class="text-center">
-                <div class="display-1 font-weight-light display-2">เนื้อหาของเว็บไซต์</div>
-                <div class="subtitle-1 font-weight-light">
-                  ทางเว็บไซต์ได้จัดแยกข้อมูลออกเป็นหมวดหมู่ด้านล่าง ให้ผู้ที่สนใจสามารถเลือกสิ่งที่ตนเองต้องการได้
-                </div>
-              </v-col>
-              <v-col
-                cols="12"
-                sm="4"
-                class="text-center"
-                v-for="(feature, i) in features"
-                :key="i"
+      <v-container fluid id="features" class="mt-2">
+        <v-row class="flex justify-center">
+            <v-col
+                cols="6"
+                md="3"
               >
-                <v-hover v-slot:default="{ hover }">
-                  <v-card
-                    class="card"
-                    shaped
-                    :elevation="hover ? 10 : 4"
-                    :class="{ up: hover }"
-                  >
-                    <v-btn
-                      fab
-                      x-large
-                      dark
-                      color="primary lighten-4"
-                      class="d-block ml-auto mr-auto"
-                      :class="{ 'zoom-efect': hover }"
-                      @click="routingTo(feature.routeTo)"
-                    >
-                      <v-icon>
-                        {{ feature.logo }}
-                      </v-icon>
-                    </v-btn>
-                    <br/>
-                    <v-card-text>
-                      <h1 class="font-weight-regular">{{ feature.title }}</h1>
-                      <h4 class="font-weight-regular subtitle-1">
-                        {{ feature.text }}
-                      </h4>
-                    </v-card-text>
-                  </v-card>
-                </v-hover>
-              </v-col>
-            </v-row>
-          </v-col>
+            </v-col>
         </v-row>
+        <v-card class="mx-auto mb-5" max-width="1200">
+            <v-card-text>
+                <h2 class="font-weight-black">คำนำจากใจคณะผู้จัดทำ</h2>
+                <br>
+                <!-- <p class="subtitle-1" >
+                    คำสอนของหลวงพ่อธัมมชโย (คุณครูไม่ใหญ่) คือ ธรรมะอันลึกซึ้งและทรงคุณค่าที่ท่านศึกษามาจากพระธรรมคำสอนของพระสัมมาสัมพุทธเจ้าและจากธรรมะปฏิบัติ กลั่นกรองออกมาด้วยถ้อยคำที่ง่ายต่อการเข้าใจ มีความแจ่มแจ้ง ชัดเจน เปี่ยมไปด้วยข้อคิด และช่วยตอกย้ำสัมมาทิฐิให้แก่ทุกคน ที่สำคัญหากใครได้นำไปใช้ในการดำเนินชีวิตจะเกิดประโยชน์อย่างยิ่งต่อตนเองทั้งในโลกนี้และโลกหน้า
+              </p>
+                <p class="subtitle-1">
+                  ด้วยเหตุนี้ ทีมงานจึงรวบรวมหนังสือทุกเล่มของหลวงพ่อธัมมชโย มาจัดทำในรูปแบบของเว็บไซต์ เพื่อสะดวกและง่ายต่อการค้นหาธรรมะในหัวข้อที่ต้องการ ทั้งนี้ยังคงรูปแบบของหน้าหนังสือไว้ และยังสามารถดาวโหลดไฟล์หนังสือเก็บไว้อ่านได้อีกด้วย
+                </p>
+                <p class="subtitle-1">
+                    หวังเป็นอย่างยิ่งว่า เว็บไซต์นี้จะตอบโจทก์ในการค้นหาโอวาทหลวงพ่อธัมมชโย เพื่อนำไปใช้งานสำหรับท่านที่สนใจ
+                </p> -->
+                <p class="subtitle-1" >
+                    คำสอนของหลวงพ่อธัมมชโย (คุณครูไม่ใหญ่) เป็นธรรมะที่ง่ายแต่ลึกซึ้งและทรงคุณค่ามาก เป็นสิ่งที่ท่านศึกษามาจากคำสอนของพระสัมมาสัมพุทธเจ้าและจากผลของธรรมปฏิบัติ ท่านได้เมตตากลั่นกรองถ่ายทอดออกมาด้วยถ้อยคำที่เข้าใจได้ง่าย ชัดเจน แจ่มแจ้ง และเปี่ยมไปด้วยข้อคิดที่เกิดกำลังใจในการปฏิบัติตาม ทั้งยังช่วยตอกย้ำสัมมาทิฐิให้มั่นคงยิ่งขึ้น หากใครได้นำคำสอนเหล่านี้ไปใช้ในการดำเนินชีวิตก็จะเกิดประโยชน์อย่างยิ่งแก่ตนเองทั้งในโลกนี้และโลกหน้าอย่างแน่นอน
+              </p>
+                <p class="subtitle-1">
+                  อาสาสมัครเพื่อเผยแพร่ธรรมะ จึงได้รวบรวมหนังสือทุกเล่มและโอวาทของท่านในวาระต่างๆ มาเรียบเรียงแล้วจัดทำในรูปแบบของเว็บไซต์ เพื่อสะดวกและง่ายต่อการค้นหาธรรมะในหัวข้อที่ต้องการ ทั้งนี้ในส่วนของหนังสือยังคงรูปแบบของหน้าหนังสือไว้ และยังสามารถดาวโหลดไฟล์หนังสือเก็บไว้อ่านได้อีกด้วย
+                </p>
+                <p class="subtitle-1">
+                    หวังเป็นอย่างยิ่งว่า เว็บไซต์นี้จะตอบโจทย์ในการค้นหาโอวาทหลวงพ่อธัมมชโย เพื่อนำไปใช้งานสำหรับท่านที่สนใจ
+                </p>
+            </v-card-text>
+        </v-card>
       </v-container>
+      <v-footer padless class=" text-center mt-5">
+        <!-- <v-card-text>
+            <p class="mt-5 subtitle-1" style="line-hight:unset;">หนังสือและเนื้อหาต่างๆ โดย กองวิชาการ 01</p>
+            <p class="subtitle-1">จัดทำเป็น Web โดย ทีมงาน RGT</p>
+            <p>TEAM DESIGN</p>
+            <p>DREAM-iTOUCH-KRIT-PUT-TUALEK</p>
+        </v-card-text> -->
+        <v-col
+        class="text-center caption"
+        cols="12"
+        > &copy;
+        <!-- 2563 — <strong>Designed by  RGT-101BOOK & DCI-TECHNO 2563</strong> -->
+        2563 — ผู้เรียบเรียงและเผยแพร่ในระบบคอมพิวเตอร์ : 'sinthu
+        </v-col>
+      </v-footer>
       <v-dialog v-model="dialog" max-width="640px">
         <v-card>
           <youtube
@@ -142,7 +169,7 @@
         </v-card>
       </v-dialog>
       <div class="svg-border-waves">
-        <img src="~@/assets/img/wave2.svg" />
+        <img src="~@/assets/wave2.svg" />
       </div>
     </section>
   </div>
@@ -154,19 +181,26 @@
       return {
         dialog: false,
         videoId: "t_k7jk-e_Mk",
+        icons: [
+          'fab fa-facebook',
+          'fab fa-twitter',
+          'fab fa-google-plus',
+          'fab fa-linkedin',
+          'fab fa-instagram',
+        ],
         features: [
           {
-            logo: 'mdi-book',
+            logo: 'mdi-book-open-page-variant',
             title: "หนังสือธรรมะ",
             text: "หนังสือที่เก็บรวบรวมคำสอนของหลวงพ่อ",
             routeTo: '/books'
           },
-          // {
-          //   logo: 'mdi-card',
-          //   title: "การ์ดธรรมะ",
-          //   text: "ธรรมะ รูปแบบข้อความสั้น ๆ ที่อยู่ในรูปภาพที่สวยงาม",
-          //   routeTo: '/'
-          // },
+          {
+            logo: 'mdi-image-multiple',
+            title: "การ์ดธรรมะ",
+            text: "ธรรมะ รูปแบบข้อความสั้น ๆ ที่อยู่ในรูปภาพที่สวยงาม",
+            routeTo: '/cards'
+          },
           // {
           //   logo: 'mdi-comment-quote-outline',
           //   title: "โอวาทหลวงพ่อ",
@@ -174,8 +208,8 @@
           //   routeTo: '/'
           // },
           // {
-          //   logo: 'mdi-microphone-message',
-          //   title: "ถอดความนำนั่งสมาธิ",
+          //   logo: 'mdi-crystal-ball',
+          //   title: "นำนั่งสมาธิ",
           //   text: "Lorem ipsum dolor sit amet consectetur adipisicing elit.",
           //   routeTo: '/'
           // },
@@ -185,14 +219,22 @@
             text: "ระบบสืบค้นธรรมะของหลวงพ่อ",
             routeTo: '/search-page'
           },
-          {
-            logo: 'mdi-account-circle',
-            title: "เกี่ยวกับเรา",
-            text: "รายละเอียดเกี่ยวกับที่มาของการจัดทำเว็บไซต์",
-            routeTo: '/about'
-          },
         ],
       };
+    },
+    computed: {
+      title () {
+        return (!this.checkingMobile) ? 'คำสอนหลวงพ่อธัมมชโย (คุณครูไม่ใหญ่)' : 'คำสอนหลวงพ่อธัมมชโย'
+      },
+      checkingMobile () {
+        return this.$vuetify.breakpoint.mdAndDown
+      },
+      totitle () {
+        return (!this.checkWidth) ? 'hot-head' : 'hothead-fixed'
+      },
+      checkWidth () {
+        return this.$vuetify.breakpoint.width < 576
+      }
     },
     created(){
       this.$store.dispatch('clear')
@@ -285,14 +327,23 @@
 
   <style>
   @import url('https://fonts.googleapis.com/css2?family=Sarabun&display=swap');
-  @import url('https://fonts.googleapis.com/css2?family=Kanit:ital,wght@1,200&display=swap');
+
   .home{
     font-family: 'Sarabun', sans-serif;
   }
 
   .hot-head{
-    font-family: 'Kanit', sans-serif !important;
-    font-size: 3.5rem !important;
+    font-size: 2rem !important;
+    text-shadow:2px 2px 8px #444444;
+  }
+
+  .hothead-fixed {
+    font-size: 1.7rem !important;
+    text-shadow:2px 2px 8px #444444;
+  }
+
+  .font-title {
+    color: #616161;
   }
 
   .btn-play {
@@ -318,7 +369,8 @@
     z-index: -1;
   }
   .card {
-    min-height: 300px;
+    max-height: 80px;
+    min-width: 210px;
     padding: 10px;
     transition: 0.5s ease-out;
   }
