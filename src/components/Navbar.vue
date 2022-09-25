@@ -21,10 +21,10 @@
         <v-btn icon router-link to="/" text @click="clearBook">
           <v-icon>mdi-home</v-icon>
         </v-btn>
-        <v-btn v-if="close" icon router-link to="/Books" text @click="clearBook">
+        <v-btn v-if="close" icon @click="routingTo('/Books', creator)" text>
           <v-icon>mdi-book</v-icon>
         </v-btn>
-        <v-btn v-else icon router-link to="/Books" text @click="clearBook">
+        <v-btn v-else icon @click="routingTo('/Books', creator)" text>
           <v-icon>mdi-book-open-page-variant</v-icon>
         </v-btn>
       </v-app-bar>
@@ -40,7 +40,7 @@
         <v-spacer></v-spacer>
         <v-btn color="white" rounded text @click="$vuetify.goTo('#features')">
           <v-icon>mdi-information-outline</v-icon>
-          &nbsp;&nbsp;เกี่ยวกับ
+          &nbsp;&nbsp;หนังสือของยาย
         </v-btn>
       </v-app-bar>
     </div>
@@ -108,11 +108,20 @@ export default {
         return false
     },
     headingWords () {
-      if (this.$route.name === 'Cards') {
+      if (this.$route.name === 'Cards' && this.creator === '1') {
         return 'การ์ดคำสอนคุณครูไม่ใหญ่'
-      } else {
+      } else if (this.$route.name === 'Cards' && this.creator === '2') {
+        return 'การ์ดคำสอนคุณยายอาจารย์'
+      } else if (this.$route.name !== 'Cards' && this.creator === '1') {
         return 'คำสอนคุณครูไม่ใหญ่'
+      } else if (this.$route.name !== 'Cards' && this.creator === '2') {
+        return 'คำสอนคุณยายอาจารย์'
+      } else {
+        return ''
       }
+    },
+    creator () {
+      return this.$route.query.t
     },
     close () {
       if (this.$route.name === 'Indexs') {
@@ -135,6 +144,10 @@ export default {
   },
 
   methods:{
+    routingTo (path, creator) {
+      this.clearBook()
+      return this.$router.push({ path: path, query: { t: creator } })
+    },
     closs(){
       this.dialog=false
       this.$store.dispatch('clear')

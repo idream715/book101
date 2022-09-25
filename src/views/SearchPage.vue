@@ -7,7 +7,7 @@
       <v-btn v-else dark router-link to="/" text>
         <v-icon class="mr-2">mdi-home</v-icon>หน้าหลัก
       </v-btn>
-      <v-btn dark router-link to="/Books" text>
+      <v-btn dark @click="routingTo('books', creatorComputed)" text>
         <v-icon class="mr-2">mdi-book</v-icon>หนังสือธรรมะ
       </v-btn>
       <v-btn dark router-link to="/About" text>
@@ -69,8 +69,9 @@
           <v-row :class="ml12">
             <v-col cols="12" sm="6" md="12" align="center">
             <!-- <v-col class="d-flex flex-column align-sm-end align-md-center"> -->
-              <v-img class="mt-12" alt="logo" contain max-height="150"
+              <v-img v-if="creatorComputed === '1'" class="mt-12" alt="logo" contain max-height="150"
                 src="@/assets/logo1.png" />
+              <v-sheet v-else color="transparent" height="150" />
             </v-col>
             <v-col cols="12" sm="6" md="12">
             <!-- <v-col class="d-flex flex-column align-sm-start align-md-center"> -->
@@ -194,6 +195,9 @@ export default {
   mounted () {
   },
   computed:{
+    creatorComputed () {
+      return this.$route.query.t
+    },
     text_exp(){
       if (this.$vuetify.breakpoint.xsOnly){
         return 'ที่แป้นพิมพ์เพื่อยืนยัน'
@@ -215,10 +219,10 @@ export default {
         return false
     },
     headingWords () {
-      if (this.$route.name === 'Cards') {
-        return 'การ์ดคำสอนคุณครูไม่ใหญ่'
+      if (this.$route.query.t === '1') {
+        return 'หนังสือคุณครูไม่ใหญ่'
       } else {
-        return 'คำสอนคุณครูไม่ใหญ่'
+        return 'หนังสือคุณยายอาจารย์'
       }
     },
     labelSearch () {
@@ -269,10 +273,13 @@ export default {
   },
 
   methods:{
+    routingTo (path, creator) {
+      return this.$router.push({ path: path, query: { t: creator } })
+    },
     clicksearch_home(input){
-      if(input.length!==0){
-        this.$router.push('/Indexs');
-        this.$store.dispatch('setFirstIndexsFromApi',{words:input,page:0})
+      if(input.length!==0 && this.$route.query.t){
+        this.$router.push({ path: '/Indexs', query: { t : this.$route.query.t }});
+        this.$store.dispatch('setFirstIndexsFromApi',{ words:input, page:0, creator: this.$route.query.t })
       }else{
         this.labelSearch = 'กรุณาใส่คำที่่ต้องการค้นหา'
       }

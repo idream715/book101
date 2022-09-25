@@ -18,7 +18,7 @@ Vue.use(VueRouter)
   {
     path: '/indexs',
     name: 'Indexs',
-    component: () => import(/* webpackChunkName: "about" */ '../views/Indexs.vue')
+    component: () => import(/* webpackChunkName: "about" */ '../views/Indexs.vue'),
   },
   {
     path: '/search',

@@ -12,20 +12,20 @@
               align="center"
             >
               <v-col cols="10">
-                <v-autocomplete
-                  v-model="filBookCategoty"
+                <v-combobox
+                  v-model="filterBookValue"
                   :items="items"
                   outlined
                   dense
-                  label="เลือกชุดหนังสือ"
-                ></v-autocomplete>
+                  label="เลือกชุดหนังสือ หรือ พิมพ์ชื่อหนังสือ"
+                ></v-combobox>
               </v-col>
               <v-col cols="2" md="2" class="mb-8">
                   <v-icon
                     color="primary"
-                    v-if="filBookCategoty"
+                    v-if="filterBookValue"
                     outlined
-                    @click="filBookCategoty = null"
+                    @click="filterBookValue = null"
                     >
                     mdi-filter-remove
                   </v-icon>
@@ -76,22 +76,27 @@ export default {
   data() {
     return {
       openDialog : false,
-      filBookCategoty:"",
+      filterBookValue:"",
     }
   },
-  created(){
-    if(this.books.length === 0 ){
-      this.$store.dispatch('getBookFromApi')
-    }
+  created() {
+
+  this.$store.dispatch('getBookFromApi', this.$route.query.t)
+
   },
   computed:{
     books(){
       return this.$store.getters.getBooks
     },
     filterBooks(){
-      if(this.filBookCategoty){
-        return this.books.filter(el => el.categoryName === this.filBookCategoty)
-      }else{
+      if (this.filterBookValue && !this.items.includes(this.filterBookValue)) {
+        console.log(`1`)
+        return this.books.filter(el => el.bookName.includes(this.filterBookValue))
+      } else if(this.filterBookValue && this.items.includes(this.filterBookValue)) {
+        console.log(`12`)
+        return this.books.filter(el => el.categoryName === this.filterBookValue)
+      } else {
+        console.log(`3`)
         return this.books
       }
     },

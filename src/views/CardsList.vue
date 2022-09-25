@@ -235,13 +235,13 @@ export default {
     },
   created () {
     this.$store.dispatch('clear')
-    this.$store.dispatch('getTagOfCards')
+    this.$store.dispatch('getTagOfCards', this.$route.query.t)
 
   },
   beforeMount () {
 
     if(this.itemsAmount === 0) {
-      this.$store.dispatch('getCardFromApi')
+      this.$store.dispatch('getCardFromApi', this.$route.query.t)
     }
   },
   computed: {
@@ -275,6 +275,7 @@ export default {
         this.$store.dispatch('setFilteredCards',{
           words: words,
           offset: this.limit,
+          creator: this.$route.query.t
         })
       }
     },
@@ -284,6 +285,7 @@ export default {
       if (words.length > 0) {
         this.$store.dispatch('setSearchedCards',{
           words: words,
+          creator: this.$route.query.t
         })
       }
     },
@@ -294,18 +296,21 @@ export default {
           case '':
             this.$store.dispatch('setCardInfiniteScrolled',{
               offset: lastCardsIndex,
+              creator: this.$route.query.t
             })
             break;
           case 'filter':
             this.$store.dispatch('setFilteredCardsContinue',{
               words: this.filterTags,
               offset: lastCardsIndex,
+              creator: this.$route.query.t
             })
             break;
           case 'search':
             this.$store.dispatch('setSearchedCardsContinue',{
               words: this.searchingWords,
               offset: lastCardsIndex,
+              creator: this.$route.query.t
             })
             break;
         }

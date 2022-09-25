@@ -112,9 +112,11 @@ export default new Vuex.Store({
   },
   actions: {
     // GET
-    getBookFromApi({ commit }){
+    getBookFromApi({ commit }, creator){
+      if (!creator) return null
+
       commit('SET_OVERLAY', true)
-      callApi.getData(`/books/all/?limit=0&offset=0`)
+      callApi.getData(`/books/all/?limit=0&offset=0&creator=${creator}`)
         .then(res=>{
           let data = res.data
           commit('SET_OVERLAY', false)
@@ -123,10 +125,12 @@ export default new Vuex.Store({
         })
         .catch(err => console.log(err))
     },
-    getCardFromApi({ commit }){
+    getCardFromApi({ commit }, creator){
+      if (!creator) return null
+
       commit('SET_OVERLAY', true)
       commit('CLEAR_FLAG')
-      callApi.getData(`/cards/all/?limit=48&offset=0`)
+      callApi.getData(`/cards/all/?limit=48&offset=0&creator=${creator}`)
         .then(res=>{
           let data = res.data
           commit('SET_NOTFOUND', false)
@@ -136,9 +140,11 @@ export default new Vuex.Store({
         })
         .catch(err => console.log(err))
     },
-    getTagOfCards({ commit }){
+    getTagOfCards({ commit }, creator){
+      if (!creator) return null
+
       commit('SET_OVERLAY', true)
-      callApi.getData(`/cards/tags/?limit=60&offset=0`)
+      callApi.getData(`/cards/tags/?limit=60&offset=0&creator=${creator}`)
         .then(res=>{
           let data = res.data
           commit('SET_OVERLAY', false)
@@ -151,7 +157,10 @@ export default new Vuex.Store({
     setwordssearch({commit},words){
       commit('SET_WORDS_SEARCH',words)
     },
-    setFirstIndexsFromApi({ commit },{ words, page }){
+    setFirstIndexsFromApi({ commit },{ words, page, creator }){
+
+      if (!creator) return null
+
       commit('SET_INDEXS', [])
       commit('SET_WORDS_SEARCH',words)
       commit('CLEAR_FLAG')
@@ -160,6 +169,7 @@ export default new Vuex.Store({
       let body = {
         keywords: tags,
         type: 'books',
+        creator: parseInt(creator),
         limit: 10,
         offset: page,
         pageNo: 0
@@ -191,7 +201,10 @@ export default new Vuex.Store({
           commit('SET_INDEXS', data.items)
         }).catch(err => console.log(err))
     },
-    setFirstIndexsFromApi_infenit({ commit, state },{ words, page }){
+    setFirstIndexsFromApi_infenit({ commit, state },{ words, page, creator }){
+
+      if (!creator) return null
+
       if(page>state.flag){
         commit('SET_FLAG')
         commit('SET_WORDS_SEARCH',words)
@@ -205,6 +218,7 @@ export default new Vuex.Store({
         let body = {
           keywords: tags,
           type: 'books',
+          creator: parseInt(creator),
           limit: 10,
           offset: page,
           pageNo: 0
@@ -263,7 +277,7 @@ export default new Vuex.Store({
     setFirstSarabun({ commit, state }, { limit, offset, book_id }){
       commit('SET_OVERLAY', true)
       callApi.getData(
-        `/books/${book_id}/index?limit=${limit}&offset=${offset}`
+        `/books/${book_id}/index?limit=${limit}&offset=${offset}&creator=0`
       ).then(res=>{
           let data = res.data
           commit('SET_SARABUN', data.items)
@@ -277,7 +291,7 @@ export default new Vuex.Store({
       if(offset>state.flag){
         commit('SET_FLAG_BOOK', limit)
         callApi.getData(
-          `/books/${book_id}/index?limit=${limit}&offset=${offset}`
+          `/books/${book_id}/index?limit=${limit}&offset=${offset}&creator=0`
         ).then(res=>{
             let data = res.data
             commit('SET_SARABUN_INFENIT', data.items)
@@ -286,9 +300,9 @@ export default new Vuex.Store({
 
     },
       // PATH CARDS
-    setCardInfiniteScrolled({ commit }, { offset }){
+    setCardInfiniteScrolled({ commit }, { offset, creator }){
       commit('SET_OVERLAY', true)
-      callApi.getData(`/cards/all/?limit=48&offset=${offset}`)
+      callApi.getData(`/cards/all/?limit=48&offset=${offset}&creator=${creator}`)
         .then(res=>{
           let data = res.data
           commit('SET_OVERLAY', false)
@@ -297,7 +311,9 @@ export default new Vuex.Store({
         })
         .catch(err => console.log(err))
     },
-    setFilteredCards( { commit }, { words, offset }){
+    setFilteredCards( { commit }, { words, offset, creator }){
+      if (!creator) return null
+
       commit('SET_NOTFOUND', false)
       commit('SET_OVERLAY', true)
       commit('SET_CARDS', [])
@@ -311,7 +327,7 @@ export default new Vuex.Store({
       words.forEach(word => qs += '|' + word)
 
       callApi.getData(
-        `/cards/all?limit=${offset}&qstr=${qs}`
+        `/cards/all?limit=${offset}&qstr=${qs}&creator=${creator}`
       ).then(res=>{
           let data = res.data
           commit('SET_FLAGS_TOOLBAR', 1)
@@ -321,7 +337,7 @@ export default new Vuex.Store({
       }).catch(err => console.log(err))
 
     },
-    setFilteredCardsContinue( { commit, state }, { words, offset }) {
+    setFilteredCardsContinue( { commit, state }, { words, offset, creator } ) {
       if (offset > state.flag) {
         commit('SET_OVERLAY', true)
         commit('SET_FLAGS_CARD', 48)
@@ -330,7 +346,7 @@ export default new Vuex.Store({
         words.forEach(word => qs += '|' + word)
 
         callApi.getData(
-          `/cards/all?limit=48&offset=${offset}&qstr=${qs}`
+          `/cards/all?limit=48&offset=${offset}&qstr=${qs}&creator=${creator}`
         ).then(res=>{
             let data = res.data
             commit('SET_FLAGS_TOOLBAR', 1)
@@ -340,7 +356,9 @@ export default new Vuex.Store({
         }).catch(err => console.log(err))
       }
     },
-    setSearchedCards( { commit }, { words }){
+    setSearchedCards( { commit }, { words, creator }){
+      if (!creator) return null
+
       commit('SET_NOTFOUND', false)
       commit('SET_OVERLAY', true)
       commit('SET_CARDS', [])
@@ -351,6 +369,7 @@ export default new Vuex.Store({
         keywords: words,
         type: 'cards',
         limit: 48,
+        creator: parseInt(creator),
         offset: 0,
         pageNo: 0
       }
@@ -367,7 +386,7 @@ export default new Vuex.Store({
       }).catch(err => console.log(err))
 
     },
-    setSearchedCardsContinue( { commit, state }, { words, offset }) {
+    setSearchedCardsContinue( { commit, state }, { words, offset, creator }) {
       if (offset > state.flag) {
         commit('SET_OVERLAY', true)
         commit('SET_FLAGS_CARD', 48)
@@ -376,6 +395,7 @@ export default new Vuex.Store({
           keywords: words,
           type: 'cards',
           limit: 48,
+          creator: parseInt(creator),
           offset: offset,
           pageNo: 0
         }
@@ -412,6 +432,11 @@ export default new Vuex.Store({
       return state.totalsBooks
     },
     getBooks(state){
+      if(state.books.length > 0) {
+        return state.books.sort((a, b) => {
+          return a['bookName'].localeCompare(b['bookName'], 'th')
+        })
+      }
       return state.books
     },
     getTotalCards(state){
@@ -438,7 +463,6 @@ export default new Vuex.Store({
     getwords_search(state){
       return state.words_search
     },
-
     getBookSelected(state){
       return state.bookSelected
     },

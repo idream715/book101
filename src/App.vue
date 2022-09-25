@@ -2,12 +2,11 @@
   <div class="homep">
     <v-app>
     <navbar></navbar>
-    
+
     <v-main id="app">
       <router-view/>
-     
     </v-main>
-    
+
   </v-app>
   </div>
 </template>
@@ -22,7 +21,7 @@ export default {
   data: () => ({
     //
   }),
-  
+
 };
 </script>
 <style>

@@ -108,7 +108,7 @@
                     >
                       <v-icon>mdi-youtube</v-icon>
                     </v-btn>
-                    <v-btn text color="red" style="margin-right:10px;" target="_blank" :href="index.chapterLinkPdf">PDF</v-btn>
+                    <v-btn v-show="index.chapterLinkPdf.includes('.pdf')" text color="red" style="margin-right:10px;" target="_blank" :href="index.chapterLinkPdf">PDF</v-btn>
                     <v-btn text color="blue lighten-1" @click="dialogs(index.mark_index,index.chapterDetail,index.mark_details,index.bookName,index.bookId)">อ่านทั้งหมด</v-btn>
                   </v-card-actions>
                 </v-col>
@@ -304,14 +304,14 @@ export default {
     },
     clicksearch(input){
       if(input.length!==0){
-      this.$store.dispatch('setFirstIndexsFromApi',{words:input,page:0})
+      this.$store.dispatch('setFirstIndexsFromApi',{ words:input, page:0, creator: this.$route.query.t })
       }else{
         this.label_search='กรุณาใส่คำที่่ต้องการค้นหา'
       }
     },
     search_infenit(){
       let offset = this.$store.getters.getIndexs.length
-      this.$store.dispatch('setFirstIndexsFromApi_infenit',{words:this.search_pageindex,page:offset,})
+      this.$store.dispatch('setFirstIndexsFromApi_infenit',{ words:this.search_pageindex,page:offset, creator: this.$route.query.t })
     },
     copyTextDetail () {
         this.selectText(this.$refs.textCopy); // e.g. <div ref="text">
