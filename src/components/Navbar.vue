@@ -1,11 +1,16 @@
 <template>
-  <div>
-    <!-- แถบ app-bar -->
-    <div v-if="!on">
-      <v-app-bar app color="primary" dark hide-on-scroll
+    <div>
+      <!-- แถบ app-bar -->
+      <v-app-bar
+        v-if="!on"
+        app
+        color="primary"
+        dark
+        absolute
+        elevation="4"
         src="https://images.unsplash.com/photo-1503455637927-730bce8583c0?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1950&q=80"
-        width="100%">
-
+        width="100%"
+      >
         <!-- เมนู bar -->
         <v-toolbar-title mt-2>
           <div class="d-flex align-center">
@@ -28,14 +33,11 @@
           <v-icon>mdi-book-open-page-variant</v-icon>
         </v-btn>
       </v-app-bar>
-
-    </div>
-    <div v-else-if="checkHome">
       <v-app-bar
+        v-else-if="checkHome"
         absolute
         color="transparent"
-        elevate-on-scroll
-        scroll-target="#scrolling-techniques-7"
+        elevation="0"
       >
         <v-spacer></v-spacer>
         <v-btn color="white" rounded text @click="$vuetify.goTo('#features')">
@@ -43,30 +45,29 @@
           &nbsp;&nbsp;หนังสือของยาย
         </v-btn>
       </v-app-bar>
-    </div>
     <!-- ปุ่ม to top -->
-    <v-btn v-scroll="onScroll"  v-show="fab" fab fixed bottom right >
-      <!-- <v-btn v-model="fab" color="blue darken-3" dark fab  >
-        <v-icon>mdi-chevron-up</v-icon>
-      </v-btn> -->
-      <v-speed-dial v-model="fab">
-        <template v-slot:activator>
-          <v-btn v-model="fab" color="blue darken-3" dark fab>
-            <v-icon v-if="fab">mdi-close</v-icon>
-          </v-btn>
-        </template>
-        <v-btn v-model="fab" color="blue lighten-1" dark fab @click="toTop">
+      <v-btn v-scroll="onScroll"  v-show="fab" fab fixed bottom right >
+        <!-- <v-btn v-model="fab" color="blue darken-3" dark fab  >
           <v-icon>mdi-chevron-up</v-icon>
-        </v-btn>
-      </v-speed-dial>
+        </v-btn> -->
+        <v-speed-dial v-model="fab">
+          <template v-slot:activator>
+            <v-btn v-model="fab" color="blue darken-3" dark fab>
+              <v-icon v-if="fab">mdi-close</v-icon>
+            </v-btn>
+          </template>
+          <v-btn v-model="fab" color="blue lighten-1" dark fab @click="toTop">
+            <v-icon>mdi-chevron-up</v-icon>
+          </v-btn>
+        </v-speed-dial>
 
-    </v-btn>
+      </v-btn>
 
-   <v-overlay v-if="setoverlay===true && on">
-      <v-progress-circular indeterminate size="64"></v-progress-circular>
-    </v-overlay>
+      <v-overlay v-if="setoverlay===true && on">
+        <v-progress-circular indeterminate size="64"></v-progress-circular>
+      </v-overlay>
+    </div>
 
-  </div>
 </template>
 
 <script>

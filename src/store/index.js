@@ -144,7 +144,7 @@ export default new Vuex.Store({
       if (!creator) return null
 
       commit('SET_OVERLAY', true)
-      callApi.getData(`/cards/tags/?limit=60&offset=0&creator=${creator}`)
+      callApi.getData(`/cards/tags/?limit=100&offset=0&creator=${creator}`)
         .then(res=>{
           let data = res.data
           commit('SET_OVERLAY', false)
@@ -356,7 +356,7 @@ export default new Vuex.Store({
         }).catch(err => console.log(err))
       }
     },
-    setSearchedCards( { commit }, { words, creator }){
+    setSearchedCards( { commit }, { words, creator, tags }){
       if (!creator) return null
 
       commit('SET_NOTFOUND', false)
@@ -370,6 +370,7 @@ export default new Vuex.Store({
         type: 'cards',
         limit: 48,
         creator: parseInt(creator),
+        tags: tags,
         offset: 0,
         pageNo: 0
       }
@@ -386,7 +387,7 @@ export default new Vuex.Store({
       }).catch(err => console.log(err))
 
     },
-    setSearchedCardsContinue( { commit, state }, { words, offset, creator }) {
+    setSearchedCardsContinue( { commit, state }, { words, offset, creator, tags }) {
       if (offset > state.flag) {
         commit('SET_OVERLAY', true)
         commit('SET_FLAGS_CARD', 48)
@@ -397,6 +398,7 @@ export default new Vuex.Store({
           limit: 48,
           creator: parseInt(creator),
           offset: offset,
+          tags: tags,
           pageNo: 0
         }
 

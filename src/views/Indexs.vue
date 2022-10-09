@@ -93,7 +93,26 @@
                       </v-col>
                     </v-row>
 
-                    <v-list-item-title class="mb-2"><v-btn text color="primary lighten-1" @click="clickedSendbook(index.bookId)"><v-icon small class="mr-2">mdi-book-open-page-variant</v-icon> จากหนังสือ:{{index.bookName}}</v-btn></v-list-item-title>
+                    <v-list-item-title class="mb-2">
+                      <v-btn
+                        v-if="index.bookId"
+                        text
+                        color="primary lighten-1"
+                        @click="clickedSendbook(index.bookId)"
+                      >
+                        <v-icon small class="mr-2">mdi-book-open-page-variant</v-icon>
+                        จากหนังสือ:{{index.bookName}}
+                      </v-btn>
+                      <v-btn
+                        v-else
+                        text
+                        color="primary lighten-1"
+                        disabled
+                      >
+                        <v-icon small class="mr-2">mdi-book-open-page-variant</v-icon>
+                        จากโอวาทเรียบเรียง:{{index.bookName}}
+                      </v-btn>
+                    </v-list-item-title>
                     <p v-html="text_render(index.mark_details)"></p>
                   </v-card-text>
                 </v-col>

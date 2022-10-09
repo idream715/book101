@@ -1,69 +1,72 @@
 <template>
-  <div class="homep">
-    <div v-if="opn" align="end">
-      <v-btn v-if="checkHome" dark router-link to="/Cards" text>
-        <v-icon class="mr-2">mdi-card-search</v-icon>การ์ดธรรมะ
-      </v-btn>
-      <v-btn v-else dark router-link to="/" text>
-        <v-icon class="mr-2">mdi-home</v-icon>หน้าหลัก
-      </v-btn>
-      <v-btn dark @click="routingTo('books', creatorComputed)" text>
-        <v-icon class="mr-2">mdi-book</v-icon>หนังสือธรรมะ
-      </v-btn>
-      <v-btn dark router-link to="/About" text>
-        <v-icon class="mr-2">mdi-information-outline</v-icon>เกี่ยวกับ
-      </v-btn>
-    </div>
-    <!-- แถบเมนูโทรศัพท์ -->
-    <div v-else align="end" class="mr-5">
-      <v-menu
-      bottom
-      left
+  <div>
+    <v-img
+      class="homep"
+      :src="background"
+      gradient="to bottom, rgba(255,255,255, 0.5), rgba(255,255,255, 0.2)"
     >
-      <template v-slot:activator="{ on }">
-        <v-btn
-          icon
-          color="white"
-          v-on="on"
-        >
-          <v-icon>mdi-dots-vertical</v-icon>
+      <div v-if="opn" align="end">
+        <v-btn v-if="checkHome" dark router-link to="/Cards" text>
+          <v-icon class="mr-2">mdi-card-search</v-icon>การ์ดธรรมะ
         </v-btn>
-      </template>
+        <v-btn v-else dark router-link to="/" text>
+          <v-icon class="mr-2">mdi-home</v-icon>หน้าหลัก
+        </v-btn>
+        <v-btn dark @click="routingTo('books', creatorComputed)" text>
+          <v-icon class="mr-2">mdi-book</v-icon>หนังสือธรรมะ
+        </v-btn>
+        <v-btn dark router-link to="/About" text>
+          <v-icon class="mr-2">mdi-information-outline</v-icon>เกี่ยวกับ
+        </v-btn>
+      </div>
+      <!-- แถบเมนูโทรศัพท์ -->
+      <div v-else align="end" class="mr-5">
+        <v-menu
+        bottom
+        left
+      >
+        <template v-slot:activator="{ on }">
+          <v-btn
+            icon
+            color="white"
+            v-on="on"
+          >
+            <v-icon>mdi-dots-vertical</v-icon>
+          </v-btn>
+        </template>
 
-      <v-list>
-        <v-list-item v-if="checkHome">
-          <v-list-item-title>
-            <v-btn router-link to="/Cards" text>
-              <v-icon class="mr-2"></v-icon><v-icon class="mr-4">mdi-card-search</v-icon>การ์ดธรรมะ
-            </v-btn>
-          </v-list-item-title>
-        </v-list-item>
-        <v-list-item v-else>
-          <v-list-item-title>
-            <v-btn router-link to="/" text>
-              <v-icon class="mr-2"></v-icon><v-icon class="mr-4">mdi-home</v-icon>หน้าหลัก
-            </v-btn>
-          </v-list-item-title>
-        </v-list-item>
-        <v-list-item>
-          <v-list-item-title>
-            <v-btn router-link to="/Books" text>
-              <v-icon class="mr-2"></v-icon><v-icon class="mr-4">mdi-book</v-icon>หนังสือธรรมะ
-            </v-btn>
-          </v-list-item-title>
-        </v-list-item>
-        <v-list-item>
-          <v-list-item-title>
-            <v-btn router-link to="/About" text>
-              <v-icon class="mr-2"></v-icon><v-icon class="mr-4">mdi-information</v-icon>เกี่ยวกับ
-            </v-btn>
-          </v-list-item-title>
-        </v-list-item>
-      </v-list>
-    </v-menu>
-    </div>
-
-    <div>
+        <v-list>
+          <v-list-item v-if="checkHome">
+            <v-list-item-title>
+              <v-btn router-link to="/Cards" text>
+                <v-icon class="mr-2"></v-icon><v-icon class="mr-4">mdi-card-search</v-icon>การ์ดธรรมะ
+              </v-btn>
+            </v-list-item-title>
+          </v-list-item>
+          <v-list-item v-else>
+            <v-list-item-title>
+              <v-btn router-link to="/" text>
+                <v-icon class="mr-2"></v-icon><v-icon class="mr-4">mdi-home</v-icon>หน้าหลัก
+              </v-btn>
+            </v-list-item-title>
+          </v-list-item>
+          <v-list-item>
+            <v-list-item-title>
+              <v-btn router-link to="/Books" text>
+                <v-icon class="mr-2"></v-icon><v-icon class="mr-4">mdi-book</v-icon>หนังสือธรรมะ
+              </v-btn>
+            </v-list-item-title>
+          </v-list-item>
+          <v-list-item>
+            <v-list-item-title>
+              <v-btn router-link to="/About" text>
+                <v-icon class="mr-2"></v-icon><v-icon class="mr-4">mdi-information</v-icon>เกี่ยวกับ
+              </v-btn>
+            </v-list-item-title>
+          </v-list-item>
+        </v-list>
+      </v-menu>
+      </div>
       <v-row>
         <v-col>
           <v-row :class="ml12">
@@ -135,34 +138,34 @@
         </v-col>
       </v-row>
 
-    </div>
 
-    <v-dialog v-model="dialog" max-width="1100" align="center"   >
-      <v-card v-for="(item,i) in random" :key="i" :value="item">
-        <v-card class="d-flex justify-center" flat>
-          <v-card class="max-width-auto"  flat>
-            <v-card-text class="headline lighten-2 ">{{item.chapterHeading}}</v-card-text>
-            <v-list-item-title class="grey--text  ">
-              <v-btn text color="primary lighten-1" @click="clickedSendbook(item.bookId)">
-                <v-icon small class="mr-2">
-                  mdi-book-open-page-variant
-                </v-icon>
-                จากหนังสือ:{{item.bookName}}
-              </v-btn>
-            </v-list-item-title>
-          <div >
-            <v-card-text style="font-size: 17px; white-space: pre-wrap;" >{{item.chapterDetail}}</v-card-text>
-          </div>
+
+      <v-dialog v-model="dialog" max-width="1100" align="center"   >
+        <v-card v-for="(item,i) in random" :key="i" :value="item">
+          <v-card class="d-flex justify-center" flat>
+            <v-card class="max-width-auto"  flat>
+              <v-card-text class="headline lighten-2 ">{{item.chapterHeading}}</v-card-text>
+              <v-list-item-title class="grey--text  ">
+                <v-btn text color="primary lighten-1" @click="clickedSendbook(item.bookId)">
+                  <v-icon small class="mr-2">
+                    mdi-book-open-page-variant
+                  </v-icon>
+                  จากหนังสือ:{{item.bookName}}
+                </v-btn>
+              </v-list-item-title>
+            <div >
+              <v-card-text style="font-size: 17px; white-space: pre-wrap;" >{{item.chapterDetail}}</v-card-text>
+            </div>
+            </v-card>
           </v-card>
-        </v-card>
-        <v-card-actions>
-          <v-spacer></v-spacer>
-          <v-btn color="primary lighten-1" text @click="searchrandom">สุ่มอ่าน</v-btn>
-          <v-btn color="primary lighten-1" text @click="closs">ออก</v-btn>
-        </v-card-actions>
-        </v-card>
-    </v-dialog>
-
+          <v-card-actions>
+            <v-spacer></v-spacer>
+            <v-btn color="primary lighten-1" text @click="searchrandom">สุ่มอ่าน</v-btn>
+            <v-btn color="primary lighten-1" text @click="closs">ออก</v-btn>
+          </v-card-actions>
+          </v-card>
+      </v-dialog>
+    </v-img>
   </div>
 </template>
 
@@ -197,6 +200,9 @@ export default {
   computed:{
     creatorComputed () {
       return this.$route.query.t
+    },
+    background () {
+      return (this.creatorComputed === '1') ? 'https://images.unsplash.com/photo-1503455637927-730bce8583c0?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1950&q=80' : 'https://scontent.fbkk3-4.fna.fbcdn.net/v/t31.18172-8/13308666_1021485067889255_4448759849068803360_o.jpg?stp=cp0_dst-jpg_e15_fr_q65&_nc_cat=108&ccb=1-7&_nc_sid=8024bb&efg=eyJpIjoidCJ9&_nc_eui2=AeHjF5kAssiaIW6-H1bg0srkOMoZB4EnmaU4yhkHgSeZpVS6Jh9EELWjdgP3yWlB8-Y&_nc_ohc=b-EFZjf4AFoAX85TQAi&_nc_ht=scontent.fbkk3-4.fna&oh=00_AT_lbTCbQyrnuq9_r5zaBrZY5dYrO5-xX1VruQecjqxJVg&oe=63562D85'
     },
     text_exp(){
       if (this.$vuetify.breakpoint.xsOnly){
@@ -355,7 +361,6 @@ export default {
   .homep {
     font-family: 'Sarabun', sans-serif;
     position: relative;
-    background-image: url(https://images.unsplash.com/photo-1503455637927-730bce8583c0?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1950&q=80);
     width: 100%;
     height: 100vh;
     background-repeat: no-repeat;

@@ -328,13 +328,13 @@
             creator: 2,
             routeTo: 'books'
           },
-          // {
-          //   logo: 'mdi-image-multiple',
-          //   title: "การ์ดธรรมะ",
-          //   text: "ธรรมะ รูปแบบข้อความสั้น ๆ ที่อยู่ในรูปภาพที่สวยงาม",
-          //   creator: 2,
-          //   routeTo: 'cards'
-          // },
+          {
+            logo: 'mdi-image-multiple',
+            title: "การ์ดธรรมะ",
+            text: "ธรรมะ รูปแบบข้อความสั้น ๆ ที่อยู่ในรูปภาพที่สวยงาม",
+            creator: 2,
+            routeTo: 'cards'
+          },
           {
             logo: 'mdi-magnify',
             title: "หน้าสืบค้น",
@@ -491,7 +491,17 @@
   .font-title {
     font-size: 1.7rem !important;
     color: #575656;
-    text-shadow:2px 2px 8px #c0cce3;
+    text-shadow:2px 2px 8px #ffffff;
+  }
+
+  @media screen and (max-width: 420px) {
+    .font-title {
+      font-size: 1.2rem !important;
+    }
+    .hot-head{
+      font-size: 1.7rem !important;
+    }
+
   }
 
   .btn-play {

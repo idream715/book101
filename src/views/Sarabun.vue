@@ -90,6 +90,8 @@
                 <div>PDF</div>
               </v-btn>
               <v-btn
+                v-show="bookSelected.bookText.includes('.txt')"
+                class="mr-3"
                 :href="bookSelected.bookText"
                 target="_blank"
                 color="primary"
@@ -97,6 +99,16 @@
                 <v-icon class="mr-1">mdi-book-open-page-variant</v-icon>
                 <div>TEXT</div>
               </v-btn>
+              <!-- <v-btn
+                color="primary"
+                @click.prevent="downloadItem({
+                  url: bookSelected.bookPdf,
+                  label: bookSelected.bookName
+                })"
+              >
+                <v-icon class="mr-1">mdi-download</v-icon>
+                DOWNLOAD
+              </v-btn> -->
             </div>
           </v-col>
         </v-row>
@@ -230,6 +242,7 @@
 </template>
 
 <script>
+  import Axios from 'axios'
   export default {
     props: {
       id: String
@@ -308,6 +321,17 @@
           window.getSelection().addRange(range);
         }
       },
+      downloadItem ({ url, label }) {
+        Axios.get(url, { responseType: 'blob' })
+          .then(response => {
+            const blob = new Blob([response.data], { type: 'application/pdf' })
+            const link = document.createElement('a')
+            link.href = URL.createObjectURL(blob)
+            link.download = label
+            link.click()
+            URL.revokeObjectURL(link.href)
+          }).catch(console.error)
+      }
     },
     computed: {
         bookSelected(){

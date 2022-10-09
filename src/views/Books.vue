@@ -56,7 +56,6 @@
               </v-img>
               <v-card-text
                 class="
-                  text-truncate
                   caption
                 "
               >

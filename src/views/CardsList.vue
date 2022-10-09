@@ -189,6 +189,21 @@
             </v-card-title>
             <v-card-text v-show="showText" ref="text" v-html="textCard" style="font-size: 17px; white-space: pre-wrap;">
             </v-card-text>
+            <v-card-text>
+              <div class="pa-4">
+                <v-chip-group
+                >
+                  <v-chip
+                    color="primary"
+                    v-for="tag in tagsCard"
+                    :key="tag"
+                    small
+                  >
+                    {{ tag }}
+                  </v-chip>
+                </v-chip-group>
+              </div>
+            </v-card-text>
             <v-card-actions>
               <v-btn
                 text
@@ -230,6 +245,7 @@ export default {
         picCard: '',
         thumbnailCard: '',
         textCard: '',
+        tagsCard: [],
         showText: false,
       }
     },
@@ -285,7 +301,8 @@ export default {
       if (words.length > 0) {
         this.$store.dispatch('setSearchedCards',{
           words: words,
-          creator: this.$route.query.t
+          creator: this.$route.query.t,
+          tags: this.filterTags
         })
       }
     },
@@ -310,7 +327,8 @@ export default {
             this.$store.dispatch('setSearchedCardsContinue',{
               words: this.searchingWords,
               offset: lastCardsIndex,
-              creator: this.$route.query.t
+              creator: this.$route.query.t,
+              tags: this.filterTags
             })
             break;
         }
@@ -321,11 +339,13 @@ export default {
       this.picCard = element.cardPic
       this.thumbnailCard = element.cardPicThumbnails
       this.textCard = element.cardDetail
+      this.tagsCard = element.cardTags
     },
     closeDialog () {
       this.picCard = ''
       this.thumbnailCard = ''
       this.textCard = ''
+      this.tagsCard = []
       this.dialogCard = !this.dialogCard
     },
     copyTextDetail () {
