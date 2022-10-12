@@ -18,13 +18,13 @@
               ></v-autocomplete>
             </v-col>
             <v-col v-if="checkMobile" cols="2" class="mb-8">
-              <v-btn
+              <!-- <v-btn
                 color="accent"
                 rounded
                 @click="clickedFilter"
               >
                 FILTER
-              </v-btn>
+              </v-btn> -->
               <v-btn
                 color="accent"
                 text
@@ -35,7 +35,7 @@
               </v-btn>
             </v-col>
             <v-col v-else cols="2" class="mb-8">
-              <v-btn
+              <!-- <v-btn
                 color="accent"
                 large
                 icon
@@ -44,7 +44,7 @@
                 <v-icon>
                   mdi-filter
                 </v-icon>
-              </v-btn>
+              </v-btn> -->
               <v-btn
                 color="accent"
                 large
@@ -298,12 +298,34 @@ export default {
     clickedSearch () {
       let words =this.searchingWords
 
-      if (words.length > 0) {
+      let tags = this.filterTags
+
+      if (words.length > 0 && tags.length > 0) {
         this.$store.dispatch('setSearchedCards',{
           words: words,
           creator: this.$route.query.t,
-          tags: this.filterTags
+          tags: tags
         })
+
+      } else if (words.length === 0 && tags.length > 0) {
+
+        this.$store.dispatch('setFilteredCards',{
+          words: tags,
+          offset: this.limit,
+          creator: this.$route.query.t
+        })
+
+      } else if (words.length > 0 && tags.length === 0) {
+
+        this.$store.dispatch('setSearchedCards',{
+          words: words,
+          creator: this.$route.query.t,
+          tags: tags
+        })
+
+      } else if (words.length === 0 && tags.length === 0) {
+        this.$store.dispatch('clear')
+        this.$store.dispatch('getCardFromApi', this.$route.query.t)
       }
     },
     infiniteScrolled () {
