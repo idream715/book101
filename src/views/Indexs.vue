@@ -140,7 +140,7 @@
                 <youtube
                   class="d-flex justify-center"
                   :video-id="videoId"
-                  :player-vars="{ autoplay: 1 }"
+                  :player-vars="{ autoplay: 1, start: startTime }"
                 ></youtube>
                 <v-card-actions>
                   <v-spacer></v-spacer>
@@ -206,6 +206,8 @@
 </template>
 
 <script>
+import { getTimeFromURL } from 'vue-youtube-embed'
+
 export default {
   data () {
       return {
@@ -231,7 +233,8 @@ export default {
         space:[' '],
         dialogYoutube: false,
         videoId: '',
-        videoURL: ''
+        videoURL: '',
+        startTime: 0
       }
     },
   computed:{
@@ -296,11 +299,16 @@ export default {
 
       this.videoURL = url
       this.videoId = vid
+
+      this.startTime = getTimeFromURL(url)
+
+      console.log(this.startTime)
       },
       closeDialogYoutube () {
       this.dialogYoutube = !this.dialogYoutube
       this.videoURL = ''
       this.videoId = ''
+      this.startTime = 0
     },
     text_render(input){
       if(!input.includes("<mark>")) return input

@@ -202,7 +202,7 @@ export default {
       return this.$route.query.t
     },
     background () {
-      return (this.creatorComputed === '1') ? 'https://images.unsplash.com/photo-1503455637927-730bce8583c0?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1950&q=80' : 'https://scontent.fbkk3-4.fna.fbcdn.net/v/t31.18172-8/13308666_1021485067889255_4448759849068803360_o.jpg?stp=cp0_dst-jpg_e15_fr_q65&_nc_cat=108&ccb=1-7&_nc_sid=8024bb&efg=eyJpIjoidCJ9&_nc_eui2=AeHjF5kAssiaIW6-H1bg0srkOMoZB4EnmaU4yhkHgSeZpVS6Jh9EELWjdgP3yWlB8-Y&_nc_ohc=b-EFZjf4AFoAX85TQAi&_nc_ht=scontent.fbkk3-4.fna&oh=00_AT_lbTCbQyrnuq9_r5zaBrZY5dYrO5-xX1VruQecjqxJVg&oe=63562D85'
+      return (this.creatorComputed === '1') ? 'https://images.unsplash.com/photo-1503455637927-730bce8583c0?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1950&q=80' : 'https://i.imgur.com/PA4GVvR.jpeg'
     },
     text_exp(){
       if (this.$vuetify.breakpoint.xsOnly){

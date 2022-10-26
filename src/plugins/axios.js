@@ -1,6 +1,7 @@
 import axios from 'axios'
 
 let baseURL = 'https://api3.rgtcenter.com:2053/dm01'
+let searchURL = 'https://localhost:7700/'
 
 const instance = axios.create({
     baseURL: baseURL,
@@ -10,8 +11,15 @@ const instance = axios.create({
     }
 });
 
+const instance2 = axios.create({
+  baseURL: searchURL,
+  headers: {
+    'Access-Control-Allow-Origin': '*',
+  }
+});
+
 export default {
-    getData( action) {
+    getData(action) {
       let url = `${baseURL}`
       url += action
       return instance.get(url)
@@ -20,5 +28,10 @@ export default {
       let url = `${baseURL}`
       url += action
       return instance.post(url, data)
+    },
+    searchData(action, data) {
+      let url = `${searchURL}`
+      url += action
+      return instance2.post(url, data)
     }
 }

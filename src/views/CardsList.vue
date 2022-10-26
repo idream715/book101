@@ -10,7 +10,7 @@
             <v-col cols="10">
               <v-autocomplete
                 v-model="filterTags"
-                :items="items"
+                :items="tagItems"
                 outlined
                 multiple
                 dense
@@ -56,15 +56,93 @@
                 </v-icon>
               </v-btn>
             </v-col>
-            <v-col col="12">
-              <v-combobox
+            <!-- <v-combobox
                 v-model="searchingWords"
                 outlined
                 multiple
+                :items="items"
                 dense
+                clearable
                 label="ค้นหาคำในการ์ด"
                 :delimiters="space"
-              ></v-combobox>
+              ></v-combobox> -->
+            <v-col col="12">
+              <v-combobox
+                v-model="model"
+                :filter="filter"
+                :hide-no-data="!search"
+                :search-input.sync="search"
+                hide-selected
+                label="ค้นหาคำในการ์ด"
+                :delimiters="space"
+                multiple
+                small-chips
+                dense
+                outlined
+              >
+                <template v-slot:no-data>
+                  <v-list-item>
+                    <span class="subheading">ค้นหา</span>
+                    <v-chip
+                      :color="`${colors[nonce - 1]} lighten-3`"
+                      label
+                      small
+                    >
+                      {{ search }}
+                    </v-chip>
+                  </v-list-item>
+                </template>
+                <template v-slot:selection="{ attrs, item, parent, selected }">
+                  <v-chip
+                    v-if="item === Object(item)"
+                    v-bind="attrs"
+                    :color="`${item.color} lighten-3`"
+                    :input-value="selected"
+                    label
+                    small
+                  >
+                    <span class="pr-2">
+                      {{ item.text }}
+                    </span>
+                    <v-icon
+                      x-small
+                      @click="parent.selectItem(item)"
+                    >
+                      $delete
+                    </v-icon>
+                  </v-chip>
+                </template>
+                <template v-slot:item="{ index, item }">
+                  <v-text-field
+                    v-if="editing === item"
+                    v-model="editing.text"
+                    autofocus
+                    flat
+                    background-color="transparent"
+                    hide-details
+                    solo
+                    @keyup.enter="edit(index, item)"
+                  ></v-text-field>
+                  <v-chip
+                    v-else
+                    :color="`${item.color} lighten-3`"
+                    dark
+                    label
+                    x-small
+                  >
+                    {{ item.text }}
+                  </v-chip>
+                  <v-spacer></v-spacer>
+                  <v-list-item-action @click.stop>
+                    <v-btn
+                      icon
+                      @click.stop.prevent="edit(index, item)"
+                    >
+                      <v-icon>{{ editing !== item ? 'mdi-pencil' : 'mdi-check' }}</v-icon>
+                    </v-btn>
+                  </v-list-item-action>
+                </template>
+              </v-combobox>
             </v-col>
           </v-row>
         </v-card-text>
@@ -145,9 +223,9 @@
             v-if="emptyCards"
           >
             <v-card-text  class="headline">
-              <div class="mb-3">คำค้นหาของคุณไม่ตรงกับเอกสารใดๆ</div>
-              <p v-for="(w,i) in search_pageindex" :key="i" :value="w" class="headline" style="color:red;">
-                - {{w.text}}
+              <div class="mb-3">คำค้นหาหรือ Tag ของคุณไม่ตรงกับเอกสารใดๆ</div>
+              <p v-for="(w,i) in model" :key="i" :value="w" class="headline" style="color:red;">
+                - คำค้น: {{ w.text }} Tags: {{ filterTags }}
               </p>
               <div >
                 <span>คำแนะนำ :</span><br>
@@ -238,7 +316,7 @@ export default {
         show: true,
         page: 1,
         filterTags: [],
-        searchingWords: [],
+        model: [],
         space:[' '],
         limit: 48,
         dialogCard: false,
@@ -247,6 +325,18 @@ export default {
         textCard: '',
         tagsCard: [],
         showText: false,
+        activator: null,
+        attach: null,
+        colors: [ 'pink', 'purple', 'indigo', 'teal', 'primary', 'accent' ],
+        editing: null,
+        editingIndex: -1,
+        items: [
+        ],
+        nonce: 1,
+        menu: false,
+        x: 0,
+        search: null,
+        y: 0,
       }
     },
   created () {
@@ -260,6 +350,26 @@ export default {
       this.$store.dispatch('getCardFromApi', this.$route.query.t)
     }
   },
+  watch: {
+    model (val, prev) {
+      if (val.length === prev.length) return
+
+      this.model = val.map(v => {
+        if (typeof v === 'string') {
+          v = {
+            text: v,
+            color: this.colors[this.nonce - 1],
+          }
+
+          this.items.push(v)
+
+          this.nonce++
+        }
+
+        return v
+      })
+    },
+  },
   computed: {
     listOfCards () {
       return this.$store.getters.getCards
@@ -270,7 +380,7 @@ export default {
     emptyCards () {
       return this.$store.getters.getnotfound
     },
-    items () {
+    tagItems () {
       return this.$store.getters.getTags
     },
     itemsAmount () {
@@ -284,6 +394,27 @@ export default {
     },
   },
   methods: {
+    edit (index, item) {
+      if (!this.editing) {
+        this.editing = item
+        this.editingIndex = index
+      } else {
+        this.editing = null
+        this.editingIndex = -1
+      }
+    },
+    filter (item, queryText, itemText) {
+      if (item.header) return false
+
+      const hasValue = val => val != null ? val : ''
+
+      const text = hasValue(itemText)
+      const query = hasValue(queryText)
+
+      return text.toString()
+        .toLowerCase()
+        .indexOf(query.toString().toLowerCase()) > -1
+    },
     clickedFilter () {
       let words =this.filterTags
 
@@ -296,7 +427,14 @@ export default {
       }
     },
     clickedSearch () {
-      let words =this.searchingWords
+
+      let words = []
+
+      if(this.model.length > 0) {
+        words = this.model.map(x => x.text)
+      } else if (this.model.length === 0 && this.search !== null) {
+        words.push(this.search)
+      }
 
       let tags = this.filterTags
 
@@ -330,6 +468,7 @@ export default {
     },
     infiniteScrolled () {
       setTimeout(() => {
+      const words = this.model.map(x => x.text)
       let lastCardsIndex = this.listOfCards.length
         switch (this.checkToolbarFlag) {
           case '':
@@ -347,7 +486,7 @@ export default {
             break;
           case 'search':
             this.$store.dispatch('setSearchedCardsContinue',{
-              words: this.searchingWords,
+              words: words,
               offset: lastCardsIndex,
               creator: this.$route.query.t,
               tags: this.filterTags

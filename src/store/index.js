@@ -187,17 +187,25 @@ export default new Vuex.Store({
             let marks = []
             array1.forEach(index => {
               let render = index
-              array2.forEach(word=>{render = render.replaceAll(word.text,`<mark>${word.text}</mark>`)})
+              if(render !== '') {
+                array2.forEach(word=>{render = render.replaceAll(word.text,`<mark>${word.text}</mark>`)})
+              }
               marks.push(render)
             })
             return marks
           }
           let indexmarked =  marks(index,words)
           let detailsmarked = marks(details,words)
+          let count = detailsmarked.map(v => {
+            let c = v.match(/mark/g)
+            return (c === null) ? 0 : c.length
+          })
           data.items.forEach((item,i) =>{
             item["mark_index"]= indexmarked[i]
             item["mark_details"]= detailsmarked[i]
+            item["count"] = count[i]
           })
+          data.items.sort((a,b) => b.count - a.count);
           commit('SET_INDEXS', data.items)
         }).catch(err => console.log(err))
     },
@@ -233,20 +241,28 @@ export default new Vuex.Store({
               let marks = []
               array1.forEach(index => {
                 let render = index
-                array2.forEach(word=>{
-                  render = render.replaceAll(word.text,`<mark>${word.text}</mark>`)
-                })
+                if(render !== '') {
+                  array2.forEach(word=>{
+                    render = render.replaceAll(word.text,`<mark>${word.text}</mark>`)
+                  })
+                }
                 marks.push(render)
               })
               return marks
             }
             let indexmarked =  marks(index,words)
             let detailsmarked = marks(details,words)
+            let count = detailsmarked.map(v => {
+              let c = v.match(/mark/g)
+              return (c === null) ? 0 : c.length
+            })
             data.items.forEach((item,i) =>{
               item["mark_index"]= indexmarked[i]
               item["mark_details"]= detailsmarked[i]
+              item["count"]= count[i]
             })
-          commit('SET_INDEXS_INFENIT', data.items)
+            data.items.sort((a,b) => b.count - a.count);
+            commit('SET_INDEXS_INFENIT', data.items)
           }).catch(err => console.log(err))
       }else{return}
     },
