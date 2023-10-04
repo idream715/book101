@@ -228,11 +228,7 @@ export default {
         input.push(attribute)
       }
 
-      this.$store.dispatch('setFirstIndexsFromApi',{
-        words:input,
-        page:0,
-        creator:1
-      })
+      this.$store.dispatch('setFirstIndexsFromApi',{words:input,page:0})
     }
   },
   computed:{
@@ -317,14 +313,14 @@ export default {
     },
     clicksearch(input){
       if(input.length!==0){
-      this.$store.dispatch('setFirstIndexsFromApi',{words:input,page:0,creator: 1})
+      this.$store.dispatch('setFirstIndexsFromApi',{words:input,page:0})
       }else{
         this.label_search='กรุณาใส่คำที่่ต้องการค้นหา'
       }
     },
     search_infenit(){
       let offset = this.$store.getters.getIndexs.length
-      this.$store.dispatch('setFirstIndexsFromApi_infenit',{words:this.search_pageindex,page:offset,creator: 1})
+      this.$store.dispatch('setFirstIndexsFromApi_infenit',{words:this.search_pageindex,page:offset,})
     },
     copyTextDetail () {
         this.selectText(this.$refs.textCopy); // e.g. <div ref="text">

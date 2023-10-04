@@ -40,10 +40,10 @@
         elevation="0"
       >
         <v-spacer></v-spacer>
-        <v-btn color="white" rounded text @click="$vuetify.goTo('#features')">
+        <!-- <v-btn color="white" rounded text @click="$vuetify.goTo('#features')">
           <v-icon>mdi-information-outline</v-icon>
           &nbsp;&nbsp;หนังสือของยาย
-        </v-btn>
+        </v-btn> -->
       </v-app-bar>
     <!-- ปุ่ม to top -->
       <v-btn v-scroll="onScroll"  v-show="fab" fab fixed bottom right >

@@ -1,66 +1,17 @@
 <template>
   <div class="home" align="center" justify="center">
     <section id="hero">
-      <v-parallax dark src="@/assets/blackground_search.jpg" height="800">
+      <v-parallax dark id="lp-bg" src="" height="800">
         <v-row align="center" justify="center">
           <v-col cols="10">
             <v-row align="center" justify="center">
               <v-col cols="12" md="5" lg="6" xl="7">
-                <v-img alt="logo" contain max-height="100"
-                src="@/assets/logo1.png" />
                 <h1 class="hot-head">
-                  {{ title }}
+                  มรดกธรรมคำสอน <br> พระมงคลเทพมุนี
                 </h1>
                 <h1 class="hot-head mb-4">
-                  (คุณครูไม่ใหญ่)
+                  (หลวงพ่อวัดปากน้ำ)
                 </h1>
-                <!-- <h1 class="font-weight-light">
-                  <small>เป็นธรรมะที่ง่ายแต่ลึกซึ้งและทรงคุณค่า </small><br />
-                  <small>เป็นสิ่งที่ท่านศึกษามาจากคำสอนของ<br />พระสัมมาสัมพุทธเจ้าและผลของธรรมปฏิบัติ</small>
-                </h1> -->
-
-                <!-- <div class="video d-flex align-center py-4">
-                  <a @click.stop="dialog = true" class="playBut">
-                    <svg
-                      version="1.1"
-                      xmlns="http://www.w3.org/2000/svg"
-                      xmlns:xlink="http://www.w3.org/1999/xlink"
-                      xmlns:a="http://ns.adobe.com/AdobeSVGViewerExtensions/3.0/"
-                      x="0px"
-                      y="0px"
-                      width="60px"
-                      height="60px"
-                      viewBox="0 0 213.7 213.7"
-                      enable-background="new 0 0 213.7 213.7"
-                      xml:space="preserve"
-                    >
-                      <polygon
-                        class="triangle"
-                        id="XMLID_18_"
-                        fill="none"
-                        stroke-width="7"
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                        stroke-miterlimit="10"
-                        points="73.5,62.5 148.5,105.8 73.5,149.1 "
-                      />
-
-                      <circle
-                        class="circle"
-                        id="XMLID_17_"
-                        fill="none"
-                        stroke-width="7"
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                        stroke-miterlimit="10"
-                        cx="106.8"
-                        cy="106.8"
-                        r="103.3"
-                      />
-                    </svg>
-                  </a>
-                  <p class="subheading ml-2 mb-0">เล่น Video</p>
-                </div> -->
 
               </v-col>
               <v-col cols="12" md="7" lg="6" xl="5">
@@ -73,7 +24,7 @@
                         lg="6"
                         xl="4"
                         class="text-center py-4"
-                        v-for="(feature, i) in menuLuangpor"
+                        v-for="(feature, i) in menuLuangPu"
                         :key="i"
                       >
                         <v-item>
@@ -88,7 +39,7 @@
                               <v-card-title>
                                   <v-icon
                                     left
-                                    color="primary lighten-4"
+                                    :color="returnColor(feature.creator)"
                                     :class="{ 'zoom-efect': hover }"
                                   >
                                     {{ feature.logo }}
@@ -111,6 +62,118 @@
           <v-img src="@/assets/borderWaves.svg" />
         </div>
       </v-parallax>
+      <section id="lp">
+        <v-container fluid id="features">
+          <v-row align="center" justify="center">
+            <v-col cols="10">
+              <v-row align="center" justify="center">
+                <v-col cols="12" md="5" lg="6" xl="7">
+                  <v-img alt="logo" contain max-height="100"
+                  src="@/assets/logo1.png" />
+                  <h1 class="hot-head2">
+                    {{ title }}
+                  </h1>
+                  <h1 class="hot-head2 mb-4">
+                    (คุณครูไม่ใหญ่)
+                  </h1>
+                  <!-- <h1 class="font-weight-light">
+                    <small>เป็นธรรมะที่ง่ายแต่ลึกซึ้งและทรงคุณค่า </small><br />
+                    <small>เป็นสิ่งที่ท่านศึกษามาจากคำสอนของ<br />พระสัมมาสัมพุทธเจ้าและผลของธรรมปฏิบัติ</small>
+                  </h1> -->
+
+                  <!-- <div class="video d-flex align-center py-4">
+                    <a @click.stop="dialog = true" class="playBut">
+                      <svg
+                        version="1.1"
+                        xmlns="http://www.w3.org/2000/svg"
+                        xmlns:xlink="http://www.w3.org/1999/xlink"
+                        xmlns:a="http://ns.adobe.com/AdobeSVGViewerExtensions/3.0/"
+                        x="0px"
+                        y="0px"
+                        width="60px"
+                        height="60px"
+                        viewBox="0 0 213.7 213.7"
+                        enable-background="new 0 0 213.7 213.7"
+                        xml:space="preserve"
+                      >
+                        <polygon
+                          class="triangle"
+                          id="XMLID_18_"
+                          fill="none"
+                          stroke-width="7"
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          stroke-miterlimit="10"
+                          points="73.5,62.5 148.5,105.8 73.5,149.1 "
+                        />
+
+                        <circle
+                          class="circle"
+                          id="XMLID_17_"
+                          fill="none"
+                          stroke-width="7"
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          stroke-miterlimit="10"
+                          cx="106.8"
+                          cy="106.8"
+                          r="103.3"
+                        />
+                      </svg>
+                    </a>
+                    <p class="subheading ml-2 mb-0">เล่น Video</p>
+                  </div> -->
+
+                </v-col>
+                <v-col cols="12" md="7" lg="6" xl="5">
+                  <!-- <v-col class="d-flex flex-column align-sm-end align-md-center"> -->
+                    <v-item-group color="transparent">
+                      <v-row
+                      >
+                        <v-col
+                          cols="12"
+                          lg="6"
+                          xl="4"
+                          class="text-center py-4"
+                          v-for="(feature, i) in menuLuangpor"
+                          :key="i"
+                        >
+                          <v-item>
+                            <v-hover v-slot:default="{ hover }">
+                              <v-card
+                                class="card"
+                                shaped
+                                :elevation="hover ? 10 : 4"
+                                :class="{ up: hover }"
+                                @click.stop="routingTo(feature.routeTo, feature.creator)"
+                              >
+                                <v-card-title>
+                                    <v-icon
+                                      left
+                                      :color="returnColor(feature.creator)"
+                                      :class="{ 'zoom-efect': hover }"
+                                    >
+                                      {{ feature.logo }}
+                                    </v-icon>
+                                  <span>
+                                    {{ feature.title }}
+                                  </span>
+                                </v-card-title>
+                              </v-card>
+                            </v-hover>
+                          </v-item>
+                        </v-col>
+                      </v-row>
+                    </v-item-group >
+                </v-col>
+              </v-row>
+            </v-col>
+          </v-row>
+          <div class="svg-border-waves text-white">
+            <v-img src="@/assets/borderWaves.svg" />
+          </div>
+        </v-container>
+      </section>
       <section id="yay">
         <v-container fluid id="features">
           <v-row class="align-center justify-center">
@@ -202,7 +265,7 @@
                                       <v-card-title>
                                           <v-icon
                                             left
-                                            color="primary lighten-4"
+                                            :color="returnColor(feature.creator)"
                                             :class="{ 'zoom-efect': hover }"
                                           >
                                             {{ feature.logo }}
@@ -318,10 +381,17 @@
           },
           {
             logo: 'mdi-magnify',
-            title: "หน้าสืบค้น",
+            title: "ค้นหาคำ",
             text: "ระบบสืบค้นธรรมะของหลวงพ่อ",
             creator: 1,
             routeTo: 'search-page'
+          },
+          {
+            logo: 'mdi-book-open-page-variant',
+            title: "ปกิณกะ",
+            text: "ระบบสืบค้นธรรมะของหลวงพ่อ",
+            creator: 1,
+            routeTo: 'shorts'
           },
           {
             logo: 'mdi-book-open-page-variant',
@@ -339,9 +409,23 @@
           },
           {
             logo: 'mdi-magnify',
-            title: "หน้าสืบค้น",
+            title: "ค้นหาคำ",
             text: "ระบบสืบค้นธรรมะของหลวงพ่อ",
             creator: 2,
+            routeTo: 'search-page'
+          },
+          {
+            logo: 'mdi-book-open-page-variant',
+            title: "หนังสือธรรมะ",
+            text: "หนังสือที่เก็บรวบรวมคำสอนของหลวงปู่",
+            creator: 4,
+            routeTo: 'books'
+          },
+          {
+            logo: 'mdi-magnify',
+            title: "ค้นหาคำ",
+            text: "ระบบสืบค้นธรรมะของหลวงปู่",
+            creator: 4,
             routeTo: 'search-page'
           },
         ],
@@ -359,6 +443,9 @@
       },
       menuYay () {
         return this.features.filter(x => x.creator === 2)
+      },
+      menuLuangPu () {
+        return this.features.filter(x => x.creator === 4)
       },
       checkingMobile () {
         return this.$vuetify.breakpoint.mdAndDown
@@ -383,6 +470,18 @@
     methods: {
       routingTo (path, creator) {
         return this.$router.push({ path: path, query: { t: creator } })
+      },
+      returnColor (creator) {
+        switch (creator) {
+          case 1:
+            return 'primary lighten-4'
+          case 2:
+            return 'blue lighten-2'
+          case 4:
+            return 'yellow darken-2'
+          default:
+            return 'primary'
+        }
       },
       ready(event) {
         this.player = event.target;
@@ -411,8 +510,8 @@
 <style lang="scss">
   #yay {
     background-image:
-    linear-gradient(to bottom, rgb(255, 255, 255), rgba(251, 251, 251, 0.324)),
-    url("~@/assets/bg.jpeg");
+    linear-gradient(to bottom, rgb(255, 255, 255), rgba(251, 251, 251, 0.125)),
+    url("https://i.imgur.com/PA4GVvR.jpeg");
     background-repeat: no-repeat;
     background-size: cover;
     background-position: center;
@@ -421,6 +520,56 @@
 
   #yay .container,
   #yay .row {
+    height: 100%;
+  }
+
+  #lp-bg {
+    position: relative;
+    background:
+      radial-gradient(circle, rgba(255,236,148,1) 0%, rgba(236,207,117,1) 50%, rgba(211,168,76,1) 70%, rgba(164,122,30,1) 100%);
+    // background: linear-gradient(-45deg, #eccf75, #ffec94, #a47a1e, #d3a84c);
+    background-size: 400% 400%;
+    animation: gradient 15s ease infinite;
+    height: 100vh;
+  }
+
+  #lp-bg::before {
+    content: ""; /* Necessary for the pseudo-element to be generated */
+    position: absolute; /* Position the pseudo-element absolutely within the body */
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    background: url('~@/assets/lp.jpg') repeat; /* Set the image pattern */
+    background-size: cover;
+    opacity: 0.6; /* 60% transparent means 40% opacity */
+    z-index: 1; /* Place the pseudo-element above the body's background but below any other content */
+  }
+
+  @keyframes gradient {
+    0% {
+      background-position: 0% 50%;
+    }
+    50% {
+      background-position: 100% 50%;
+    }
+    100% {
+      background-position: 0% 50%;
+    }
+  }
+
+  #lp {
+    background-image:
+    linear-gradient(to bottom, rgb(255, 255, 255), rgba(255, 255, 255, 0.281)),
+    url("~@/assets/blackground_search.jpg");
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-position: center;
+    height: 800px;
+  }
+
+  #lp .container,
+  #lp .row {
     height: 100%;
   }
   .circle {
@@ -482,18 +631,24 @@
 
   .hot-head{
     font-size: 2rem !important;
-    text-shadow:2px 2px 8px #444444;
+    color:#c29930;
+  }
+
+  .hot-head2 {
+    font-size: 2rem !important;
+    color:#d97d8e;
+    /* text-shadow:1px 0px 3px #444444; */
   }
 
   .hothead-fixed {
     font-size: 1.7rem !important;
-    text-shadow:2px 2px 8px #444444;
+    text-shadow:1px 0px 3px #444444;
   }
 
   .font-title {
     font-size: 1.7rem !important;
-    color: #575656;
-    text-shadow:2px 2px 8px #ffffff;
+    color: #5484c1;
+    text-shadow:1px 0px 3px #ffffff;
   }
 
   @media screen and (max-width: 420px) {

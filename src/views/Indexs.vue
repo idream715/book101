@@ -352,6 +352,13 @@ export default {
         }
       },
     clickedSendbook(bookname2) {
+
+      this.$gtag.event('view_book_from_search', {
+        'event_category': 'view_item',
+        'event_label': `Search Clicked`,
+        'value': `${Number(bookname2)}`
+      })
+
       let openBook = this.$router.resolve({path: `/book/${bookname2}`});
       window.open(openBook.href, '_blank')
     },

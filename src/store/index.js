@@ -95,6 +95,9 @@ export default new Vuex.Store({
     SET_FLAGS_CARD(state, payload){
       state.flag += payload
     },
+    SET_FLAGS_SHORTS(state, payload){
+      state.flag += payload
+    },
     SET_FLAGS_TOOLBAR(state, payload) {
       switch(payload) {
         case 0:
@@ -151,6 +154,22 @@ export default new Vuex.Store({
           commit('SET_CARDS_TAGS', data.items)
         })
         .catch(err => console.log(err))
+    },
+    getShortsFromApi({ commit }, creator){
+      if (!creator) return null
+
+      commit('SET_OVERLAY', true)
+      commit('CLEAR_FLAG')
+      callApi.getData(`/shorts/all/?limit=50&offset=0&creator=${creator}`)
+        .then(res=>{
+          let data = res.data
+          commit('SET_NOTFOUND', false)
+          commit('SET_OVERLAY', false)
+          commit('SET_TOTALS_INDEXS', data.nItems)
+          commit('SET_INDEXS', data.items)
+        })
+        .catch(err => console.log(err))
+
     },
     // SET
       // PATH INDEXS
@@ -266,9 +285,80 @@ export default new Vuex.Store({
           }).catch(err => console.log(err))
       }else{return}
     },
-    setsearchrandom({ commit },number){
+    searchShortFromApiContinue({ commit, state },{ words, page, creator }){
+
+      if (!creator) return null
+
+      if(page>state.flag){
+        commit('SET_FLAGS_SHORTS', 50)
+        commit('SET_WORDS_SEARCH',words)
+        let tags = []
+
+        words.forEach(element => {
+          let tag = element.text
+          tags.push(tag)
+        });
+
+        let body = {
+          keywords: tags,
+          type: 'shorts',
+          creator: parseInt(creator),
+          limit: 50,
+          offset: page,
+          pageNo: 0
+        }
+
+        callApi.postData(`/search` , body)
+          .then(res=>{
+            let data = res.data
+            let details = data.items.map(x=>x.chapterDetail)
+            let index = data.items.map(x=>x.chapterHeading)
+            function marks(array1,array2){
+              let marks = []
+              array1.forEach(index => {
+                let render = index
+                if(render !== '') {
+                  array2.forEach(word=>{
+                    render = render.replaceAll(word.text,`<mark>${word.text}</mark>`)
+                  })
+                }
+                marks.push(render)
+              })
+              return marks
+            }
+            let indexmarked =  marks(index,words)
+            let detailsmarked = marks(details,words)
+            let count = detailsmarked.map(v => {
+              let c = v.match(/mark/g)
+              return (c === null) ? 0 : c.length
+            })
+            data.items.forEach((item,i) =>{
+              item["mark_index"]= indexmarked[i]
+              item["mark_details"]= detailsmarked[i]
+              item["count"]= count[i]
+            })
+            data.items.sort((a,b) => b.count - a.count);
+            commit('SET_INDEXS_INFENIT', data.items)
+          }).catch(err => console.log(err))
+      } else { return }
+    },
+    setShortFromApiContinue({ commit, state },{ page, creator }){
+      if (!creator) return null
+
+      if(page>state.flag){
+        commit('SET_FLAGS_SHORTS', 50)
+
+        callApi.getData(`/shorts/all?limit=50&offset=${page}&creator=${creator}`)
+          .then(res=>{
+            let data = res.data
+            commit('SET_INDEXS_INFENIT', data.items)
+          }).catch(err => console.log(err))
+      }else{return}
+
+    },
+    setSearchRandom({ commit }, { creator }){
       commit('SET_OVERLAY', true)
-      callApi.getData(`/indexs/${number}`)
+      callApi.getData(`/indexs-rand/?limit=1&offset=0&creator=${creator}`)
       .then(res=>{
         commit('SET_OVERLAY', false)
         let data = res.data

@@ -54,6 +54,11 @@ Vue.use(VueRouter)
     name: 'Cards',
     component: () => import('@/views/CardsList.vue')
   },
+  {
+    path: '/shorts',
+    name: 'Shorts',
+    component: () => import('@/views/ShortsList.vue')
+  },
 ]
 
 const router = new VueRouter({

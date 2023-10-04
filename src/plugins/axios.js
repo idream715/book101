@@ -1,7 +1,8 @@
 import axios from 'axios'
 
 let baseURL = 'https://api3.rgtcenter.com:2053/dm01'
-let searchURL = 'https://localhost:7700/'
+let searchURL = 'https://dm01.code-th.com/books'
+const accessToken = 'dhamma101'
 
 const instance = axios.create({
     baseURL: baseURL,
@@ -15,6 +16,7 @@ const instance2 = axios.create({
   baseURL: searchURL,
   headers: {
     'Access-Control-Allow-Origin': '*',
+    'Authorization': 'Bearer ' + accessToken
   }
 });
 

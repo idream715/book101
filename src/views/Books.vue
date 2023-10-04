@@ -109,6 +109,12 @@ export default {
   },
   methods: {
     bookSelect(selected){
+      this.$gtag.event('view_book_from_click', {
+          'event_category': 'view_item',
+          'event_label': `Books Clicked: ${selected['bookName']}`,
+          'value': `${Number(selected['bookId'])}`
+        })
+
       //new tab
       console.log(selected)
       let openBook = this.$router.resolve({path: `/book/${selected['bookId']}`});

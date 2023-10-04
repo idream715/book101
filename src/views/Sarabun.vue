@@ -260,6 +260,11 @@
       }
     },
     created() {
+      this.$gtag.event('page_view', {
+          'page_title': 'Book101 Sarabun',
+          'page_path': `/${this.$route.params.id}`,
+        })
+
       this.$store.dispatch('setbook_index',this.id)
       this.$store.dispatch('setFirstSarabun', {limit:this.itemsPerPage, offset:0, book_id: this.id})
     },

@@ -202,7 +202,15 @@ export default {
       return this.$route.query.t
     },
     background () {
-      return (this.creatorComputed === '1') ? 'https://images.unsplash.com/photo-1503455637927-730bce8583c0?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1950&q=80' : 'https://i.imgur.com/PA4GVvR.jpeg'
+      switch (this.creatorComputed) {
+        case '1':
+          return 'https://images.unsplash.com/photo-1503455637927-730bce8583c0?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1950&q=80'
+        case '2':
+          return 'https://i.imgur.com/PA4GVvR.jpeg'
+        case '4':
+          return 'https://i.postimg.cc/2yNjQ85Z/gold.jpg'
+        default: return ''
+      }
     },
     text_exp(){
       if (this.$vuetify.breakpoint.xsOnly){
@@ -227,8 +235,10 @@ export default {
     headingWords () {
       if (this.$route.query.t === '1') {
         return 'หนังสือคุณครูไม่ใหญ่'
-      } else {
+      } else if (this.$route.query.t === '2') {
         return 'หนังสือคุณยายอาจารย์'
+      } else {
+        return 'มรดกธรรมคำสอนพระมงคลเทพมุนี'
       }
     },
     labelSearch () {
@@ -292,8 +302,7 @@ export default {
     },
     searchrandom(){
       this.$store.dispatch('clear')
-      let number = Math.ceil(Math.random() *3548)
-      this.$store.dispatch('setsearchrandom',number)
+      this.$store.dispatch('setSearchRandom', { creator: this.$route.query.t })
       this.dialog=true
     },
     closs(){

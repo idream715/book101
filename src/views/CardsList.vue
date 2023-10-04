@@ -342,14 +342,11 @@ export default {
   created () {
     this.$store.dispatch('clear')
     this.$store.dispatch('getTagOfCards', this.$route.query.t)
+    this.$store.dispatch('getCardFromApi', this.$route.query.t)
 
   },
-  beforeMount () {
-
-    if(this.itemsAmount === 0) {
-      this.$store.dispatch('getCardFromApi', this.$route.query.t)
-    }
-  },
+  // beforeMount () {
+  // },
   watch: {
     model (val, prev) {
       if (val.length === prev.length) return
