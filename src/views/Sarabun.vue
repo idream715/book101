@@ -99,7 +99,7 @@
                 <v-icon class="mr-1">mdi-book-open-page-variant</v-icon>
                 <div>TEXT</div>
               </v-btn>
-              <!-- <v-btn
+              <v-btn
                 color="primary"
                 @click.prevent="downloadItem({
                   url: bookSelected.bookPdf,
@@ -108,7 +108,7 @@
               >
                 <v-icon class="mr-1">mdi-download</v-icon>
                 DOWNLOAD
-              </v-btn> -->
+              </v-btn>
             </div>
           </v-col>
         </v-row>
@@ -138,13 +138,11 @@
             <v-list-item v-for="(item, i) in sarabunSelected" :key="item.chapterId">
               <template>
                 <v-list-item-avatar>
-                  <v-list-item-title
-                    v-text="i+1+'.'"
-                  ></v-list-item-title>
+                  <v-list-item-title> {{ i + 1 + `.` }}</v-list-item-title>
                 </v-list-item-avatar>
 
                 <v-list-item-content>
-                  <v-list-item-title v-text="item.chapterHeading" style="line-height: unset;"></v-list-item-title>
+                  <v-list-item-title style="line-height: unset;">{{ item.chapterHeading }}</v-list-item-title>
                 </v-list-item-content>
                 <v-btn
                   v-show="item.chapterLinkYouTube.length > 0"
@@ -215,9 +213,11 @@
         class="elevation-10"
       >
         <v-card >
-          <v-card-title class="d-flex justify-center" v-html="textSarabun">
+          <v-card-title class="d-flex justify-center">
+            {{ textSarabun }}
           </v-card-title>
-          <v-card-text style="white-space: pre-wrap;" class="d-flex justify-center" ref="textCopy" v-html="textDetail">
+          <v-card-text style="white-space: pre-wrap;" class="d-flex justify-center" ref="textCopy">
+            {{  textDetail  }}
           </v-card-text>
           <v-card-actions class="justify-end">
             <v-btn
@@ -327,15 +327,35 @@
         }
       },
       downloadItem ({ url, label }) {
-        Axios.get(url, { responseType: 'blob' })
+        const namepdf = this.extractPdfFileName(url)
+        Axios({
+          url: `https://one.rgtcenter.com/dm01/api/download/book/${namepdf}`,
+          method: 'GET',
+          responseType: 'blob',
+        })
           .then(response => {
             const blob = new Blob([response.data], { type: 'application/pdf' })
             const link = document.createElement('a')
-            link.href = URL.createObjectURL(blob)
-            link.download = label
+            link.href = window.URL.createObjectURL(blob)
+            link.setAttribute('download', `${label}.pdf`)
+            document.body.appendChild(link)
+            // link.download = label
             link.click()
-            URL.revokeObjectURL(link.href)
+            // URL.revokeObjectURL(link.href)
+            link.parentNode.removeChild(link);
           }).catch(console.error)
+      },
+      extractPdfFileName(x) {
+        // Split the URL by '/' and get the last part
+        const parts = x.split('/');
+        const lastPart = parts[parts.length - 1];
+
+        // Optional: Check if the last part ends with '.pdf'
+        if (lastPart.endsWith('.pdf')) {
+            return lastPart;
+        } else {
+            return null; // or handle this case as you see fit
+        }
       }
     },
     computed: {

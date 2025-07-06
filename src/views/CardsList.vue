@@ -180,8 +180,8 @@
         <v-card-text>
           <v-row>
             <v-col
-              v-for="card in listOfCards"
-              :key="card.cardId"
+              v-for="(card, index) in listOfCards"
+              :key="index"
               cols="6"
               sm="4"
               md="3"
@@ -191,7 +191,7 @@
                   :src="card.cardPicThumbnails"
                   class="white--text align-end"
                   height="200px"
-                  @click="popDialogCard(card)"
+                  @click="popDialogCard(card, index)"
                 >
                 </v-img>
                 <v-card-actions>
@@ -203,7 +203,7 @@
 
                   <v-btn
                     icon
-                    @click="popDialogCard(card)"
+                    @click="popDialogCard(card, index)"
                   >
                     <v-icon>mdi-chevron-right</v-icon>
                   </v-btn>
@@ -265,7 +265,8 @@
               <v-spacer></v-spacer>
               <v-btn color="accent lighten-1" text @click="copyTextDetail">คัดลอกเนื้อหา</v-btn>
             </v-card-title>
-            <v-card-text v-show="showText" ref="text" v-html="textCard" style="font-size: 17px; white-space: pre-wrap;">
+            <v-card-text v-show="showText" ref="text" style="font-size: 17px; white-space: pre-wrap;">
+              {{ textCard }}
             </v-card-text>
             <v-card-text>
               <div class="pa-4">
@@ -293,6 +294,8 @@
                 <v-icon>{{ showText ? 'mdi-chevron-up' : 'mdi-chevron-down' }}</v-icon>
               </v-btn>
               <v-spacer></v-spacer>
+              <v-btn color="accent lighten-1" text :disabled="btnDisabled" loading="btnLoading" @click="handleClick">ก่อนหน้า</v-btn>
+              <v-btn color="accent lighten-1" text :disabled="btnDisabled" loading="btnLoading" @click="handleClick">ถัดไป</v-btn>
               <!-- <v-btn color="accent lighten-1" text @click="downloadItem({ url: picCard, label: 'downloadImg' })">บันทึกภาพ</v-btn> -->
               <v-btn color="accent lighten-1" text @click="closeDialog">ออก</v-btn>
             </v-card-actions>
@@ -330,6 +333,8 @@ export default {
         colors: [ 'pink', 'purple', 'indigo', 'teal', 'primary', 'accent' ],
         editing: null,
         editingIndex: -1,
+        selectedIndex: -1,
+        btnDisabled: false,
         items: [
         ],
         nonce: 1,
@@ -463,6 +468,12 @@ export default {
         this.$store.dispatch('getCardFromApi', this.$route.query.t)
       }
     },
+    handleClick() {
+      this.btnDisabled = true; // Disable the button
+      setTimeout(() => {
+        this.btnDisabled = false; // Enable the button after 2 seconds
+      }, 2000);
+    },
     infiniteScrolled () {
       setTimeout(() => {
       const words = this.model.map(x => x.text)
@@ -492,7 +503,8 @@ export default {
         }
       }, 500);
     },
-    popDialogCard (element) {
+    popDialogCard (element, index) {
+      this.selectedIndex = index
       this.dialogCard = !this.dialogCard
       this.picCard = element.cardPic
       this.thumbnailCard = element.cardPicThumbnails

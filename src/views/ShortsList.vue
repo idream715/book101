@@ -8,56 +8,6 @@
       <v-card shaped class="my-6" color="info">
         <v-card-text v-show="show">
           <v-row>
-            <!-- <v-col cols="10">
-              <v-autocomplete
-                outlined
-                multiple
-                dense
-                label="Tags ของ ปกิณกะ"
-              ></v-autocomplete>
-            </v-col>
-            <v-col v-if="checkMobile" cols="2" class="mb-8">
-              <v-btn
-                color="accent"
-                text
-                rounded
-                @click="filterTags = []"
-              >
-                CLEAR
-              </v-btn>
-            </v-col>
-            <v-col v-else cols="2" class="mb-8">
-              <v-btn
-                color="accent"
-                large
-                icon
-                @click="filterTags = []"
-              >
-                <v-icon>
-                  mdi-filter-remove-outline
-                </v-icon>
-              </v-btn>
-            </v-col> -->
-              <!-- <v-btn
-                color="accent"
-                large
-                icon
-                @click="clickedFilter"
-              >
-                <v-icon>
-                  mdi-filter
-                </v-icon>
-              </v-btn> -->
-            <!-- <v-combobox
-                v-model="searchingWords"
-                outlined
-                multiple
-                :items="items"
-                dense
-                clearable
-                label="ค้นหาคำในการ์ด"
-                :delimiters="space"
-              ></v-combobox> -->
             <v-col col="12">
               <v-combobox
                 v-model="model"

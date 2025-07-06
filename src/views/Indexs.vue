@@ -86,7 +86,7 @@
                   <v-card-text class="pa-1">
                     <v-row>
                       <v-col cols="10">
-                        <v-list-item-title class=" mb-1 " v-html="index.mark_index" style="line-height:2;font-size:24px;"></v-list-item-title>
+                        <div class=" mb-1 " v-html="index.mark_index" style="line-height:2;font-size:24px;"></div>
                       </v-col>
                       <v-col cols="2">
                         <v-list-item-title class="grey--text" align="end">{{i+1}}</v-list-item-title>
@@ -155,10 +155,10 @@
             <v-card>
               <v-card class="d-flex justify-center" flat>
                 <v-card class="max-width-auto"  flat>
-                  <v-card-text class=" lighten-2 " style="line-height:2;font-size:24px;" v-html="head_content" ></v-card-text>
-                  <v-list-item-title class="grey--text "><v-btn text color="primary lighten-1" @click="clickedSendbook(book_id)"><v-icon small class="mr-2">mdi-book-open-page-variant</v-icon>จากหนังสือ:{{frombook}}</v-btn></v-list-item-title>
+                  <div class=" lighten-2 pa-5" style="line-height:2;font-size:24px;" v-html="head_content" ></div>
+                  <v-list-item-title class="grey--text "><v-btn text color="primary lighten-1" @click="clickedSendbook(book_id)" :disabled="!book_id"><v-icon small class="mr-2">mdi-book-open-page-variant</v-icon>จากหนังสือ:{{frombook}}</v-btn></v-list-item-title>
                 <div >
-                  <v-card-text ref="textCopy" v-html="content_copy" style="font-size: 17px; white-space: pre-wrap;" ></v-card-text>
+                  <div class="pa-5" ref="textCopy" v-html="content_copy" style="font-size: 17px; white-space: pre-wrap;" ></div>
                 </div>
                 </v-card>
 
