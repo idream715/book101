@@ -4,7 +4,7 @@
       <v-overlay v-model="loading">
         <v-progress-circular indeterminate size="64"></v-progress-circular>
       </v-overlay>
-      <v-card shaped class="my-6" color="info">
+      <v-card variant="elevated" class="my-6" color="info">
         <v-card-text v-show="show">
           <v-row>
             <v-col cols="10">
@@ -27,7 +27,7 @@
               </v-btn> -->
               <v-btn
                 color="accent"
-                text
+                variant="text"
                 rounded
                 @click="filterTags = []"
               >
@@ -71,7 +71,7 @@
                 v-model="model"
                 :filter="filter"
                 :hide-no-data="!search"
-                :search-input.sync="search"
+                v-model:search-input="search"
                 hide-selected
                 label="ค้นหาคำในการ์ด"
                 :delimiters="space"
@@ -170,7 +170,7 @@
         </v-card-actions>
       </v-card>
 
-      <v-card v-if="!emptyCards" shaped>
+      <v-card v-if="!emptyCards" variant="elevated">
         <v-card-title>
           <v-spacer></v-spacer>
           <span class="accent--text">
@@ -263,7 +263,7 @@
             </v-img> -->
             <v-card-title v-show="showText">
               <v-spacer></v-spacer>
-              <v-btn color="accent lighten-1" text @click="copyTextDetail">คัดลอกเนื้อหา</v-btn>
+              <v-btn color="accent-lighten-1" variant="text" @click="copyTextDetail">คัดลอกเนื้อหา</v-btn>
             </v-card-title>
             <v-card-text v-show="showText" ref="text" style="font-size: 17px; white-space: pre-wrap;">
               {{ textCard }}
@@ -285,7 +285,7 @@
             </v-card-text>
             <v-card-actions>
               <v-btn
-                text
+                variant="text"
                 class="ml-2"
                 color="accent lighten-1"
                 @click="showText = !showText"
@@ -294,10 +294,10 @@
                 <v-icon>{{ showText ? 'mdi-chevron-up' : 'mdi-chevron-down' }}</v-icon>
               </v-btn>
               <v-spacer></v-spacer>
-              <v-btn color="accent lighten-1" text :disabled="btnDisabled" loading="btnLoading" @click="handleClick">ก่อนหน้า</v-btn>
-              <v-btn color="accent lighten-1" text :disabled="btnDisabled" loading="btnLoading" @click="handleClick">ถัดไป</v-btn>
-              <!-- <v-btn color="accent lighten-1" text @click="downloadItem({ url: picCard, label: 'downloadImg' })">บันทึกภาพ</v-btn> -->
-              <v-btn color="accent lighten-1" text @click="closeDialog">ออก</v-btn>
+              <v-btn color="accent-lighten-1" variant="text" :disabled="btnDisabled" :loading="btnLoading" @click="handleClick('prev')">ก่อนหน้า</v-btn>
+              <v-btn color="accent-lighten-1" variant="text" :disabled="btnDisabled" :loading="btnLoading" @click="handleClick('next')">ถัดไป</v-btn>
+              <!-- <v-btn color="accent-lighten-1" variant="text" @click="downloadItem({ url: picCard, label: 'downloadImg' })">บันทึกภาพ</v-btn> -->
+              <v-btn color="accent-lighten-1" variant="text" @click="closeDialog">ออก</v-btn>
             </v-card-actions>
           </v-card>
         </v-dialog>
@@ -311,7 +311,13 @@
 </template>
 
 <script>
+import { useCardsStore } from '@/stores/cards'
+
 export default {
+  setup() {
+    const cardsStore = useCardsStore()
+    return { cardsStore }
+  },
   data () {
       return {
         src: 'https://s3.ap-southeast-1.amazonaws.com/book.dhamma01.com/cards/luangpu.jpg',
@@ -335,6 +341,7 @@ export default {
         editingIndex: -1,
         selectedIndex: -1,
         btnDisabled: false,
+        btnLoading: false,
         items: [
         ],
         nonce: 1,
@@ -345,9 +352,9 @@ export default {
       }
     },
   created () {
-    this.$store.dispatch('clear')
-    this.$store.dispatch('getTagOfCards', this.$route.query.t)
-    this.$store.dispatch('getCardFromApi', this.$route.query.t)
+    this.cardsStore.clear()
+    this.cardsStore.getTagOfCards(this.$route.query.t)
+    this.cardsStore.getCardFromApi(this.$route.query.t)
 
   },
   // beforeMount () {
@@ -374,25 +381,25 @@ export default {
   },
   computed: {
     listOfCards () {
-      return this.$store.getters.getCards
+      return this.cardsStore.cards
     },
     loading(){
-      return this.$store.getters.getoverlay
+      return this.cardsStore.overlay
     },
     emptyCards () {
-      return this.$store.getters.getnotfound
+      return this.cardsStore.notfound
     },
     tagItems () {
-      return this.$store.getters.getTags
+      return this.cardsStore.cardTags
     },
     itemsAmount () {
-      return this.$store.getters.getTotalCards
+      return this.cardsStore.totalsCards
     },
     checkToolbarFlag () {
-      return this.$store.getters.getCheckToolbar
+      return this.cardsStore.cardToolbarFlag
     },
     checkMobile () {
-      return !this.$vuetify.breakpoint.mobile
+      return !this.$vuetify.display.mobile
     },
   },
   methods: {
@@ -468,11 +475,38 @@ export default {
         this.$store.dispatch('getCardFromApi', this.$route.query.t)
       }
     },
-    handleClick() {
+    handleClick(direction) {
       this.btnDisabled = true; // Disable the button
+      
+      if (direction === 'prev' && this.selectedIndex > 0) {
+        this.selectedIndex--;
+        this.showPreviousCard();
+      } else if (direction === 'next' && this.selectedIndex < this.listOfCards.length - 1) {
+        this.selectedIndex++;
+        this.showNextCard();
+      }
+      
       setTimeout(() => {
         this.btnDisabled = false; // Enable the button after 2 seconds
-      }, 2000);
+      }, 1000);
+    },
+    showPreviousCard() {
+      const prevCard = this.listOfCards[this.selectedIndex];
+      if (prevCard) {
+        this.picCard = prevCard.cardPic;
+        this.thumbnailCard = prevCard.cardPicThumbnails;
+        this.textCard = prevCard.cardDetail;
+        this.tagsCard = prevCard.cardTags;
+      }
+    },
+    showNextCard() {
+      const nextCard = this.listOfCards[this.selectedIndex];
+      if (nextCard) {
+        this.picCard = nextCard.cardPic;
+        this.thumbnailCard = nextCard.cardPicThumbnails;
+        this.textCard = nextCard.cardDetail;
+        this.tagsCard = nextCard.cardTags;
+      }
     },
     infiniteScrolled () {
       setTimeout(() => {

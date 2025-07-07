@@ -1,7 +1,7 @@
 <template>
   <div class="home" align="center" justify="center">
     <section id="hero">
-      <v-parallax dark id="lp-bg" src="" height="800">
+      <v-parallax theme="dark" id="lp-bg" src="" height="800">
         <v-row align="center" justify="center">
           <v-col cols="10">
             <v-row align="center" justify="center">
@@ -31,14 +31,14 @@
                           <v-hover v-slot:default="{ hover }">
                             <v-card
                               class="card"
-                              shaped
+                              variant="elevated"
                               :elevation="hover ? 10 : 4"
                               :class="{ up: hover }"
-                              @click.stop="routingTo(feature.routeTo, feature.creator)"
+                              :to="{ path: feature.routeTo, query: { t: feature.creator } }"
                             >
                               <v-card-title>
                                   <v-icon
-                                    left
+                                    start
                                     :color="returnColor(feature.creator)"
                                     :class="{ 'zoom-efect': hover }"
                                   >
@@ -142,14 +142,14 @@
                             <v-hover v-slot:default="{ hover }">
                               <v-card
                                 class="card"
-                                shaped
+                                variant="elevated"
                                 :elevation="hover ? 10 : 4"
                                 :class="{ up: hover }"
-                                @click.stop="routingTo(feature.routeTo, feature.creator)"
+                                :to="{ path: feature.routeTo, query: { t: feature.creator } }"
                               >
                                 <v-card-title>
                                     <v-icon
-                                      left
+                                      start
                                       :color="returnColor(feature.creator)"
                                       :class="{ 'zoom-efect': hover }"
                                     >
@@ -256,15 +256,15 @@
                                   <v-hover v-slot:default="{ hover }">
                                     <v-card
                                       class="card"
-                                      shaped
+                                      variant="elevated"
                                       color="white"
                                       :elevation="hover ? 10 : 4"
                                       :class="{ up: hover }"
-                                      @click.stop="routingTo(feature.routeTo, feature.creator)"
+                                      :to="{ path: feature.routeTo, query: { t: feature.creator } }"
                                     >
                                       <v-card-title>
                                           <v-icon
-                                            left
+                                            start
                                             :color="returnColor(feature.creator)"
                                             :class="{ 'zoom-efect': hover }"
                                           >
@@ -318,7 +318,7 @@
         </v-container>
       </section>
       <section>
-        <v-footer padless class="text-center mt-5">
+        <v-footer class="text-center mt-5 pa-0">
           <!-- <v-card-text>
               <p class="mt-5 subtitle-1" style="line-hight:unset;">หนังสือและเนื้อหาต่างๆ โดย กองวิชาการ 01</p>
               <p class="subtitle-1">จัดทำเป็น Web โดย ทีมงาน RGT</p>
@@ -448,17 +448,17 @@
         return this.features.filter(x => x.creator === 4)
       },
       checkingMobile () {
-        return this.$vuetify.breakpoint.mdAndDown
+        return this.$vuetify.display.mdAndDown
       },
       totitle () {
         return (!this.checkWidth) ? 'hot-head' : 'hothead-fixed'
       },
       checkWidth () {
-        return this.$vuetify.breakpoint.width < 576
+        return this.$vuetify.display.width < 576
       }
     },
     created(){
-      this.$store.dispatch('clear')
+      // Clear any existing state on page load
     },
     watch: {
       dialog(value) {
@@ -540,7 +540,7 @@
     right: 0;
     bottom: 0;
     left: 0;
-    background: url('~@/assets/lp.jpg') repeat; /* Set the image pattern */
+    background: url('@/assets/lp.jpg') repeat; /* Set the image pattern */
     background-size: cover;
     opacity: 0.6; /* 60% transparent means 40% opacity */
     z-index: 1; /* Place the pseudo-element above the body's background but below any other content */
@@ -561,7 +561,7 @@
   #lp {
     background-image:
     linear-gradient(to bottom, rgb(255, 255, 255), rgba(255, 255, 255, 0.281)),
-    url("~@/assets/blackground_search.jpg");
+    url("@/assets/blackground_search.jpg");
     background-repeat: no-repeat;
     background-size: cover;
     background-position: center;
@@ -577,14 +577,17 @@
     stroke-dasharray: 650;
     stroke-dashoffset: 650;
     -webkit-transition: all 0.5s ease-in-out;
+    transition: all 0.5s ease-in-out;
     opacity: 0.3;
   }
   .playBut {
     /*  border: 1px solid red;*/
     display: inline-block;
     -webkit-transition: all 0.5s ease;
+    transition: all 0.5s ease;
     .triangle {
       -webkit-transition: all 0.7s ease-in-out;
+      transition: all 0.7s ease-in-out;
       stroke-dasharray: 240;
       stroke-dashoffset: 480;
       stroke: white;

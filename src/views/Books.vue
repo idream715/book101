@@ -15,8 +15,8 @@
                 <v-combobox
                   v-model="filterBookValue"
                   :items="items"
-                  outlined
-                  dense
+                  variant="outlined"
+                  density="compact"
                   label="เลือกชุดหนังสือ หรือ พิมพ์ชื่อหนังสือ"
                 ></v-combobox>
               </v-col>
@@ -24,7 +24,7 @@
                   <v-icon
                     color="primary"
                     v-if="filterBookValue"
-                    outlined
+                    variant="outlined"
                     @click="filterBookValue = null"
                     >
                     mdi-filter-remove
@@ -46,7 +46,8 @@
             <v-card
               class="mx-auto"
               max-width="160"
-              @click="bookSelect(n)"
+              :to="`/book/${n.bookId}`"
+              @click="trackBookClick(n)"
               >
               <v-img
                 :src="n.bookCoverThumbnails"
@@ -69,7 +70,8 @@
 </template>
 
 <script>
-
+import { useBooksStore } from '@/stores/books'
+import { useSearchStore } from '@/stores/search'
 
 export default {
   data() {
@@ -78,45 +80,50 @@ export default {
       filterBookValue:"",
     }
   },
+  setup() {
+    const booksStore = useBooksStore()
+    const searchStore = useSearchStore()
+    return { booksStore, searchStore }
+  },
   created() {
-
-  this.$store.dispatch('getBookFromApi', this.$route.query.t)
-
+    this.booksStore.getBooksFromApi(this.$route.query.t)
   },
   computed:{
     books(){
-      return this.$store.getters.getBooks
+      return this.booksStore.getBooks
     },
     filterBooks(){
+      const books = this.books || []
       if (this.filterBookValue && !this.items.includes(this.filterBookValue)) {
         console.log(`1`)
-        return this.books.filter(el => el.bookName.includes(this.filterBookValue))
+        return books.filter(el => el.bookName.includes(this.filterBookValue))
       } else if(this.filterBookValue && this.items.includes(this.filterBookValue)) {
         console.log(`12`)
-        return this.books.filter(el => el.categoryName === this.filterBookValue)
+        return books.filter(el => el.categoryName === this.filterBookValue)
       } else {
         console.log(`3`)
-        return this.books
+        return books
       }
     },
     loading(){
-      return this.$store.getters.getoverlay
+      return this.searchStore.getoverlay
     },
     items(){
-      return Array.from(new Set(this.$store.getters.getBooks.map(a => a.categoryName)))
+      return Array.from(new Set((this.booksStore.getBooks || []).map(a => a.categoryName)))
     },
 
   },
   methods: {
-    bookSelect(selected){
+    trackBookClick(selected){
       this.$gtag.event('view_book_from_click', {
           'event_category': 'view_item',
           'event_label': `Books Clicked: ${selected['bookName']}`,
           'value': `${Number(selected['bookId'])}`
         })
-
-      //new tab
-      console.log(selected)
+    },
+    bookSelect(selected){
+      // Legacy method - kept for compatibility
+      this.trackBookClick(selected)
       let openBook = this.$router.resolve({path: `/book/${selected['bookId']}`});
       window.open(openBook.href, '_blank');
     },

@@ -1,25 +1,34 @@
-import Vue from 'vue'
+import { createApp, configureCompat } from 'vue'
 import App from './App.vue'
 import router from './router'
-import store from './store'
-import vuetify from './plugins/vuetify';
-import VueGtag from "vue-gtag";
+import { pinia } from './stores'
+import vuetify from './plugins/vuetify'
+import VueGtag from "vue-gtag"
 import VueYouTubeEmbed from 'vue-youtube-embed'
+
+// Vuetify 3 styles
+import 'vuetify/styles'
 import 'roboto-fontface/css/roboto/roboto-fontface.css'
 import '@mdi/font/css/materialdesignicons.css'
 
+// Configure Vue 3 compatibility mode
+configureCompat({
+  COMPONENT_ASYNC: false,
+  GLOBAL_PROTOTYPE: 'suppress-warning',
+  COMPONENT_V_MODEL: 'suppress-warning',
+  INSTANCE_ATTRS_CLASS_STYLE: 'suppress-warning'
+})
 
-Vue.use(VueGtag, {
+const app = createApp(App)
+
+app.use(router)
+app.use(pinia)
+app.use(vuetify)
+app.use(VueGtag, {
   appName: 'Dhamma01.com',
   pageTrackerScreenviewEnabled: true,
   config: { id: "G-XFFXK5N9GH" }
-}, router);
-Vue.use(VueYouTubeEmbed)
-Vue.config.productionTip = false
+}, router)
+app.use(VueYouTubeEmbed)
 
-new Vue({
-  router,
-  store,
-  vuetify,
-  render: h => h(App)
-}).$mount('#app')
+app.mount('#app')

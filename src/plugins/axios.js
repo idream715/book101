@@ -1,10 +1,7 @@
 import axios from 'axios'
 
 // For development
-const isDev = process.env.NODE_ENV === 'development'
-let baseURL = 'https://api3.rgtcenter.com:2053/dm01'
-let searchURL = isDev ? '/api2' : 'https://dm01.code-th.com/books'
-const accessToken = 'dhamma101'
+let baseURL = 'https://api3.rgtcenter.com:2053/dm01/'
 
 const instance = axios.create({
   baseURL: baseURL,
@@ -13,27 +10,21 @@ const instance = axios.create({
   }
 });
 
-const instance2 = axios.create({
-  baseURL: searchURL,
-  headers: {
-    'Authorization': 'Bearer ' + accessToken
-  }
-});
-
-export default {
+// Legacy API for existing components
+export const callApi = {
   getData(action) {
-    let url = `${baseURL}`
-    url += action
-    return instance.get(url)
+    return instance.get(action)
   },
   postData(action, data) {
-    let url = `${baseURL}`
-    url += action
-    return instance.post(url, data)
+    return instance.post(action, data)
   },
   searchData(action, data) {
-    let url = `${searchURL}`
-    url += action
-    return instance2.post(url, data)
+    return instance.post(action, data)
   }
 }
+
+// Export main API instance for all operations
+export const searchApi = instance
+
+// Default export for backwards compatibility
+export default callApi

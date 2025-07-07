@@ -9,7 +9,7 @@
       ></v-skeleton-loader>
       <v-card-title class="justify-center">
         <div class="font-weight-bold">
-          {{ bookSelected.bookName }}
+          {{ bookSelected?.bookName || 'Loading...' }}
         </div>
       </v-card-title>
       <v-card-text >
@@ -46,7 +46,7 @@
             <v-img
               v-else
               width="250"
-              :src="bookSelected.bookCover"
+              :src="bookSelected?.bookCover"
               class="elevation-10"
             ></v-img>
           </v-col>
@@ -78,10 +78,10 @@
                 <span class="pink--text subtitle-1 font-weight-bold" v-text="sarabunTotal"></span>
               </p>
               <p>ชุดหนังสือ
-                <span class="pink--text subtitle-1 font-weight-bold" v-text="bookSelected.categoryName"></span>
+                <span class="pink--text subtitle-1 font-weight-bold" v-text="bookSelected?.categoryName"></span>
               </p>
               <v-btn
-                :href="bookSelected.bookPdf"
+                :href="bookSelected?.bookPdf"
                 target="_blank"
                 class="mr-3"
                 color="primary"
@@ -90,9 +90,9 @@
                 <div>PDF</div>
               </v-btn>
               <v-btn
-                v-show="bookSelected.bookText.includes('.txt')"
+                v-show="bookSelected.bookText && bookSelected.bookText.includes('.txt')"
                 class="mr-3"
-                :href="bookSelected.bookText"
+                :href="bookSelected?.bookText"
                 target="_blank"
                 color="primary"
                 >
@@ -102,8 +102,8 @@
               <v-btn
                 color="primary"
                 @click.prevent="downloadItem({
-                  url: bookSelected.bookPdf,
-                  label: bookSelected.bookName
+                  url: bookSelected?.bookPdf,
+                  label: bookSelected?.bookName
                 })"
               >
                 <v-icon class="mr-1">mdi-download</v-icon>
@@ -117,11 +117,11 @@
         class="mx-auto elevation-10"
       >
         <v-list>
-          <v-subheader
+          <v-list-subheader
             class="primary--text title d-flex justify-center font-weight-bold"
           >
             <h4 class="sara">สารบัญ</h4>
-          </v-subheader>
+          </v-list-subheader>
           <div v-for="(n,i) in 5" :key="i">
             <v-skeleton-loader
               v-if="loading"
@@ -132,53 +132,88 @@
             ></v-skeleton-loader>
           </div>
 
-          <v-list-item-group
-            active-class="primary--text"
-          >
-            <v-list-item v-for="(item, i) in sarabunSelected" :key="item.chapterId">
-              <template>
-                <v-list-item-avatar>
-                  <v-list-item-title> {{ i + 1 + `.` }}</v-list-item-title>
-                </v-list-item-avatar>
+          <v-list>
+            <template v-for="(item, i) in sarabunSelected" :key="item.chapterId">
+              <v-list-item>
+                <template v-slot:prepend>
+                  <v-avatar color="grey-lighten-1">
+                    <span>{{ i + 1 }}.</span>
+                  </v-avatar>
+                </template>
 
-                <v-list-item-content>
-                  <v-list-item-title style="line-height: unset;">{{ item.chapterHeading }}</v-list-item-title>
-                </v-list-item-content>
-                <v-btn
-                  v-show="item.chapterLinkYouTube.length > 0"
-                  icon
-                  @click="showDialogYoutube(item.chapterLinkYouTube)"
-                >
-                  <v-icon color="red">mdi-youtube</v-icon>
-                </v-btn>
+                <v-list-item-title style="line-height: unset;">{{ item.chapterHeading }}</v-list-item-title>
 
-
-                <v-list-item-action>
-                </v-list-item-action>
-                <v-list-item-action>
-                  <v-btn :href="item.chapterLinkPdf" target="_blank" icon>
-                    <v-icon :color="item.chapterLinkPdf.length > 0 ? 'red' : 'grey'">mdi-file-pdf</v-icon>
+                <template v-slot:append>
+                  <v-btn
+                    v-show="item.chapterLinkYouTube && item.chapterLinkYouTube.length > 0"
+                    variant="text"
+                    icon
+                    @click="showDialogYoutube(item.chapterLinkYouTube)"
+                  >
+                    <v-icon color="red">mdi-youtube</v-icon>
                   </v-btn>
-                </v-list-item-action>
-                <v-list-item-action>
-                <v-btn
-                    @click="readText(item.chapterHeading,item.chapterDetail)"
-                    text icon
-                    >
-                    <v-icon :color="item.chapterDetail ? 'blue': 'grey'">
+
+                  <v-btn :href="item.chapterLinkPdf" target="_blank" icon variant="text">
+                    <v-icon :color="item.chapterLinkPdf && item.chapterLinkPdf.length > 0 ? 'red' : 'grey'">mdi-file-pdf-box</v-icon>
+                  </v-btn>
+
+                  <v-dialog max-width="800" v-if="item.chapterDetail">
+                    <template v-slot:activator="{ props: activatorProps }">
+                      <v-btn
+                        v-bind="activatorProps"
+                        variant="text" icon
+                      >
+                        <v-icon color="blue">
+                          mdi-book-open-page-variant
+                        </v-icon>
+                      </v-btn>
+                    </template>
+
+                    <template v-slot:default="{ isActive }">
+                      <v-card>
+                        <v-card-title class="d-flex justify-center">
+                          {{ item.chapterHeading }}
+                        </v-card-title>
+                        <v-card-text style="white-space: pre-wrap;" class="d-flex justify-center">
+                          {{ item.chapterDetail }}
+                        </v-card-text>
+                        <v-card-actions>
+                          <v-btn
+                            color="primary"
+                            variant="text"
+                            @click="copyTextDetail(item.chapterDetail)"
+                          >
+                            คัดลอก
+                          </v-btn>
+                          <v-btn
+                            color="primary"
+                            variant="text"
+                            @click="isActive.value = false"
+                          >
+                            ออก
+                          </v-btn>
+                        </v-card-actions>
+                      </v-card>
+                    </template>
+                  </v-dialog>
+                  <v-btn
+                    v-else
+                    variant="text" icon
+                    disabled
+                  >
+                    <v-icon color="grey">
                       mdi-book-open-page-variant
                     </v-icon>
                   </v-btn>
-                </v-list-item-action>
-              </template>
-            </v-list-item>
-            <v-divider
-              v-if="i + 1 < sarabunSelected.length"
-              :key="i"
-            ></v-divider>
-          </v-list-item-group>
+                </template>
+              </v-list-item>
+              <v-divider
+                v-if="i + 1 < (sarabunSelected || []).length"
+              ></v-divider>
+            </template>
+          </v-list>
           <v-row>
-            <v-col cols="12" v-if="sarabunSelected.length>0 && sarabunSelected.length < sarabunTotal">
+            <v-col cols="12" v-if="(sarabunSelected || []).length>0 && (sarabunSelected || []).length < sarabunTotal">
               <v-skeleton-loader
                 v-for="n in 3"
                 :key="n"
@@ -202,38 +237,8 @@
           ></youtube>
           <v-card-actions>
             <v-spacer></v-spacer>
-            <v-btn color="accent lighten-1" text target="_blank" :href="videoURL">เข้าสู่เว็บหลักYoutube</v-btn>
-            <v-btn color="accent lighten-1" text @click="closeDialogYoutube">ออก</v-btn>
-          </v-card-actions>
-        </v-card>
-      </v-dialog>
-      <v-dialog
-        v-model="dialogReadText"
-        max-width="800"
-        class="elevation-10"
-      >
-        <v-card >
-          <v-card-title class="d-flex justify-center">
-            {{ textSarabun }}
-          </v-card-title>
-          <v-card-text style="white-space: pre-wrap;" class="d-flex justify-center" ref="textCopy">
-            {{  textDetail  }}
-          </v-card-text>
-          <v-card-actions class="justify-end">
-            <v-btn
-              color="primary"
-              text
-              @click.stop.prevent="copyTextDetail"
-            >
-              {{word_copy}}
-            </v-btn>
-            <v-btn
-              color="primary"
-              text
-              @click="dialogReadText = false"
-            >
-              ออก
-            </v-btn>
+            <v-btn color="accent lighten-1" variant="text" target="_blank" :href="videoURL">เข้าสู่เว็บหลักYoutube</v-btn>
+            <v-btn color="accent lighten-1" variant="text" @click="closeDialogYoutube">ออก</v-btn>
           </v-card-actions>
         </v-card>
       </v-dialog>
@@ -243,17 +248,21 @@
 
 <script>
   import Axios from 'axios'
+  import { useBooksStore } from '@/stores/books'
+  import { useSearchStore } from '@/stores/search'
+
   export default {
+    setup() {
+      const booksStore = useBooksStore()
+      const searchStore = useSearchStore()
+      return { booksStore, searchStore }
+    },
     props: {
       id: String
     },
     data() {
       return {
-        dialogReadText: false,
         itemsPerPage: 50,
-        textSarabun:"",
-        textDetail:``,
-        word_copy:'คัดลอก',
         dialogYoutube: false,
         videoId: '',
         videoURL: ''
@@ -265,8 +274,8 @@
           'page_path': `/${this.$route.params.id}`,
         })
 
-      this.$store.dispatch('setbook_index',this.id)
-      this.$store.dispatch('setFirstSarabun', {limit:this.itemsPerPage, offset:0, book_id: this.id})
+      this.booksStore.setbook(this.id)
+      this.booksStore.setSarabun({bookId: this.id, offset: 0})
     },
     methods: {
       showDialogYoutube (url) {
@@ -285,31 +294,35 @@
         this.videoURL = ''
         this.videoId = ''
       },
-      readText(sarabun,detail){
-        this.dialogReadText = !this.dialogReadText
-        window.getSelection().removeAllRanges()
-        this.textSarabun = sarabun
-        this.textDetail = detail
-        this.word_copy = 'คัดลอก'
-      },
-      copyTextDetail () {
-        this.selectText(this.$refs.textCopy); // e.g. <div ref="text">
-
-        try {
-          var successful = document.execCommand('copy');
-          var msg = successful ? 'คัดลอกแล้ว' : 'คัดลอกไม่สำเร็จ';
-          this.word_copy = `${msg}`
-        } catch (err) {
-          alert('Oops, unable to copy');
+      copyTextDetail (text) {
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(text).then(() => {
+            console.log('Text copied to clipboard');
+          }).catch(err => {
+            console.error('Failed to copy text: ', err);
+          });
+        } else {
+          // Fallback for older browsers
+          try {
+            const textArea = document.createElement('textarea');
+            textArea.value = text;
+            document.body.appendChild(textArea);
+            textArea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textArea);
+            console.log('Text copied using fallback method');
+          } catch (err) {
+            console.error('Failed to copy text: ', err);
+          }
         }
       },
       nextLoading(){
-        let timesLoaded = Math.ceil(this.$store.getters.getSarabun.length/this.itemsPerPage)
+        let timesLoaded = Math.ceil(this.booksStore.getSarabuns.length/this.itemsPerPage)
         if(timesLoaded<this.pages){
           timesLoaded += 1
           let offset = 0
           offset = timesLoaded*this.itemsPerPage-this.itemsPerPage;
-          this.$store.dispatch('setContinueToLoad', {limit:this.itemsPerPage, offset:offset, book_id : this.id})
+          this.booksStore.setSarabun({bookId: this.id, offset: offset})
         }
       },
       selectText(element) {
@@ -360,19 +373,19 @@
     },
     computed: {
         bookSelected(){
-          return this.$store.getters.getBookSelected
+          return this.booksStore.getbook || {}
         },
         sarabunSelected(){
-          return this.$store.getters.getSarabun
+          return this.booksStore.getSarabuns || []
         },
         sarabunTotal(){
-          return this.$store.getters.getTotalSarabun
+          return this.booksStore.getTotalSarabun || 0
         },
         pages(){
           return Math.ceil(this.sarabunTotal/this.itemsPerPage)
         },
         loading(){
-          return this.$store.getters.getoverlay
+          return this.searchStore.getoverlay
         },
       }
   }

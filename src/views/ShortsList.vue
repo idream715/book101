@@ -5,7 +5,7 @@
         <v-progress-circular indeterminate size="64"></v-progress-circular>
       </v-overlay> -->
 
-      <v-card shaped class="my-6" color="info">
+      <v-card variant="elevated" class="my-6" color="info">
         <v-card-text v-show="show">
           <v-row>
             <v-col col="12">
@@ -13,14 +13,14 @@
                 v-model="model"
                 :filter="filter"
                 :hide-no-data="!search"
-                :search-input.sync="search"
+                v-model:search-input="search"
                 hide-selected
                 label="ค้นหาข้อความปกิณกะ"
                 :delimiters="space"
                 multiple
                 small-chips
-                dense
-                outlined
+                density="compact"
+                variant="outlined"
               >
                 <template v-slot:no-data>
                   <v-list-item>
@@ -191,8 +191,8 @@
               </v-card>
               <v-card-actions>
                 <v-spacer></v-spacer>
-                <v-btn color="primary lighten-1" text @click="copyTextDetail">{{word_copy}}</v-btn>
-                <v-btn color="primary lighten-1" text @click="close">ออก</v-btn>
+                <v-btn color="primary lighten-1" variant="text" @click="copyTextDetail">{{word_copy}}</v-btn>
+                <v-btn color="primary lighten-1" variant="text" @click="close">ออก</v-btn>
 
               </v-card-actions>
               </v-card>

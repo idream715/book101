@@ -6,24 +6,23 @@
       gradient="to bottom, rgba(255,255,255, 0.5), rgba(255,255,255, 0.2)"
     >
       <div v-if="opn" align="end">
-        <v-btn v-if="checkHome" dark router-link to="/Cards" text>
+        <v-btn v-if="checkHome" variant="text" theme="dark" router-link to="/Cards">
           <v-icon class="mr-2">mdi-card-search</v-icon>การ์ดธรรมะ
         </v-btn>
-        <v-btn v-else dark router-link to="/" text>
+        <v-btn v-else variant="text" theme="dark" router-link to="/">
           <v-icon class="mr-2">mdi-home</v-icon>หน้าหลัก
         </v-btn>
-        <v-btn dark @click="routingTo('books', creatorComputed)" text>
+        <v-btn variant="text" theme="dark" @click="routingTo('books', creatorComputed)">
           <v-icon class="mr-2">mdi-book</v-icon>หนังสือธรรมะ
         </v-btn>
-        <v-btn dark router-link to="/About" text>
+        <v-btn variant="text" theme="dark" router-link to="/About">
           <v-icon class="mr-2">mdi-information-outline</v-icon>เกี่ยวกับ
         </v-btn>
       </div>
       <!-- แถบเมนูโทรศัพท์ -->
       <div v-else align="end" class="mr-5">
         <v-menu
-        bottom
-        left
+        location="bottom start"
       >
         <template v-slot:activator="{ on }">
           <v-btn
@@ -89,7 +88,7 @@
                     :hide-no-data="!search"
                     :items="items"
                     :menu-props="{ top: true, closeOnClick: false, offsetY: true }"
-                    :search-input.sync="search"
+                    v-model:search-input="search"
                     hide-selected
                     :label="labelSearch"
                     multiple
@@ -170,8 +169,16 @@
 </template>
 
 <script>
+import { useSearchStore } from '@/stores/search'
+import { useBooksStore } from '@/stores/books'
+
 export default {
   name: 'SearchPage',
+  setup() {
+    const searchStore = useSearchStore()
+    const booksStore = useBooksStore()
+    return { searchStore, booksStore }
+  },
   data: () => ({
     drawer: false,
     fab: false,
@@ -193,7 +200,7 @@ export default {
     words_search:[],
   }),
   created(){
-      this.$store.dispatch('clear')
+      this.searchStore.clear()
   },
   mounted () {
   },
@@ -213,7 +220,7 @@ export default {
       }
     },
     text_exp(){
-      if (this.$vuetify.breakpoint.xsOnly){
+      if (this.$vuetify.display.xs){
         return 'ที่แป้นพิมพ์เพื่อยืนยัน'
       }
         return  '(spacebar,เว้นวรรค) ที่แป้นพิมพ์เพื่อยืนยัน'
@@ -249,13 +256,13 @@ export default {
       }
     },
     mr12 (){
-      if (this.$vuetify.breakpoint.smOnly){
+      if (this.$vuetify.display.sm){
         return 'mr-12'
       }
         return false
     },
     ml12 (){
-      if (this.$vuetify.breakpoint.smOnly){
+      if (this.$vuetify.display.sm){
         return 'ml-12'
       }
         return false
@@ -273,16 +280,16 @@ export default {
         return false
     },
     opn () {
-      return !this.$vuetify.breakpoint.xsOnly
+      return !this.$vuetify.display.xs
     },
     wn () {
-      return this.$vuetify.breakpoint.xsOnly
+      return this.$vuetify.display.xs
     },
     random(){
-      return this.$store.getters.getsearchrandom
+      return this.searchStore.search_random
     },
     setoverlay(){
-      return this.$store.getters.getoverlay
+      return this.searchStore.overlay
     },
 
 
@@ -295,32 +302,32 @@ export default {
     clicksearch_home(input){
       if(input.length!==0 && this.$route.query.t){
         this.$router.push({ path: '/Indexs', query: { t : this.$route.query.t }});
-        this.$store.dispatch('setFirstIndexsFromApi',{ words:input, page:0, creator: this.$route.query.t })
+        this.searchStore.setFirstIndexsFromApi({ words:input, page:0, creator: this.$route.query.t })
       }else{
         this.labelSearch = 'กรุณาใส่คำที่่ต้องการค้นหา'
       }
     },
     searchrandom(){
-      this.$store.dispatch('clear')
-      this.$store.dispatch('setSearchRandom', { creator: this.$route.query.t })
+      this.searchStore.clear()
+      this.searchStore.setSearchRandom({ creator: this.$route.query.t })
       this.dialog=true
     },
     closs(){
       this.dialog=false
-      this.$store.dispatch('clear')
+      this.searchStore.clear()
     },
     onScroll (e) {
       if (typeof window === 'undefined') return
-      const top = window.pageYOffset ||   e.target.scrollTop || 0
+      const top = window.scrollY || e.target?.scrollTop || 0
       this.fab = top > 30
     },
     toTop () {
-      this.$vuetify.goTo(0)
+      window.scrollTo({ top: 0, behavior: 'smooth' })
     },
     clearBook(){
       this.page = 1
-      this.$store.dispatch('clearSarabun')
-      this.$store.dispatch('clearTotalsSarabun')
+      this.booksStore.clearSarabun()
+      this.booksStore.clearTotalsSarabun()
     },
     filter (item, queryText, itemText) {
       if (item.header) return false

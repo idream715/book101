@@ -10,7 +10,7 @@
                 :filter="filter"
                 :hide-no-data="!search"
                 :items="items"
-                :search-input.sync="search"
+                v-model:search-input="search"
                 hide-selected
                 :label="label_search"
                 multiple
@@ -127,8 +127,8 @@
                     >
                       <v-icon>mdi-youtube</v-icon>
                     </v-btn>
-                    <v-btn v-show="index.chapterLinkPdf.includes('.pdf')" text color="red" style="margin-right:10px;" target="_blank" :href="index.chapterLinkPdf">PDF</v-btn>
-                    <v-btn text color="blue lighten-1" @click="dialogs(index.mark_index,index.chapterDetail,index.mark_details,index.bookName,index.bookId)">อ่านทั้งหมด</v-btn>
+                    <v-btn v-show="index.chapterLinkPdf.includes('.pdf')" variant="text" color="red" style="margin-right:10px;" target="_blank" :href="index.chapterLinkPdf">PDF</v-btn>
+                    <v-btn variant="text" color="blue lighten-1" @click="dialogs(index.mark_index,index.chapterDetail,index.mark_details,index.bookName,index.bookId)">อ่านทั้งหมด</v-btn>
                   </v-card-actions>
                 </v-col>
             </v-card><hr>
@@ -144,8 +144,8 @@
                 ></youtube>
                 <v-card-actions>
                   <v-spacer></v-spacer>
-                  <v-btn color="primary lighten-1" text target="_blank" :href="videoURL">เข้าสู่เว็บหลักYoutube</v-btn>
-                  <v-btn color="primary lighten-1" text @click="closeDialogYoutube">ออก</v-btn>
+                  <v-btn color="primary lighten-1" variant="text" target="_blank" :href="videoURL">เข้าสู่เว็บหลักYoutube</v-btn>
+                  <v-btn color="primary lighten-1" variant="text" @click="closeDialogYoutube">ออก</v-btn>
                 </v-card-actions>
               </v-card>
             </v-dialog>
@@ -156,7 +156,7 @@
               <v-card class="d-flex justify-center" flat>
                 <v-card class="max-width-auto"  flat>
                   <div class=" lighten-2 pa-5" style="line-height:2;font-size:24px;" v-html="head_content" ></div>
-                  <v-list-item-title class="grey--text "><v-btn text color="primary lighten-1" @click="clickedSendbook(book_id)" :disabled="!book_id"><v-icon small class="mr-2">mdi-book-open-page-variant</v-icon>จากหนังสือ:{{frombook}}</v-btn></v-list-item-title>
+                  <v-list-item-title class="grey--text "><v-btn variant="text" color="primary lighten-1" @click="clickedSendbook(book_id)" :disabled="!book_id"><v-icon small class="mr-2">mdi-book-open-page-variant</v-icon>จากหนังสือ:{{frombook}}</v-btn></v-list-item-title>
                 <div >
                   <div class="pa-5" ref="textCopy" v-html="content_copy" style="font-size: 17px; white-space: pre-wrap;" ></div>
                 </div>
@@ -165,8 +165,8 @@
               </v-card>
               <v-card-actions>
                 <v-spacer></v-spacer>
-                <v-btn color="primary lighten-1" text @click="copyTextDetail">{{word_copy}}</v-btn>
-                <v-btn color="primary lighten-1" text @click="closs">ออก</v-btn>
+                <v-btn color="primary lighten-1" variant="text" @click="copyTextDetail">{{word_copy}}</v-btn>
+                <v-btn color="primary lighten-1" variant="text" @click="closs">ออก</v-btn>
 
               </v-card-actions>
               </v-card>
