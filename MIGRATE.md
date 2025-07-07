@@ -5,7 +5,7 @@ This file provides comprehensive guidance for migrating the Vue.js 2 Buddhist co
 ## Migration Overview
 
 **Current Stack:** Vue 2.6.11 + Vuetify 2.7.2 + Vue CLI 4.3.0 + Vuex 3.1.3
-**Target Stack:** Vue 3.4.x + Vuetify 3.5.x + Vite 5.x + Pinia
+**Target Stack:** Vue 3.5.x + Vuetify 3.8.x + Vite 5.x + Pinia
 
 **Critical Context:** This is a Buddhist content platform with 3-author search system, complex infinite scroll, and Thai language support.
 
@@ -26,8 +26,8 @@ This file provides comprehensive guidance for migrating the Vue.js 2 Buddhist co
 - [ ] **TASK-CODE-003:** Update package.json dependencies (Phase 1)
   ```json
   {
-    "vue": "^3.4.0",
-    "@vue/compat": "^3.4.0",
+    "vue": "^3.5.0",
+    "@vue/compat": "^3.5.0",
     "vite": "^5.0.0",
     "@vitejs/plugin-vue": "^5.0.0"
   }
@@ -78,7 +78,7 @@ This file provides comprehensive guidance for migrating the Vue.js 2 Buddhist co
 **Phase 1: Vuetify 3 Foundation**
 - [ ] **TASK-UI-001:** Install Vuetify 3 with Vite plugin
   ```bash
-  yarn add vuetify@^3.5.0
+  yarn add vuetify@^3.8.0
   yarn add @mdi/font@^7.4.0
   ```
 - [ ] **TASK-UI-002:** Update Vuetify configuration
@@ -161,7 +161,7 @@ This file provides comprehensive guidance for migrating the Vue.js 2 Buddhist co
 
 **Requirements for Migration:**
 - **Vite 5.x:** Requires Node.js 20.19+ or 22.12+
-- **Vue 3.4.x:** Requires Node.js 16+ (but 20+ recommended)
+- **Vue 3.5.x:** Requires Node.js 18+ (but 20+ recommended)
 - **Current Status:** v22.14.0 LTS meets all requirements
 
 **Available Node.js versions (nvm list):**
