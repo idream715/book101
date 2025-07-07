@@ -63,6 +63,7 @@ This file provides comprehensive guidance for migrating the Vue.js 2 Buddhist co
   - Verify keyword highlighting with `<mark>` tags
   - Test search result ranking by match count
   - Validate infinite scroll pagination
+  - **Test URL parameter search redirect** (`/search?word1=ธรรม`)
 - [ ] **TASK-CODE-012:** Test multi-author system
   - Verify creator ID routing (1, 2, 4)
   - Test content filtering by author
@@ -106,6 +107,7 @@ This file provides comprehensive guidance for migrating the Vue.js 2 Buddhist co
   - Fix Sarabun.vue chapter display
   - Migrate ShortsList.vue layout
   - Update Gallery.vue if needed
+  - **Add swipe navigation to CardsList.vue dialog** (ก่อนหน้า/ถัดไป buttons)
 
 **Phase 3: Component API Updates**
 - [ ] **TASK-UI-007:** Fix deprecated component props
@@ -142,13 +144,15 @@ This file provides comprehensive guidance for migrating the Vue.js 2 Buddhist co
 
 ### ✅ Core Functionality Testing
 - [ ] Search with Thai keywords works correctly
+- [ ] **URL parameter search redirect** (`/search?word1=ธรรม`) works
 - [ ] Infinite scroll loads more content
 - [ ] Creator-based routing (/?t=1, /?t=2, /?t=4) functions
+- [ ] **Card view features** (copy text, download images, swipe navigation)
 - [ ] YouTube embed plays videos
 - [ ] PDF links open correctly
 - [ ] Firebase deployment succeeds
 
-### ✅ UI/UX Testing  
+### ✅ UI/UX Testing
 - [ ] All 3 author sections display properly
 - [ ] Mobile responsiveness maintained
 - [ ] Thai fonts render correctly
@@ -197,14 +201,16 @@ cat package.json | grep -A 20 "dependencies"
 ### Critical Context to Remember
 1. **Multi-Author System:** 3 creators (ID: 1, 2, 4) with separate content
 2. **Search Complexity:** Keyword highlighting, infinite scroll, ranking
-3. **Thai Language:** Must preserve font rendering and language support
-4. **Mobile-First:** Responsive design is critical
-5. **Firebase Deployment:** Build process must remain compatible
+3. **URL Parameter Search:** Direct search via `/search?word1=ธรรม` auto-redirects
+4. **Card View Features:** Copy text, download images, swipe navigation
+5. **Thai Language:** Must preserve font rendering and language support
+6. **Mobile-First:** Responsive design is critical
+7. **Firebase Deployment:** Build process must remain compatible
 
 ## Emergency Rollback Plan
 ```bash
 # If migration fails critically:
-git checkout master
+git checkout dev
 yarn install
 yarn dev  # Should restore working state
 ```
