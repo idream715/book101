@@ -161,7 +161,8 @@
                     <template v-slot:activator="{ props: activatorProps }">
                       <v-btn
                         v-bind="activatorProps"
-                        variant="text" icon
+                        variant="text" 
+                        icon
                       >
                         <v-icon color="blue">
                           mdi-book-open-page-variant
@@ -246,149 +247,138 @@
   </div>
 </template>
 
-<script>
-  import Axios from 'axios'
-  import { useBooksStore } from '@/stores/books'
-  import { useSearchStore } from '@/stores/search'
+<script setup>
+import { ref, computed, onMounted, getCurrentInstance } from 'vue'
+import { useRoute } from 'vue-router'
+import Axios from 'axios'
+import { useBooksStore } from '@/stores/books'
+import { useSearchStore } from '@/stores/search'
 
-  export default {
-    setup() {
-      const booksStore = useBooksStore()
-      const searchStore = useSearchStore()
-      return { booksStore, searchStore }
-    },
-    props: {
-      id: String
-    },
-    data() {
-      return {
-        itemsPerPage: 50,
-        dialogYoutube: false,
-        videoId: '',
-        videoURL: ''
-      }
-    },
-    created() {
-      this.$gtag.event('page_view', {
-          'page_title': 'Book101 Sarabun',
-          'page_path': `/${this.$route.params.id}`,
-        })
+const props = defineProps({
+  id: String
+})
 
-      this.booksStore.setbook(this.id)
-      this.booksStore.setSarabun({bookId: this.id, offset: 0})
-    },
-    methods: {
-      showDialogYoutube (url) {
+const route = useRoute()
+const booksStore = useBooksStore()
+const searchStore = useSearchStore()
+const { $gtag } = getCurrentInstance().appContext.config.globalProperties
 
-        this.dialogYoutube = !this.dialogYoutube
-        const regExp = /^.*((youtu.be\/)|(v\/)|(\/u\/\w\/)|(embed\/)|(watch\?))\??v?=?([^#&?]*).*/
-        const match = url.match(regExp)
+const itemsPerPage = ref(50)
+const dialogYoutube = ref(false)
+const videoId = ref('')
+const videoURL = ref('')
 
-        let vid = (match && match[7].length == 11) ? match[7] : false
+const bookSelected = computed(() => booksStore.getbook || {})
+const sarabunSelected = computed(() => booksStore.getSarabuns || [])
+const sarabunTotal = computed(() => booksStore.getTotalSarabun || 0)
+const pages = computed(() => Math.ceil(sarabunTotal.value / itemsPerPage.value))
+const loading = computed(() => searchStore.getoverlay)
 
-        this.videoURL = url
-        this.videoId = vid
-      },
-      closeDialogYoutube () {
-        this.dialogYoutube = !this.dialogYoutube
-        this.videoURL = ''
-        this.videoId = ''
-      },
-      copyTextDetail (text) {
-        if (navigator.clipboard && navigator.clipboard.writeText) {
-          navigator.clipboard.writeText(text).then(() => {
-            console.log('Text copied to clipboard');
-          }).catch(err => {
-            console.error('Failed to copy text: ', err);
-          });
-        } else {
-          // Fallback for older browsers
-          try {
-            const textArea = document.createElement('textarea');
-            textArea.value = text;
-            document.body.appendChild(textArea);
-            textArea.select();
-            document.execCommand('copy');
-            document.body.removeChild(textArea);
-            console.log('Text copied using fallback method');
-          } catch (err) {
-            console.error('Failed to copy text: ', err);
-          }
-        }
-      },
-      nextLoading(){
-        let timesLoaded = Math.ceil(this.booksStore.getSarabuns.length/this.itemsPerPage)
-        if(timesLoaded<this.pages){
-          timesLoaded += 1
-          let offset = 0
-          offset = timesLoaded*this.itemsPerPage-this.itemsPerPage;
-          this.booksStore.setSarabun({bookId: this.id, offset: offset})
-        }
-      },
-      selectText(element) {
-        var range;
-        if (document.selection) {
-          // IE
-          range = document.body.createTextRange();
-          range.moveToElementText(element);
-          range.select();
-        } else if (window.getSelection) {
-          range = document.createRange();
-          range.selectNode(element);
-          window.getSelection().removeAllRanges();
-          window.getSelection().addRange(range);
-        }
-      },
-      downloadItem ({ url, label }) {
-        const namepdf = this.extractPdfFileName(url)
-        Axios({
-          url: `https://one.rgtcenter.com/dm01/api/download/book/${namepdf}`,
-          method: 'GET',
-          responseType: 'blob',
-        })
-          .then(response => {
-            const blob = new Blob([response.data], { type: 'application/pdf' })
-            const link = document.createElement('a')
-            link.href = window.URL.createObjectURL(blob)
-            link.setAttribute('download', `${label}.pdf`)
-            document.body.appendChild(link)
-            // link.download = label
-            link.click()
-            // URL.revokeObjectURL(link.href)
-            link.parentNode.removeChild(link);
-          }).catch(console.error)
-      },
-      extractPdfFileName(x) {
-        // Split the URL by '/' and get the last part
-        const parts = x.split('/');
-        const lastPart = parts[parts.length - 1];
+const showDialogYoutube = (url) => {
+  dialogYoutube.value = !dialogYoutube.value
+  const regExp = /^.*((youtu.be\/)|(v\/)|(\/u\/\w\/)|(embed\/)|(watch\?))\??v?=?([^#&?]*).*/
+  const match = url.match(regExp)
 
-        // Optional: Check if the last part ends with '.pdf'
-        if (lastPart.endsWith('.pdf')) {
-            return lastPart;
-        } else {
-            return null; // or handle this case as you see fit
-        }
-      }
-    },
-    computed: {
-        bookSelected(){
-          return this.booksStore.getbook || {}
-        },
-        sarabunSelected(){
-          return this.booksStore.getSarabuns || []
-        },
-        sarabunTotal(){
-          return this.booksStore.getTotalSarabun || 0
-        },
-        pages(){
-          return Math.ceil(this.sarabunTotal/this.itemsPerPage)
-        },
-        loading(){
-          return this.searchStore.getoverlay
-        },
-      }
+  let vid = (match && match[7].length == 11) ? match[7] : false
+
+  videoURL.value = url
+  videoId.value = vid
+}
+
+const closeDialogYoutube = () => {
+  dialogYoutube.value = !dialogYoutube.value
+  videoURL.value = ''
+  videoId.value = ''
+}
+
+const copyTextDetail = (text) => {
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(text).then(() => {
+      console.log('Text copied to clipboard')
+    }).catch(err => {
+      console.error('Failed to copy text: ', err)
+    })
+  } else {
+    // Fallback for older browsers
+    try {
+      const textArea = document.createElement('textarea')
+      textArea.value = text
+      document.body.appendChild(textArea)
+      textArea.select()
+      document.execCommand('copy')
+      document.body.removeChild(textArea)
+      console.log('Text copied using fallback method')
+    } catch (err) {
+      console.error('Failed to copy text: ', err)
+    }
   }
+}
+
+const nextLoading = () => {
+  let timesLoaded = Math.ceil(booksStore.getSarabuns.length / itemsPerPage.value)
+  if (timesLoaded < pages.value) {
+    timesLoaded += 1
+    let offset = 0
+    offset = timesLoaded * itemsPerPage.value - itemsPerPage.value
+    booksStore.setSarabun({ bookId: props.id, offset: offset })
+  }
+}
+
+const selectText = (element) => {
+  var range
+  if (document.selection) {
+    // IE
+    range = document.body.createTextRange()
+    range.moveToElementText(element)
+    range.select()
+  } else if (window.getSelection) {
+    range = document.createRange()
+    range.selectNode(element)
+    window.getSelection().removeAllRanges()
+    window.getSelection().addRange(range)
+  }
+}
+
+const downloadItem = ({ url, label }) => {
+  const namepdf = extractPdfFileName(url)
+  Axios({
+    url: `https://one.rgtcenter.com/dm01/api/download/book/${namepdf}`,
+    method: 'GET',
+    responseType: 'blob',
+  })
+    .then(response => {
+      const blob = new Blob([response.data], { type: 'application/pdf' })
+      const link = document.createElement('a')
+      link.href = window.URL.createObjectURL(blob)
+      link.setAttribute('download', `${label}.pdf`)
+      document.body.appendChild(link)
+      link.click()
+      link.parentNode.removeChild(link)
+    }).catch(console.error)
+}
+
+const extractPdfFileName = (x) => {
+  // Split the URL by '/' and get the last part
+  const parts = x.split('/')
+  const lastPart = parts[parts.length - 1]
+
+  // Optional: Check if the last part ends with '.pdf'
+  if (lastPart.endsWith('.pdf')) {
+    return lastPart
+  } else {
+    return null // or handle this case as you see fit
+  }
+}
+
+onMounted(() => {
+  $gtag.event('page_view', {
+    'page_title': 'Book101 Sarabun',
+    'page_path': `/${route.params.id}`,
+  })
+
+  booksStore.setbook(props.id)
+  booksStore.setSarabun({ bookId: props.id, offset: 0 })
+})
 </script>
 
 <style>

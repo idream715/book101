@@ -5,16 +5,15 @@
   </div>
 </template>
 
-<script>
-export default {
-  data () {
-      return {
-      }
-    }, 
-  created(){
-      this.$store.dispatch('clear')
-  },
-}
+<script setup>
+import { onMounted } from 'vue'
+import { useCardsStore } from '@/stores/cards'
+
+const cardsStore = useCardsStore()
+
+onMounted(() => {
+  cardsStore.clear()
+})
 </script>
 
 <style>

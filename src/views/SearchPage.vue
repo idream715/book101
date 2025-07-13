@@ -24,11 +24,11 @@
         <v-menu
         location="bottom start"
       >
-        <template v-slot:activator="{ on }">
+        <template v-slot:activator="{ props: activatorProps }">
           <v-btn
+            v-bind="activatorProps"
             icon
             color="white"
-            v-on="on"
           >
             <v-icon>mdi-dots-vertical</v-icon>
           </v-btn>
@@ -37,28 +37,28 @@
         <v-list>
           <v-list-item v-if="checkHome">
             <v-list-item-title>
-              <v-btn router-link to="/Cards" text>
+              <v-btn router-link to="/Cards" variant="text">
                 <v-icon class="mr-2"></v-icon><v-icon class="mr-4">mdi-card-search</v-icon>การ์ดธรรมะ
               </v-btn>
             </v-list-item-title>
           </v-list-item>
           <v-list-item v-else>
             <v-list-item-title>
-              <v-btn router-link to="/" text>
+              <v-btn router-link to="/" variant="text">
                 <v-icon class="mr-2"></v-icon><v-icon class="mr-4">mdi-home</v-icon>หน้าหลัก
               </v-btn>
             </v-list-item-title>
           </v-list-item>
           <v-list-item>
             <v-list-item-title>
-              <v-btn router-link to="/Books" text>
+              <v-btn router-link to="/Books" variant="text">
                 <v-icon class="mr-2"></v-icon><v-icon class="mr-4">mdi-book</v-icon>หนังสือธรรมะ
               </v-btn>
             </v-list-item-title>
           </v-list-item>
           <v-list-item>
             <v-list-item-title>
-              <v-btn router-link to="/About" text>
+              <v-btn router-link to="/About" variant="text">
                 <v-icon class="mr-2"></v-icon><v-icon class="mr-4">mdi-information</v-icon>เกี่ยวกับ
               </v-btn>
             </v-list-item-title>
@@ -88,12 +88,12 @@
                     :hide-no-data="!search"
                     :items="items"
                     :menu-props="{ top: true, closeOnClick: false, offsetY: true }"
-                    v-model:search-input="search"
+                    v-model:search="search"
                     hide-selected
                     :label="labelSearch"
                     multiple
-                    small-chips
-                    solo
+                    chips
+                    variant="solo"
                     style="width:325px"
                     :delimiters="space"
                   >
@@ -105,9 +105,9 @@
                         </kbd>
                         <span class="subheading mr-1">{{text_exp}}</span>
                         <v-chip
-                          :color="`${colors[nonce - 1]} lighten-3`"
+                          :color="`${colors[nonce - 1]}-lighten-3`"
                           label
-                          small
+                          size="small"
                         >
                           {{ search }}
                         </v-chip>
@@ -115,21 +115,21 @@
                     </template>
                     <template v-slot:selection="{ attrs, item, parent, selected }">
                       <v-chip
-                        v-if="item === Object(item)"
                         v-bind="attrs"
-                        :color="`${item.color} lighten-3`"
-                        :input-value="selected"
+                        v-if="item === Object(item)"
+                        :color="`${item.color}-lighten-3`"
+                        :selected="selected"
                         label
-                        small >
+                        size="small" >
                         <span class="pr-2">{{ item.text }} </span>
-                        <v-icon small @click="parent.selectItem(item)">mdi-close</v-icon>
+                        <v-icon size="small" @click="parent.selectItem(item)">mdi-close</v-icon>
                       </v-chip>
                     </template>
                   </v-combobox>
                 </v-col>
                 <v-col cols="12" align="center">
-                  <v-btn id="search"  @click="clicksearch_home(words_search)" class="mr-10" dark color="blue lighten-1"><v-icon class="mr-3">mdi-magnify</v-icon>ค้นหา</v-btn>
-                  <v-btn @click="searchrandom" class="" dark color="blue lighten-1">อ่านอะไรดี</v-btn>
+                  <v-btn id="search"  @click="clicksearch_home(words_search)" class="mr-10" theme="dark" color="blue-lighten-1"><v-icon class="mr-3">mdi-magnify</v-icon>ค้นหา</v-btn>
+                  <v-btn @click="searchrandom" class="" theme="dark" color="blue-lighten-1">อ่านอะไรดี</v-btn>
                 </v-col>
               </v-row>
             </v-col>
@@ -144,9 +144,9 @@
           <v-card class="d-flex justify-center" flat>
             <v-card class="max-width-auto"  flat>
               <v-card-text class="headline lighten-2 ">{{item.chapterHeading}}</v-card-text>
-              <v-list-item-title class="grey--text  ">
-                <v-btn text color="primary lighten-1" @click="clickedSendbook(item.bookId)">
-                  <v-icon small class="mr-2">
+              <v-list-item-title class="grey-text  ">
+                <v-btn variant="text" color="primary-lighten-1" @click="clickedSendbook(item.bookId)">
+                  <v-icon size="small" class="mr-2">
                     mdi-book-open-page-variant
                   </v-icon>
                   จากหนังสือ:{{item.bookName}}
@@ -159,8 +159,8 @@
           </v-card>
           <v-card-actions>
             <v-spacer></v-spacer>
-            <v-btn color="primary lighten-1" text @click="searchrandom">สุ่มอ่าน</v-btn>
-            <v-btn color="primary lighten-1" text @click="closs">ออก</v-btn>
+            <v-btn color="primary-lighten-1" variant="text" @click="searchrandom">สุ่มอ่าน</v-btn>
+            <v-btn color="primary-lighten-1" variant="text" @click="closs">ออก</v-btn>
           </v-card-actions>
           </v-card>
       </v-dialog>
@@ -183,7 +183,7 @@ export default {
     drawer: false,
     fab: false,
     title: '',
-    search: null,
+    search: "",
     dialog: false,
     group: null,
     activator: null,
@@ -347,23 +347,26 @@ export default {
     },
   },
   watch:{
-    words_search (val,prev) {
-      if (val.length === prev.length) return
+    words_search: {
+      handler(val, prev) {
+        if (val.length === prev.length) return
 
-      if (val.length > 5) {
-        this.$nextTick(() => this.words_search.pop())
-      }
-      this.words_search = val.map(v => {
-        if (typeof v === 'string') {
-            v = {
-              text: v,
-              color: this.colors[this.nonce - 1],
-            }
-            this.items.push(v)
-            this.nonce++
+        if (val.length > 5) {
+          this.$nextTick(() => this.words_search.pop())
         }
-        return v
-      })
+        this.words_search = val.map(v => {
+          if (typeof v === 'string') {
+              v = {
+                text: v,
+                color: this.colors[this.nonce - 1],
+              }
+              this.items.push(v)
+              this.nonce++
+          }
+          return v
+        })
+      },
+      deep: true
     },
     group () {
       this.drawer = false

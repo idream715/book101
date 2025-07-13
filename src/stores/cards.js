@@ -28,11 +28,13 @@ export const useCardsStore = defineStore('cards', {
 
       try {
         const response = await callApi.getData(`cards/all?creator=${creator}&offset=0&limit=48`)
-        this.cards = response.data.cards || []
-        this.totalsCards = response.data.total || 0
+        this.cards = response.data.items || []
+        this.totalsCards = response.data.nItems || 0
         this.notfound = this.cards.length === 0
       } catch (error) {
         console.error('Error fetching cards:', error)
+        this.cards = []
+        this.totalsCards = 0
         this.notfound = true
       } finally {
         this.overlay = false
@@ -42,7 +44,7 @@ export const useCardsStore = defineStore('cards', {
     async getTagOfCards(creator) {
       try {
         const response = await callApi.getData(`cards/tags?creator=${creator}`)
-        this.cardTags = response.data.tags || []
+        this.cardTags = response.data.items || []
       } catch (error) {
         console.error('Error fetching card tags:', error)
       }
@@ -51,15 +53,15 @@ export const useCardsStore = defineStore('cards', {
     async setCardInfiniteScrolled({ offset, creator }) {
       try {
         const response = await callApi.getData(`cards/all?creator=${creator}&offset=${offset}&limit=48`)
-        if (response.data.cards && response.data.cards.length > 0) {
-          this.cards.push(...response.data.cards)
+        if (response.data.items && response.data.items.length > 0) {
+          this.cards.push(...response.data.items)
         }
       } catch (error) {
         console.error('Error in card infinite scroll:', error)
       }
     },
 
-    async setFilteredCards({ words, offset, creator }) {
+    async setFilteredCards({ words, creator }) {
       this.overlay = true
       this.cardToolbarFlag = 'filter'
 
@@ -68,15 +70,17 @@ export const useCardsStore = defineStore('cards', {
           keywords: [],
           type: 'cards',
           creator: creator,
-          tags: words,
+          tags: words || [],
           offset: 0
         })
 
-        this.cards = response.data.cards || []
-        this.totalsCards = response.data.total || 0
+        this.cards = response.data.items || []
+        this.totalsCards = response.data.nItems || 0
         this.notfound = this.cards.length === 0
       } catch (error) {
         console.error('Error filtering cards:', error)
+        this.cards = []
+        this.totalsCards = 0
         this.notfound = true
       } finally {
         this.overlay = false
@@ -93,8 +97,8 @@ export const useCardsStore = defineStore('cards', {
           offset: offset
         })
 
-        if (response.data.cards && response.data.cards.length > 0) {
-          this.cards.push(...response.data.cards)
+        if (response.data.items && response.data.items.length > 0) {
+          this.cards.push(...response.data.items)
         }
       } catch (error) {
         console.error('Error in filtered cards infinite scroll:', error)
@@ -110,15 +114,17 @@ export const useCardsStore = defineStore('cards', {
           keywords: words,
           type: 'cards',
           creator: creator,
-          tags: tags,
+          tags: tags || [],
           offset: 0
         })
 
-        this.cards = response.data.cards || []
-        this.totalsCards = response.data.total || 0
+        this.cards = response.data.items || []
+        this.totalsCards = response.data.nItems || 0
         this.notfound = this.cards.length === 0
       } catch (error) {
         console.error('Error searching cards:', error)
+        this.cards = []
+        this.totalsCards = 0
         this.notfound = true
       } finally {
         this.overlay = false
@@ -135,8 +141,8 @@ export const useCardsStore = defineStore('cards', {
           offset: offset
         })
 
-        if (response.data.cards && response.data.cards.length > 0) {
-          this.cards.push(...response.data.cards)
+        if (response.data.items && response.data.items.length > 0) {
+          this.cards.push(...response.data.items)
         }
       } catch (error) {
         console.error('Error in searched cards infinite scroll:', error)

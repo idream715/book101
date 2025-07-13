@@ -1,7 +1,9 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import Home from '../views/Home.vue'
+import { routesV2 } from './routes-v2'
 
-const routes = [
+// Legacy V1 routes (Vuetify)
+const routesV1 = [
   {
     path: '/',
     name: 'Home',
@@ -56,6 +58,12 @@ const routes = [
     name: 'Shorts',
     component: () => import('@/views/ShortsList.vue')
   },
+]
+
+// Combine V2 and V1 routes (V2 routes must come first for proper matching)
+const routes = [
+  ...routesV2,
+  ...routesV1
 ]
 
 const router = createRouter({

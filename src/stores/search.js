@@ -22,7 +22,7 @@ export const useSearchStore = defineStore('search', {
   },
 
   actions: {
-    async setFirstIndexsFromApi({ words, page, creator }) {
+    async setFirstIndexsFromApi({ words, page, creator, type = 'books' }) {
       this.overlay = true
       this.notfound = false
 
@@ -30,22 +30,25 @@ export const useSearchStore = defineStore('search', {
         const wordsArray = words.map(w => w.text)
         const response = await searchApi.post('/search', {
           keywords: wordsArray,
-          type: 'indexs',
-          creator: creator,
+          type: type,
+          creator: parseInt(creator),
           tags: [],
-          offset: page
+          offset: page,
+          limit: 50
         })
 
-        if (response.data.indexs && response.data.indexs.length > 0) {
-          // Process marked text for highlighting
-          const processedIndexs = response.data.indexs.map(index => ({
-            ...index,
-            mark_index: this.processMarkedText(index.mark_index),
-            mark_details: this.processMarkedText(index.mark_details)
+        if (response.data.items && response.data.items.length > 0) {
+          // Map new API structure to expected format
+          const processedIndexs = response.data.items.map(item => ({
+            ...item,
+            mark_index: item.chapterHeading || item.bookName || '',
+            mark_details: item.chapterDetail || '',
+            bookName: item.bookName || '',
+            bookId: item.bookId || item.searchId || ''
           }))
 
           this.indexs = processedIndexs
-          this.totalsIndexs = response.data.total
+          this.totalsIndexs = response.data.nItems
           this.words_search = words
           this.notfound = false
         } else {
@@ -61,22 +64,26 @@ export const useSearchStore = defineStore('search', {
       }
     },
 
-    async setFirstIndexsFromApi_infenit({ words, page, creator }) {
+    async setFirstIndexsFromApi_infenit({ words, page, creator, type = 'books' }) {
       try {
         const wordsArray = words.map(w => w.text)
         const response = await searchApi.post('/search', {
           keywords: wordsArray,
-          type: 'indexs',
-          creator: creator,
+          type: type,
+          creator: parseInt(creator),
           tags: [],
-          offset: page
+          offset: page,
+          limit: 50
         })
 
-        if (response.data.indexs && response.data.indexs.length > 0) {
-          const processedIndexs = response.data.indexs.map(index => ({
-            ...index,
-            mark_index: this.processMarkedText(index.mark_index),
-            mark_details: this.processMarkedText(index.mark_details)
+        if (response.data.items && response.data.items.length > 0) {
+          // Map new API structure to expected format
+          const processedIndexs = response.data.items.map(item => ({
+            ...item,
+            mark_index: item.chapterHeading || item.bookName || '',
+            mark_details: item.chapterDetail || '',
+            bookName: item.bookName || '',
+            bookId: item.bookId || item.searchId || ''
           }))
 
           this.indexs.push(...processedIndexs)
@@ -141,8 +148,80 @@ export const useSearchStore = defineStore('search', {
       this.indexs = []
       this.totalsIndexs = 0
       this.words_search = []
+      this.search_random = []
       this.overlay = false
       this.notfound = false
+      this.flag = 1
+    },
+
+    // Shorts-specific methods migrated from Vuex
+    async getShortsFromApi(creator) {
+      if (!creator) return null
+
+      this.overlay = true
+      this.flag = 1
+      
+      try {
+        const response = await callApi.getData(`/shorts/all/?limit=50&offset=0&creator=${creator}`)
+        const data = response.data
+        
+        this.notfound = false
+        this.overlay = false
+        this.totalsIndexs = data.nItems
+        this.indexs = data.items
+      } catch (error) {
+        console.error('Error fetching shorts:', error)
+        this.overlay = false
+      }
+    },
+
+    async searchShortFromApiContinue({ words, page, creator }) {
+      if (!creator) return null
+
+      if (page > this.flag) {
+        this.flag += 50
+        this.words_search = words
+
+        const tags = words.map(element => element.text)
+        const body = {
+          keywords: tags,
+          type: 'shorts',
+          creator: parseInt(creator),
+          limit: 50,
+          offset: page,
+          pageNo: 0
+        }
+
+        try {
+          const response = await callApi.postData('/search', body)
+          const data = response.data
+          
+          if (data.items && data.items.length > 0) {
+            this.indexs.push(...data.items)
+          }
+        } catch (error) {
+          console.error('Error in search short continue:', error)
+        }
+      }
+    },
+
+    async setShortFromApiContinue({ page, creator }) {
+      if (!creator) return null
+
+      if (page > this.flag) {
+        this.flag += 50
+
+        try {
+          const response = await callApi.getData(`/shorts/all?limit=50&offset=${page}&creator=${creator}`)
+          const data = response.data
+          
+          if (data.items && data.items.length > 0) {
+            this.indexs.push(...data.items)
+          }
+        } catch (error) {
+          console.error('Error in short continue:', error)
+        }
+      }
     }
   }
 })

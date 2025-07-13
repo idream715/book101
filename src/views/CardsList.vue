@@ -11,9 +11,9 @@
               <v-autocomplete
                 v-model="filterTags"
                 :items="tagItems"
-                outlined
+                variant="outlined"
                 multiple
-                dense
+                density="compact"
                 label="เลือก Tag ของการ์ด"
               ></v-autocomplete>
             </v-col>
@@ -47,7 +47,7 @@
               </v-btn> -->
               <v-btn
                 color="accent"
-                large
+                size="large"
                 icon
                 @click="filterTags = []"
               >
@@ -71,22 +71,22 @@
                 v-model="model"
                 :filter="filter"
                 :hide-no-data="!search"
-                v-model:search-input="search"
+                v-model:search="search"
                 hide-selected
                 label="ค้นหาคำในการ์ด"
                 :delimiters="space"
                 multiple
-                small-chips
-                dense
-                outlined
+                chips
+                density="compact"
+                variant="outlined"
               >
                 <template v-slot:no-data>
                   <v-list-item>
                     <span class="subheading">ค้นหา</span>
                     <v-chip
-                      :color="`${colors[nonce - 1]} lighten-3`"
+                      :color="`${colors[nonce - 1]}-lighten-3`"
                       label
-                      small
+                      size="small"
                     >
                       {{ search }}
                     </v-chip>
@@ -94,18 +94,18 @@
                 </template>
                 <template v-slot:selection="{ attrs, item, parent, selected }">
                   <v-chip
-                    v-if="item === Object(item)"
                     v-bind="attrs"
-                    :color="`${item.color} lighten-3`"
-                    :input-value="selected"
+                    v-if="item === Object(item)"
+                    :color="`${item.color}-lighten-3`"
+                    :selected="selected"
                     label
-                    small
+                    size="small"
                   >
                     <span class="pr-2">
                       {{ item.text }}
                     </span>
                     <v-icon
-                      x-small
+                      size="x-small"
                       @click="parent.selectItem(item)"
                     >
                       $delete
@@ -120,15 +120,15 @@
                     flat
                     background-color="transparent"
                     hide-details
-                    solo
+                    variant="solo"
                     @keyup.enter="edit(index, item)"
                   ></v-text-field>
                   <v-chip
                     v-else
-                    :color="`${item.color} lighten-3`"
-                    dark
+                    :color="`${item.color}-lighten-3`"
+                    theme="dark"
                     label
-                    x-small
+                    size="x-small"
                   >
                     {{ item.text }}
                   </v-chip>
@@ -159,7 +159,7 @@
           <v-spacer></v-spacer>
           <v-btn
             v-if="show"
-            class="mr-3 white--text"
+            class="mr-3 white-text"
             color="#AF2743"
             rounded
             @click="clickedSearch"
@@ -189,7 +189,7 @@
               <v-card max-width="300px">
                 <v-img
                   :src="card.cardPicThumbnails"
-                  class="white--text align-end"
+                  class="white-text align-end"
                   height="200px"
                   @click="popDialogCard(card, index)"
                 >
@@ -240,9 +240,15 @@
        </v-row>
 
       <v-row justify="center">
-        <v-dialog persistent v-model="dialogCard" max-width="640" max-height="480">
+        <v-dialog persistent v-model="dialogCard" max-width="640">
           <v-card class="max-width-auto info" flat>
-            <img :src="picCard" style="width: 100%;">
+            <div style="background: red; color: white; padding: 10px;">
+              DEBUG: picCard = {{ picCard }}
+            </div>
+            <img v-if="picCard" :src="picCard" style="width: 100%;" alt="Card image">
+            <div v-else style="background: yellow; color: black; padding: 20px;">
+              No image to display
+            </div>
             <!-- <v-img
               :lazy-src="thumbnailCard"
               max-width="640"
@@ -265,7 +271,9 @@
               <v-spacer></v-spacer>
               <v-btn color="accent-lighten-1" variant="text" @click="copyTextDetail">คัดลอกเนื้อหา</v-btn>
             </v-card-title>
-            <v-card-text v-show="showText" ref="text" style="font-size: 17px; white-space: pre-wrap;">
+            <v-card-text v-show="showText" ref="textRef" style="font-size: 17px; white-space: pre-wrap;">
+              DEBUG: textCard = {{ textCard }}
+              <br><br>
               {{ textCard }}
             </v-card-text>
             <v-card-text>
@@ -276,7 +284,7 @@
                     color="primary"
                     v-for="tag in tagsCard"
                     :key="tag"
-                    small
+                    size="small"
                   >
                     {{ tag }}
                   </v-chip>
@@ -287,7 +295,7 @@
               <v-btn
                 variant="text"
                 class="ml-2"
-                color="accent lighten-1"
+                color="accent-lighten-1"
                 @click="showText = !showText"
               >
                 {{ showText ? 'ซ่อนเนื้อหา' : 'แสดงเนื้อหา' }}
@@ -310,267 +318,252 @@
   </div>
 </template>
 
-<script>
+<script setup>
+import { ref, computed, onMounted, watch, getCurrentInstance } from 'vue'
+import { useRoute } from 'vue-router'
 import { useCardsStore } from '@/stores/cards'
 
-export default {
-  setup() {
-    const cardsStore = useCardsStore()
-    return { cardsStore }
-  },
-  data () {
-      return {
-        src: 'https://s3.ap-southeast-1.amazonaws.com/book.dhamma01.com/cards/luangpu.jpg',
-        title: '',
-        show: true,
-        page: 1,
-        filterTags: [],
-        model: [],
-        space:[' '],
-        limit: 48,
-        dialogCard: false,
-        picCard: '',
-        thumbnailCard: '',
-        textCard: '',
-        tagsCard: [],
-        showText: false,
-        activator: null,
-        attach: null,
-        colors: [ 'pink', 'purple', 'indigo', 'teal', 'primary', 'accent' ],
-        editing: null,
-        editingIndex: -1,
-        selectedIndex: -1,
-        btnDisabled: false,
-        btnLoading: false,
-        items: [
-        ],
-        nonce: 1,
-        menu: false,
-        x: 0,
-        search: null,
-        y: 0,
-      }
-    },
-  created () {
-    this.cardsStore.clear()
-    this.cardsStore.getTagOfCards(this.$route.query.t)
-    this.cardsStore.getCardFromApi(this.$route.query.t)
-
-  },
-  // beforeMount () {
-  // },
-  watch: {
-    model (val, prev) {
-      if (val.length === prev.length) return
-
-      this.model = val.map(v => {
-        if (typeof v === 'string') {
-          v = {
-            text: v,
-            color: this.colors[this.nonce - 1],
-          }
-
-          this.items.push(v)
-
-          this.nonce++
-        }
-
-        return v
-      })
-    },
-  },
-  computed: {
-    listOfCards () {
-      return this.cardsStore.cards
-    },
-    loading(){
-      return this.cardsStore.overlay
-    },
-    emptyCards () {
-      return this.cardsStore.notfound
-    },
-    tagItems () {
-      return this.cardsStore.cardTags
-    },
-    itemsAmount () {
-      return this.cardsStore.totalsCards
-    },
-    checkToolbarFlag () {
-      return this.cardsStore.cardToolbarFlag
-    },
-    checkMobile () {
-      return !this.$vuetify.display.mobile
-    },
-  },
-  methods: {
-    edit (index, item) {
-      if (!this.editing) {
-        this.editing = item
-        this.editingIndex = index
-      } else {
-        this.editing = null
-        this.editingIndex = -1
-      }
-    },
-    filter (item, queryText, itemText) {
-      if (item.header) return false
-
-      const hasValue = val => val != null ? val : ''
-
-      const text = hasValue(itemText)
-      const query = hasValue(queryText)
-
-      return text.toString()
-        .toLowerCase()
-        .indexOf(query.toString().toLowerCase()) > -1
-    },
-    clickedFilter () {
-      let words =this.filterTags
-
-      if (words.length > 0) {
-        this.$store.dispatch('setFilteredCards',{
-          words: words,
-          offset: this.limit,
-          creator: this.$route.query.t
-        })
-      }
-    },
-    clickedSearch () {
-
-      let words = []
-
-      if(this.model.length > 0) {
-        words = this.model.map(x => x.text)
-      } else if (this.model.length === 0 && this.search !== null) {
-        words.push(this.search)
-      }
-
-      let tags = this.filterTags
-
-      if (words.length > 0 && tags.length > 0) {
-        this.$store.dispatch('setSearchedCards',{
-          words: words,
-          creator: this.$route.query.t,
-          tags: tags
-        })
-
-      } else if (words.length === 0 && tags.length > 0) {
-
-        this.$store.dispatch('setFilteredCards',{
-          words: tags,
-          offset: this.limit,
-          creator: this.$route.query.t
-        })
-
-      } else if (words.length > 0 && tags.length === 0) {
-
-        this.$store.dispatch('setSearchedCards',{
-          words: words,
-          creator: this.$route.query.t,
-          tags: tags
-        })
-
-      } else if (words.length === 0 && tags.length === 0) {
-        this.$store.dispatch('clear')
-        this.$store.dispatch('getCardFromApi', this.$route.query.t)
-      }
-    },
-    handleClick(direction) {
-      this.btnDisabled = true; // Disable the button
-      
-      if (direction === 'prev' && this.selectedIndex > 0) {
-        this.selectedIndex--;
-        this.showPreviousCard();
-      } else if (direction === 'next' && this.selectedIndex < this.listOfCards.length - 1) {
-        this.selectedIndex++;
-        this.showNextCard();
-      }
-      
-      setTimeout(() => {
-        this.btnDisabled = false; // Enable the button after 2 seconds
-      }, 1000);
-    },
-    showPreviousCard() {
-      const prevCard = this.listOfCards[this.selectedIndex];
-      if (prevCard) {
-        this.picCard = prevCard.cardPic;
-        this.thumbnailCard = prevCard.cardPicThumbnails;
-        this.textCard = prevCard.cardDetail;
-        this.tagsCard = prevCard.cardTags;
-      }
-    },
-    showNextCard() {
-      const nextCard = this.listOfCards[this.selectedIndex];
-      if (nextCard) {
-        this.picCard = nextCard.cardPic;
-        this.thumbnailCard = nextCard.cardPicThumbnails;
-        this.textCard = nextCard.cardDetail;
-        this.tagsCard = nextCard.cardTags;
-      }
-    },
-    infiniteScrolled () {
-      setTimeout(() => {
-      const words = this.model.map(x => x.text)
-      let lastCardsIndex = this.listOfCards.length
-        switch (this.checkToolbarFlag) {
-          case '':
-            this.$store.dispatch('setCardInfiniteScrolled',{
-              offset: lastCardsIndex,
-              creator: this.$route.query.t
-            })
-            break;
-          case 'filter':
-            this.$store.dispatch('setFilteredCardsContinue',{
-              words: this.filterTags,
-              offset: lastCardsIndex,
-              creator: this.$route.query.t
-            })
-            break;
-          case 'search':
-            this.$store.dispatch('setSearchedCardsContinue',{
-              words: words,
-              offset: lastCardsIndex,
-              creator: this.$route.query.t,
-              tags: this.filterTags
-            })
-            break;
-        }
-      }, 500);
-    },
-    popDialogCard (element, index) {
-      this.selectedIndex = index
-      this.dialogCard = !this.dialogCard
-      this.picCard = element.cardPic
-      this.thumbnailCard = element.cardPicThumbnails
-      this.textCard = element.cardDetail
-      this.tagsCard = element.cardTags
-    },
-    closeDialog () {
-      this.picCard = ''
-      this.thumbnailCard = ''
-      this.textCard = ''
-      this.tagsCard = []
-      this.dialogCard = !this.dialogCard
-    },
-    copyTextDetail () {
-      this.selectText(this.$refs.text); // e.g. <div ref="text">
-    },
-    selectText(element) {
-        var range;
-        if (document.selection) {
-          // IE
-          range = document.body.createTextRange();
-          range.moveToElementText(element);
-          range.select();
-        } else if (window.getSelection) {
-          range = document.createRange();
-          range.selectNode(element);
-          window.getSelection().removeAllRanges();
-          window.getSelection().addRange(range);
-        }
-    },
+const route = useRoute()
+const cardsStore = useCardsStore()
+const show = ref(true)
+const filterTags = ref([])
+const model = ref([])
+const space = ref([' '])
+const dialogCard = ref(false)
+const picCard = ref('')
+const thumbnailCard = ref('')
+const textCard = ref('')
+const tagsCard = ref([])
+const showText = ref(false)
+const colors = ref(['pink', 'purple', 'indigo', 'teal', 'primary', 'accent'])
+const editing = ref(null)
+const editingIndex = ref(-1)
+const selectedIndex = ref(-1)
+const btnDisabled = ref(false)
+const btnLoading = ref(false)
+const items = ref([])
+const nonce = ref(1)
+const search = ref("")
+const listOfCards = computed(() => cardsStore.cards)
+const loading = computed(() => cardsStore.overlay)
+const emptyCards = computed(() => cardsStore.notfound)
+const tagItems = computed(() => cardsStore.cardTags)
+const itemsAmount = computed(() => cardsStore.totalsCards)
+const checkToolbarFlag = computed(() => cardsStore.cardToolbarFlag)
+const checkMobile = computed(() => {
+  const { $vuetify } = getCurrentInstance().appContext.config.globalProperties
+  return !$vuetify.display.mobile
+})
+const edit = (index, item) => {
+  if (!editing.value) {
+    editing.value = item
+    editingIndex.value = index
+  } else {
+    editing.value = null
+    editingIndex.value = -1
   }
 }
+const filter = (item, queryText, itemText) => {
+  if (item.header) return false
+
+  const hasValue = val => val != null ? val : ''
+
+  const text = hasValue(itemText)
+  const query = hasValue(queryText)
+
+  return text.toString()
+    .toLowerCase()
+    .indexOf(query.toString().toLowerCase()) > -1
+}
+const clickedSearch = () => {
+  let words = []
+
+  if (model.value.length > 0) {
+    words = model.value.map(x => x.text)
+  } else if (model.value.length === 0 && search.value !== "") {
+    words.push(search.value)
+  }
+
+  let tags = filterTags.value
+
+  if (words.length > 0 && tags.length > 0) {
+    cardsStore.setSearchedCards({
+      words: words,
+      creator: route.query.t,
+      tags: tags
+    })
+
+  } else if (words.length === 0 && tags.length > 0) {
+
+    cardsStore.setFilteredCards({
+      words: tags,
+      creator: route.query.t
+    })
+
+  } else if (words.length > 0 && tags.length === 0) {
+
+    cardsStore.setSearchedCards({
+      words: words,
+      creator: route.query.t,
+      tags: tags
+    })
+
+  } else if (words.length === 0 && tags.length === 0) {
+    cardsStore.clear()
+    cardsStore.getCardFromApi(route.query.t)
+  }
+}
+const handleClick = (direction) => {
+  btnDisabled.value = true
+  
+  if (direction === 'prev' && selectedIndex.value > 0) {
+    selectedIndex.value--
+    showPreviousCard()
+  } else if (direction === 'next' && selectedIndex.value < listOfCards.value.length - 1) {
+    selectedIndex.value++
+    showNextCard()
+  }
+  
+  setTimeout(() => {
+    btnDisabled.value = false
+  }, 1000)
+}
+
+const showPreviousCard = () => {
+  const prevCard = listOfCards.value[selectedIndex.value]
+  if (prevCard) {
+    picCard.value = prevCard.cardPic
+    thumbnailCard.value = prevCard.cardPicThumbnails
+    textCard.value = prevCard.cardDetail
+    // Ensure cardTags is an array
+    if (Array.isArray(prevCard.cardTags)) {
+      tagsCard.value = prevCard.cardTags
+    } else if (typeof prevCard.cardTags === 'string') {
+      tagsCard.value = prevCard.cardTags.split(',').map(tag => tag.trim())
+    } else {
+      tagsCard.value = []
+    }
+  }
+}
+
+const showNextCard = () => {
+  const nextCard = listOfCards.value[selectedIndex.value]
+  if (nextCard) {
+    picCard.value = nextCard.cardPic
+    thumbnailCard.value = nextCard.cardPicThumbnails
+    textCard.value = nextCard.cardDetail
+    // Ensure cardTags is an array
+    if (Array.isArray(nextCard.cardTags)) {
+      tagsCard.value = nextCard.cardTags
+    } else if (typeof nextCard.cardTags === 'string') {
+      tagsCard.value = nextCard.cardTags.split(',').map(tag => tag.trim())
+    } else {
+      tagsCard.value = []
+    }
+  }
+}
+
+const infiniteScrolled = () => {
+  setTimeout(() => {
+    const words = model.value.map(x => x.text)
+    let lastCardsIndex = listOfCards.value.length
+    switch (checkToolbarFlag.value) {
+      case '':
+        cardsStore.setCardInfiniteScrolled({
+          offset: lastCardsIndex,
+          creator: route.query.t
+        })
+        break
+      case 'filter':
+        cardsStore.setFilteredCardsContinue({
+          words: filterTags.value,
+          offset: lastCardsIndex,
+          creator: route.query.t
+        })
+        break
+      case 'search':
+        cardsStore.setSearchedCardsContinue({
+          words: words,
+          offset: lastCardsIndex,
+          creator: route.query.t,
+          tags: filterTags.value
+        })
+        break
+    }
+  }, 500)
+}
+
+const popDialogCard = (element, index) => {
+  console.log('popDialogCard called with:', element)
+  selectedIndex.value = index
+  dialogCard.value = !dialogCard.value
+  picCard.value = element.cardPic
+  thumbnailCard.value = element.cardPicThumbnails
+  textCard.value = element.cardDetail
+  console.log('Setting picCard to:', element.cardPic)
+  console.log('Setting textCard to:', element.cardDetail)
+  // Ensure cardTags is an array
+  if (Array.isArray(element.cardTags)) {
+    tagsCard.value = element.cardTags
+  } else if (typeof element.cardTags === 'string') {
+    tagsCard.value = element.cardTags.split(',').map(tag => tag.trim())
+  } else {
+    tagsCard.value = []
+  }
+}
+
+const closeDialog = () => {
+  picCard.value = ''
+  thumbnailCard.value = ''
+  textCard.value = ''
+  tagsCard.value = []
+  dialogCard.value = !dialogCard.value
+}
+
+const textRef = ref(null)
+const copyTextDetail = () => {
+  selectText(textRef.value)
+}
+
+const selectText = (element) => {
+  var range
+  if (document.selection) {
+    // IE
+    range = document.body.createTextRange()
+    range.moveToElementText(element)
+    range.select()
+  } else if (window.getSelection) {
+    range = document.createRange()
+    range.selectNode(element)
+    window.getSelection().removeAllRanges()
+    window.getSelection().addRange(range)
+  }
+}
+
+// Watchers and lifecycle
+watch(model, (val, prev) => {
+  if (val.length === prev.length) return
+
+  model.value = val.map(v => {
+    if (typeof v === 'string') {
+      v = {
+        text: v,
+        color: colors.value[nonce.value - 1],
+      }
+
+      items.value.push(v)
+      nonce.value++
+    }
+
+    return v
+  })
+}, { deep: true })
+
+onMounted(() => {
+  cardsStore.clear()
+  cardsStore.getTagOfCards(route.query.t)
+  cardsStore.getCardFromApi(route.query.t)
+})
 </script>
 
 <style>

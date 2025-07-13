@@ -10,12 +10,12 @@
                 :filter="filter"
                 :hide-no-data="!search"
                 :items="items"
-                v-model:search-input="search"
+                v-model:search="search"
                 hide-selected
                 :label="label_search"
                 multiple
-                small-chips
-                solo
+                chips
+                variant="solo"
                 :delimiters="space"
               >
                 <template v-slot:no-data>
@@ -23,9 +23,9 @@
                     <span class="subheading mr-1">กด</span><kbd ><v-icon color="white" class="mb-2">mdi-keyboard-space</v-icon></kbd>
                     <span class="subheading mr-1">{{text_exp}}</span>
                     <v-chip
-                      :color="`${colors[nonce - 1]} lighten-3`"
+                      :color="`${colors[nonce - 1]}-lighten-3`"
                       label
-                      small
+                      size="small"
                     >
                       {{ search }}
                     </v-chip>
@@ -33,20 +33,20 @@
                 </template>
                 <template v-slot:selection="{ attrs, item, parent, selected }">
                   <v-chip
-                    v-if="item === Object(item)"
                     v-bind="attrs"
+                    v-if="item === Object(item)"
                     :color="`${item.color} lighten-3`"
-                    :input-value="selected"
+                    :selected="selected"
                     label
-                    small >
+                    size="small" >
                     <span class="pr-2">{{ item.text }} </span>
-                    <v-icon small @click="parent.selectItem(item)">mdi-close</v-icon>
+                    <v-icon size="small" @click="parent.selectItem(item)">mdi-close</v-icon>
                   </v-chip>
                 </template>
               </v-combobox>
           </v-col>
           <v-col cols="12" md="2" class="mb-5">
-            <v-btn @click="clicksearch(search_pageindex)" class="mr-10" dark color="blue lighten-1"><v-icon class="mr-3">mdi-magnify</v-icon>ค้นหา</v-btn>
+            <v-btn @click="clicksearch(search_pageindex)" class="mr-10" theme="dark" color="blue-lighten-1"><v-icon class="mr-3">mdi-magnify</v-icon>ค้นหา</v-btn>
           </v-col>
       </v-row>
          <v-col v-if="setoverlay===false" cols="6" align="start" justify="center" class="pt-1">พบ {{getTotalIndexs}} รายการ</v-col>
@@ -89,11 +89,11 @@
                         <v-list-item-title class=" mb-1 " v-html="index.mark_index" style="line-height:2;font-size:24px;"></v-list-item-title>
                       </v-col>
                       <v-col cols="2">
-                        <v-list-item-title class="grey--text" align="end">{{i+1}}</v-list-item-title>
+                        <v-list-item-title class="grey-text" align="end">{{i+1}}</v-list-item-title>
                       </v-col>
                     </v-row>
 
-                    <v-list-item-title class="mb-2"><v-btn variant="text" color="primary lighten-1" @click="clickedSendbook(index.bookId)"><v-icon small class="mr-2">mdi-book-open-page-variant</v-icon> จากหนังสือ:{{index.bookName}}</v-btn></v-list-item-title>
+                    <v-list-item-title class="mb-2"><v-btn variant="text" color="primary-lighten-1" @click="clickedSendbook(index.bookId)"><v-icon size="small" class="mr-2">mdi-book-open-page-variant</v-icon> จากหนังสือ:{{index.bookName}}</v-btn></v-list-item-title>
                     <p v-html="text_render(index.mark_details)"></p>
                   </v-card-text>
                 </v-col>
@@ -109,7 +109,7 @@
                         <v-icon>mdi-youtube</v-icon>
                       </v-btn>
                      <v-btn variant="text" color="red" style="margin-right:10px;" target="_blank" :href="index.chapterLinkPdf">PDF</v-btn>
-                     <v-btn variant="text" color="blue lighten-1" @click="dialogs(index.mark_index,index.chapterDetail,index.mark_details,index.bookName,index.bookId)">อ่านทั้งหมด</v-btn>
+                     <v-btn variant="text" color="blue-lighten-1" @click="dialogs(index.mark_index,index.chapterDetail,index.mark_details,index.bookName,index.bookId)">อ่านทั้งหมด</v-btn>
                   </v-card-actions>
                 </v-col>
             </v-card><hr>
@@ -124,8 +124,8 @@
                 ></youtube>
                 <v-card-actions>
                   <v-spacer></v-spacer>
-                  <v-btn color="primary lighten-1" variant="text" target="_blank" :href="videoURL">เข้าสู่เว็บหลักYoutube</v-btn>
-                  <v-btn color="primary lighten-1" variant="text" @click="closeDialogYoutube">ออก</v-btn>
+                  <v-btn color="primary-lighten-1" variant="text" target="_blank" :href="videoURL">เข้าสู่เว็บหลักYoutube</v-btn>
+                  <v-btn color="primary-lighten-1" variant="text" @click="closeDialogYoutube">ออก</v-btn>
                 </v-card-actions>
               </v-card>
             </v-dialog>
@@ -136,7 +136,7 @@
               <v-card class="d-flex justify-center" flat>
                 <v-card class="max-width-auto"  flat>
                   <v-card-text class=" lighten-2 " style="line-height:2;font-size:24px;" v-html="head_content" ></v-card-text>
-                  <v-list-item-title class="grey--text "><v-btn variant="text" color="primary lighten-1" @click="clickedSendbook(book_id)"><v-icon small class="mr-2">mdi-book-open-page-variant</v-icon>จากหนังสือ:{{frombook}}</v-btn></v-list-item-title>
+                  <v-list-item-title class="grey-text "><v-btn variant="text" color="primary-lighten-1" @click="clickedSendbook(book_id)"><v-icon size="small" class="mr-2">mdi-book-open-page-variant</v-icon>จากหนังสือ:{{frombook}}</v-btn></v-list-item-title>
                 <div >
                   <v-card-text ref="textCopy" v-html="content_copy" style="font-size: 17px; white-space: pre-wrap;" ></v-card-text>
                 </div>
@@ -145,8 +145,8 @@
               </v-card>
               <v-card-actions>
                 <v-spacer></v-spacer>
-                <v-btn color="primary lighten-1" variant="text" @click="copyTextDetail">{{word_copy}}</v-btn>
-                <v-btn color="primary lighten-1" variant="text" @click="closs">ออก</v-btn>
+                <v-btn color="primary-lighten-1" variant="text" @click="copyTextDetail">{{word_copy}}</v-btn>
+                <v-btn color="primary-lighten-1" variant="text" @click="closs">ออก</v-btn>
 
               </v-card-actions>
               </v-card>
@@ -243,7 +243,7 @@ export default {
   },
   computed:{
     text_exp(){
-      if (this.$vuetify.breakpoint.xsOnly){
+      if (this.$vuetify.display.xs){
         return 'ที่แป้นพิมพ์เพื่อยืนยัน'
       }
         return  '(spacebar,เว้นวรรค) ที่แป้นพิมพ์เพื่อยืนยัน'
@@ -374,26 +374,29 @@ export default {
     },
   },
   watch: {
-    search_pageindex (val,prev) {
-      if (val.length === prev.length) return
+    search_pageindex: {
+      handler(val, prev) {
+        if (val.length === prev.length) return
 
-      if (val.length > 5) {
-        this.$nextTick(() =>this.search_pageindex.pop())
-      }
-      this.search_pageindex = val.map(v => {
-        if (typeof v === 'string') {
-          v = {
-            text: v,
-            color: this.colors[this.nonce - 1],
+        if (val.length > 5) {
+          this.$nextTick(() =>this.search_pageindex.pop())
+        }
+        this.search_pageindex = val.map(v => {
+          if (typeof v === 'string') {
+            v = {
+              text: v,
+              color: this.colors[this.nonce - 1],
+            }
+
+            this.items.push(v)
+
+            this.nonce++
           }
 
-          this.items.push(v)
-
-          this.nonce++
-        }
-
-        return v
-      })
+          return v
+        })
+      },
+      deep: true
     }
   },
 }

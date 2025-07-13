@@ -14,7 +14,8 @@
               <v-col cols="10">
                 <v-combobox
                   v-model="filterBookValue"
-                  :items="items"
+                  v-model:search="search"
+                  @update:search="onFilter"
                   variant="outlined"
                   density="compact"
                   label="เลือกชุดหนังสือ หรือ พิมพ์ชื่อหนังสือ"
@@ -69,69 +70,70 @@
   </div>
 </template>
 
-<script>
+<script setup>
+import { ref, computed, onMounted, getCurrentInstance } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
 import { useBooksStore } from '@/stores/books'
 import { useSearchStore } from '@/stores/search'
 
-export default {
-  data() {
-    return {
-      openDialog : false,
-      filterBookValue:"",
-    }
-  },
-  setup() {
-    const booksStore = useBooksStore()
-    const searchStore = useSearchStore()
-    return { booksStore, searchStore }
-  },
-  created() {
-    this.booksStore.getBooksFromApi(this.$route.query.t)
-  },
-  computed:{
-    books(){
-      return this.booksStore.getBooks
-    },
-    filterBooks(){
-      const books = this.books || []
-      if (this.filterBookValue && !this.items.includes(this.filterBookValue)) {
-        console.log(`1`)
-        return books.filter(el => el.bookName.includes(this.filterBookValue))
-      } else if(this.filterBookValue && this.items.includes(this.filterBookValue)) {
-        console.log(`12`)
-        return books.filter(el => el.categoryName === this.filterBookValue)
-      } else {
-        console.log(`3`)
-        return books
-      }
-    },
-    loading(){
-      return this.searchStore.getoverlay
-    },
-    items(){
-      return Array.from(new Set((this.booksStore.getBooks || []).map(a => a.categoryName)))
-    },
+const route = useRoute()
+const router = useRouter()
+const booksStore = useBooksStore()
+const searchStore = useSearchStore()
 
-  },
-  methods: {
-    trackBookClick(selected){
-      this.$gtag.event('view_book_from_click', {
-          'event_category': 'view_item',
-          'event_label': `Books Clicked: ${selected['bookName']}`,
-          'value': `${Number(selected['bookId'])}`
-        })
-    },
-    bookSelect(selected){
-      // Legacy method - kept for compatibility
-      this.trackBookClick(selected)
-      let openBook = this.$router.resolve({path: `/book/${selected['bookId']}`});
-      window.open(openBook.href, '_blank');
-    },
-    setOpenDialog(val){
-      this.openDialog = val
-    },
+const openDialog = ref(false)
+let filterBookValue = ref('')
+const search = ref('')
+
+const books = computed(() => booksStore.getBooks)
+
+const filterBooks = computed(() => {
+  console.log(filterBookValue.value)
+  const booksData = books.value || []
+  if (filterBookValue.value && !items.value.includes(filterBookValue.value)) {
+    return booksData.filter(el => el.bookName.includes(filterBookValue.value))
+  } else if (filterBookValue.value && items.value.includes(filterBookValue.value)) {
+    return booksData.filter(el => el.categoryName === filterBookValue.value)
+  } else {
+    return booksData
   }
+})
+
+const onFilter = (value) => {
+  console.log(filterBookValue.value)
+  console.log(value)
 }
+
+const loading = computed(() => searchStore.getoverlay)
+
+const items = computed(() => {
+  return Array.from(new Set((booksStore.getBooks || []).map(a => a.categoryName)))
+})
+
+const trackBookClick = (selected) => {
+  // Access gtag from globalProperties
+  const { $gtag } = getCurrentInstance().appContext.config.globalProperties
+  $gtag.event('view_book_from_click', {
+    'event_category': 'view_item',
+    'event_label': `Books Clicked: ${selected['bookName']}`,
+    'value': `${Number(selected['bookId'])}`
+  })
+}
+
+const bookSelect = (selected) => {
+  // Legacy method - kept for compatibility
+  trackBookClick(selected)
+  let openBook = router.resolve({path: `/book/${selected['bookId']}`})
+  window.open(openBook.href, '_blank')
+}
+
+const setOpenDialog = (val) => {
+  openDialog.value = val
+}
+
+onMounted(() => {
+  booksStore.getBooksFromApi(route.query.t)
+})
 </script>
 
 <style>

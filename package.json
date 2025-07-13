@@ -7,33 +7,44 @@
     "lint": "eslint . --ext .vue,.js,.jsx,.ts,.tsx --fix",
     "dev": "vite",
     "preview": "vite preview",
-    "deploy": "yarn build && firebase deploy --only hosting"
+    "deploy": "yarn build && firebase deploy --only hosting",
+    "test": "vitest",
+    "test:run": "vitest run"
   },
   "dependencies": {
     "@mdi/font": "^7.4.0",
+    "@vicons/antd": "^0.13.0",
     "@vue/compat": "^3.5.0",
     "@vue/shared": "^3.5.0",
+    "@vueuse/core": "^13.5.0",
     "add": "^2.0.6",
     "axios": "^1.6.0",
     "core-js": "^3.6.4",
     "firebase": "^9.8.0",
+    "naive-ui": "2.42.0",
     "pinia": "^2.1.0",
     "roboto-fontface": "*",
     "vue": "^3.5.0",
     "vue-gtag": "^2.0.1",
     "vue-router": "^4.0.0",
     "vue-youtube-embed": "^2.2.2",
-    "vuetify": "^3.8.0",
-    "vuex": "^4.0.0"
+    "vuetify": "^3.8.12"
   },
   "devDependencies": {
+    "@testing-library/vue": "^8.1.0",
+    "@types/node": "^24.0.10",
+    "@vicons/ionicons5": "^0.13.0",
     "@vitejs/plugin-vue": "^5.0.0",
     "@vue/eslint-config-standard": "^8.0.0",
+    "@vue/test-utils": "^2.4.6",
     "deepmerge": "^4.3.1",
     "eslint": "^8.0.0",
     "eslint-plugin-vue": "^9.0.0",
+    "happy-dom": "^18.0.1",
     "sass": "^1.70.0",
+    "typescript": "^5.8.3",
     "vite": "^5.0.0",
-    "vite-plugin-vuetify": "^2.0.0"
+    "vite-plugin-vuetify": "^2.0.0",
+    "vitest": "^3.2.4"
   }
 }

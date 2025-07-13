@@ -21,28 +21,17 @@
           </div>
         </v-toolbar-title>
         <v-spacer></v-spacer>
-        <v-btn icon variant="text" router-link to="/" @click="clearBook">
+        <v-btn icon variant="plain" router-link to="/" @click="clearBook">
           <v-icon>mdi-home</v-icon>
         </v-btn>
-        <v-btn v-if="close" icon variant="text" @click="routingTo('/Books', creator)">
+        <v-btn v-if="close" icon variant="plain" @click="routingTo('/Books', creator)">
           <v-icon>mdi-book</v-icon>
         </v-btn>
-        <v-btn v-else icon variant="text" @click="routingTo('/Books', creator)">
+        <v-btn v-else icon variant="plain" @click="routingTo('/Books', creator)">
           <v-icon>mdi-book-open-page-variant</v-icon>
         </v-btn>
       </v-app-bar>
-      <v-app-bar
-        v-else-if="checkHome"
-        absolute
-        color="transparent"
-        elevation="0"
-      >
-        <v-spacer></v-spacer>
-        <!-- <v-btn color="white" rounded text @click="$vuetify.goTo('#features')">
-          <v-icon>mdi-information-outline</v-icon>
-          &nbsp;&nbsp;หนังสือของยาย
-        </v-btn> -->
-      </v-app-bar>
+      <!-- Removed unnecessary transparent navbar for Home page -->
     <!-- ปุ่ม to top -->
       <v-fab 
         v-show="fab"
@@ -52,7 +41,7 @@
         @click="toTop"
       ></v-fab>
 
-      <v-overlay v-if="setoverlay===true && on">
+      <v-overlay v-if="setoverlay===true && on && $route.name !== 'Home'">
         <v-progress-circular indeterminate size="64"></v-progress-circular>
       </v-overlay>
     </div>

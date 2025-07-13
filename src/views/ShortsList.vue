@@ -13,12 +13,12 @@
                 v-model="model"
                 :filter="filter"
                 :hide-no-data="!search"
-                v-model:search-input="search"
+                v-model:search="search"
                 hide-selected
                 label="ค้นหาข้อความปกิณกะ"
                 :delimiters="space"
                 multiple
-                small-chips
+                chips
                 density="compact"
                 variant="outlined"
               >
@@ -26,9 +26,9 @@
                   <v-list-item>
                     <span class="subheading">ค้นหา</span>
                     <v-chip
-                      :color="`${colors[nonce - 1]} lighten-3`"
+                      :color="`${colors[nonce - 1]}-lighten-3`"
                       label
-                      small
+                      size="small"
                     >
                       {{ search }}
                     </v-chip>
@@ -36,18 +36,18 @@
                 </template>
                 <template v-slot:selection="{ attrs, item, parent, selected }">
                   <v-chip
-                    v-if="item === Object(item)"
                     v-bind="attrs"
-                    :color="`${item.color} lighten-3`"
-                    :input-value="selected"
+                    v-if="item === Object(item)"
+                    :color="`${item.color}-lighten-3`"
+                    :selected="selected"
                     label
-                    small
+                    size="small"
                   >
                     <span class="pr-2">
                       {{ item.text }}
                     </span>
                     <v-icon
-                      x-small
+                      size="x-small"
                       @click="parent.selectItem(item)"
                     >
                       $delete
@@ -62,15 +62,15 @@
                     flat
                     background-color="transparent"
                     hide-details
-                    solo
+                    variant="solo"
                     @keyup.enter="edit(index, item)"
                   ></v-text-field>
                   <v-chip
                     v-else
-                    :color="`${item.color} lighten-3`"
+                    :color="`${item.color}-lighten-3`"
                     dark
                     label
-                    x-small
+                    size="x-small"
                   >
                     {{ item.text }}
                   </v-chip>
@@ -146,7 +146,7 @@
         <v-col cols="12" >
           <v-timeline
             align-top
-            dense
+            density="compact"
           >
             <v-timeline-item
               v-for="(item,i) in indexs"
@@ -155,13 +155,13 @@
               size="small"
             >
               <div class="d-flex">
-                <strong class="me-4 pink--text">{{ item.year }}</strong>
+                <strong class="me-4 pink-text">{{ item.year }}</strong>
                 <v-hover>
                   <template v-slot:default="{ isHovering, props }">
                     <v-card
                       class="px-5"
-                      elevation="0"
                       v-bind="props"
+                      elevation="0"
                       :color="isHovering ? 'pink' : 'transparent'"
                       @click="dialogs(item.chapterHeading, item.chapterDetail, item.chapterDetail, item.bookName, item.chapterId)"
                     >
@@ -182,17 +182,17 @@
               <v-card class="d-flex justify-center" flat>
                 <v-card class="max-width-auto"  flat>
                   <v-card-text class=" lighten-2 " style="line-height:2;font-size:24px;">{{ head_content }}</v-card-text>
-                  <v-list-item-title class="grey--text "><v-btn text color="primary lighten-1"><v-icon small class="mr-2">mdi-book-open-page-variant</v-icon>จากหนังสือ:{{frombook}}</v-btn></v-list-item-title>
+                  <v-list-item-title class="grey-text "><v-btn variant="text" color="primary-lighten-1"><v-icon size="small" class="mr-2">mdi-book-open-page-variant</v-icon>จากหนังสือ:{{frombook}}</v-btn></v-list-item-title>
                 <div >
-                  <v-card-text ref="textCopy" style="font-size: 17px; white-space: pre-wrap;" >{{ content_copy }}</v-card-text>
+                  <v-card-text ref="textCopyRef" style="font-size: 17px; white-space: pre-wrap;" >{{ content_copy }}</v-card-text>
                 </div>
                 </v-card>
 
               </v-card>
               <v-card-actions>
                 <v-spacer></v-spacer>
-                <v-btn color="primary lighten-1" variant="text" @click="copyTextDetail">{{word_copy}}</v-btn>
-                <v-btn color="primary lighten-1" variant="text" @click="close">ออก</v-btn>
+                <v-btn color="primary-lighten-1" variant="text" @click="copyTextDetail">{{word_copy}}</v-btn>
+                <v-btn color="primary-lighten-1" variant="text" @click="close">ออก</v-btn>
 
               </v-card-actions>
               </v-card>
@@ -231,177 +231,187 @@
   </div>
 </template>
 
-<script>
-export default {
-  data: () => ({
-    dialog: false,
-    show: false,
-    content:"",
-    content_copy:"",
-    head_content:"",
-    frombook:"",
-    book_id:"",
-    word_copy:'คัดลอก',
-    activator: null,
-    attach: null,
-    colors: [ 'pink', 'purple', 'indigo', 'teal', 'primary', 'accent' ],
-    items: [],
-    nonce: 1,
-    search: null,
-    space:[' '],
-    editing: null,
-    editingIndex: -1,
-    filterTags: [],
-    model: [],
-    dialogYoutube: false,
-    videoId: '',
-    videoURL: '',
-    startTime: 0
-  }),
-  watch: {
-    model (val, prev) {
-      if (val.length === prev.length) return
+<script setup>
+import { ref, computed, onMounted, onBeforeUnmount, watch, getCurrentInstance } from 'vue'
+import { useRoute } from 'vue-router'
+import { useSearchStore } from '@/stores/search'
 
-      if (val.length > 5) {
-        this.$nextTick(() =>this.model.pop())
-      }
+const route = useRoute()
+const searchStore = useSearchStore()
 
-      this.model = val.map(v => {
-        if (typeof v === 'string') {
-          v = {
-            text: v,
-            color: this.colors[this.nonce - 1],
-          }
+const dialog = ref(false)
+const show = ref(false)
+const content = ref('')
+const content_copy = ref('')
+const head_content = ref('')
+const frombook = ref('')
+const book_id = ref('')
+const word_copy = ref('คัดลอก')
+const activator = ref(null)
+const attach = ref(null)
+const colors = ref(['pink', 'purple', 'indigo', 'teal', 'primary', 'accent'])
+const items = ref([])
+const nonce = ref(1)
+const search = ref("")
+const space = ref([' '])
+const editing = ref(null)
+const editingIndex = ref(-1)
+const filterTags = ref([])
+const model = ref([])
+const dialogYoutube = ref(false)
+const videoId = ref('')
+const videoURL = ref('')
+const startTime = ref(0)
+const loading = computed(() => searchStore.overlay)
 
-          this.items.push(v)
+const indexs = computed(() => {
+  const list = searchStore.indexs
+  if (model.value.length > 0) {
+    return list.filter(x => x.chapterDetail.includes(model.value.map(x => x.text).join(' ')))
+  }
+  return list
+})
 
-          this.nonce++
-        }
+const getTotalIndexs = computed(() => searchStore.totalsIndexs)
 
-        return v
-      })
-    },
-  },
-  computed: {
-    loading(){
-      return this.$store.getters.getoverlay
-    },
-    indexs(){
-      const list = this.$store.getters.getIndexs
-      if (this.model.length > 0) {
-        return list.filter(x => x.chapterDetail.includes(this.model.map(x => x.text).join(' ')))
-      }
-      return list
-    },
-    getTotalIndexs(){
-      return this.$store.getters.getTotalIndexs
-    },
-    checkMobile () {
-      return !this.$vuetify.breakpoint.mobile
-    },
-    notfound(){
-      return (this.indexs.length===0 && this.$store.getters.getTotalIndexs!==0)
-    },
-  },
-  created () {
-    this.$store.dispatch('clear')
-    this.$store.dispatch('getShortsFromApi', this.$route.query.t)
-  },
-  beforeDestroy () {
-    this.$store.dispatch('clear')
-  },
-  methods: {
-    edit (index, item) {
-      if (!this.editing) {
-        this.editing = item
-        this.editingIndex = index
-      } else {
-        this.editing = null
-        this.editingIndex = -1
-      }
-    },
-    filter (item, queryText, itemText) {
-      if (item.header) return false
+const checkMobile = computed(() => {
+  const { $vuetify } = getCurrentInstance().appContext.config.globalProperties
+  return !$vuetify.display.mobile
+})
 
-      const hasValue = val => val != null ? val : ''
-
-      const text = hasValue(itemText)
-      const query = hasValue(queryText)
-
-      return text.toString()
-        .toLowerCase()
-        .indexOf(query.toString().toLowerCase()) > -1
-    },
-    text_render(input){
-      if(!input.includes("<mark>")) return input
-
-       let text = input.split("html")
-       if(text.length>1){
-        let t = input.split("html").slice(1).join(' ')
-        let b = t.replace('<mark>',`$<mark>`)
-        let s = b.split("$")
-        let x = s[0].split(" ")
-        let value =`${x[x.length-1]}${s[1]}`
-        return value
-       }else{
-        let b = input.replace('<mark>',`$<mark>`)
-        let s = b.split("$")
-        let x = s[0].split(" ")
-        let value =`${x[x.length-1]}${s[1]}`
-        return value
-       }
-    },
-    dialogs(head,content,content_copy,book,id){
-      this.dialog=!this.dialog
-      this.content=content
-      this.content_copy=content_copy
-      this.head_content=head
-      this.frombook=book
-      this.book_id=id
-    },
-    close(){
-      this.dialog=!this.dialog
-      window.getSelection().removeAllRanges()
-      this.word_copy = 'คัดลอก'
-      this.content=""
-      this.head_content=""
-    },
-    infiniteRow(){
-      let offset = this.$store.getters.getIndexs.length
-
-      if (this.model.length > 0) {
-        this.$store.dispatch('searchShortFromApiContinue',{ words:this.model, page:offset, creator: this.$route.query.t })
-      } else {
-        this.$store.dispatch('setShortFromApiContinue',{ page: offset, creator: this.$route.query.t })
-      }
-    },
-    selectText(element) {
-        var range;
-        if (document.selection) {
-          // IE
-          range = document.body.createTextRange();
-          range.moveToElementText(element);
-          range.select();
-        } else if (window.getSelection) {
-          range = document.createRange();
-          range.selectNode(element);
-          window.getSelection().removeAllRanges();
-          window.getSelection().addRange(range);
-        }
-    },
-    copyTextDetail () {
-      this.selectText(this.$refs.textCopy); // e.g. <div ref="text">
-
-      try {
-        var successful = document.execCommand('copy');
-        var msg = successful ? 'คัดลอกแล้ว' : 'คัดลอกไม่สำเร็จ';
-        this.word_copy = `${msg}`
-      } catch (err) {
-        alert('Oops, unable to copy');
-      }
-    },
+const notfound = computed(() => {
+  return (indexs.value.length === 0 && searchStore.totalsIndexs !== 0)
+})
+const edit = (index, item) => {
+  if (!editing.value) {
+    editing.value = item
+    editingIndex.value = index
+  } else {
+    editing.value = null
+    editingIndex.value = -1
   }
 }
+
+const filter = (item, queryText, itemText) => {
+  if (item.header) return false
+
+  const hasValue = val => val != null ? val : ''
+
+  const text = hasValue(itemText)
+  const query = hasValue(queryText)
+
+  return text.toString()
+    .toLowerCase()
+    .indexOf(query.toString().toLowerCase()) > -1
+}
+
+const text_render = (input) => {
+  if (!input.includes("<mark>")) return input
+
+  let text = input.split("html")
+  if (text.length > 1) {
+    let t = input.split("html").slice(1).join(' ')
+    let b = t.replace('<mark>', `$<mark>`)
+    let s = b.split("$")
+    let x = s[0].split(" ")
+    let value = `${x[x.length - 1]}${s[1]}`
+    return value
+  } else {
+    let b = input.replace('<mark>', `$<mark>`)
+    let s = b.split("$")
+    let x = s[0].split(" ")
+    let value = `${x[x.length - 1]}${s[1]}`
+    return value
+  }
+}
+
+const dialogs = (head, content_param, content_copy_param, book, id) => {
+  dialog.value = !dialog.value
+  content.value = content_param
+  content_copy.value = content_copy_param
+  head_content.value = head
+  frombook.value = book
+  book_id.value = id
+}
+
+const close = () => {
+  dialog.value = !dialog.value
+  window.getSelection().removeAllRanges()
+  word_copy.value = 'คัดลอก'
+  content.value = ""
+  head_content.value = ""
+}
+
+const infiniteRow = () => {
+  let offset = searchStore.indexs.length
+
+  if (model.value.length > 0) {
+    searchStore.searchShortFromApiContinue({ words: model.value, page: offset, creator: route.query.t })
+  } else {
+    searchStore.setShortFromApiContinue({ page: offset, creator: route.query.t })
+  }
+}
+
+const textCopyRef = ref(null)
+
+const selectText = (element) => {
+  var range
+  if (document.selection) {
+    // IE
+    range = document.body.createTextRange()
+    range.moveToElementText(element)
+    range.select()
+  } else if (window.getSelection) {
+    range = document.createRange()
+    range.selectNode(element)
+    window.getSelection().removeAllRanges()
+    window.getSelection().addRange(range)
+  }
+}
+
+const copyTextDetail = () => {
+  selectText(textCopyRef.value)
+
+  try {
+    var successful = document.execCommand('copy')
+    var msg = successful ? 'คัดลอกแล้ว' : 'คัดลอกไม่สำเร็จ'
+    word_copy.value = `${msg}`
+  } catch (err) {
+    alert('Oops, unable to copy')
+  }
+}
+
+// Watchers and lifecycle
+watch(model, (val, prev) => {
+  if (val.length === prev.length) return
+
+  if (val.length > 5) {
+    model.value.pop()
+  }
+
+  model.value = val.map(v => {
+    if (typeof v === 'string') {
+      v = {
+        text: v,
+        color: colors.value[nonce.value - 1],
+      }
+
+      items.value.push(v)
+      nonce.value++
+    }
+
+    return v
+  })
+}, { deep: true })
+
+onMounted(() => {
+  searchStore.clear()
+  searchStore.getShortsFromApi(route.query.t)
+})
+
+onBeforeUnmount(() => {
+  searchStore.clear()
+})
 </script>
 
 <style>

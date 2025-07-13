@@ -11,12 +11,17 @@ import 'vuetify/styles'
 import 'roboto-fontface/css/roboto/roboto-fontface.css'
 import '@mdi/font/css/materialdesignicons.css'
 
+// Naive UI setup for V2 routes
+import naive from 'naive-ui'
+
 // Configure Vue 3 compatibility mode
 configureCompat({
   COMPONENT_ASYNC: false,
   GLOBAL_PROTOTYPE: 'suppress-warning',
   COMPONENT_V_MODEL: 'suppress-warning',
-  INSTANCE_ATTRS_CLASS_STYLE: 'suppress-warning'
+  INSTANCE_ATTRS_CLASS_STYLE: 'suppress-warning',
+  WATCH_ARRAY: 'suppress-warning',
+  COMPILER_V_BIND_OBJECT_ORDER: 'suppress-warning'
 })
 
 const app = createApp(App)
@@ -24,6 +29,7 @@ const app = createApp(App)
 app.use(router)
 app.use(pinia)
 app.use(vuetify)
+app.use(naive)
 app.use(VueGtag, {
   appName: 'Dhamma01.com',
   pageTrackerScreenviewEnabled: true,
