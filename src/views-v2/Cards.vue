@@ -30,9 +30,11 @@
                 :options="keywordOptions"
                 placeholder="พิมพ์คำค้นหา..."
                 class="keyword-input"
-                @select="addKeyword"
+                @select="handleKeywordSelect"
                 @keydown.enter="addKeywordFromInput"
+                @blur="addKeywordFromInput"
                 clearable
+                clear-after-select
               />
               <n-button
                 v-if="searchKeywords.length > 0"
@@ -98,14 +100,13 @@
         <div class="cards-grid">
           <n-grid
             :cols="12"
-            :x-gap="16"
             :y-gap="20"
             responsive="screen"
             item-responsive
             class="cards-container"
           >
             <n-grid-item
-              v-for="(card, index) in cards"
+              v-for="card in cards"
               :key="card.cardId"
               span="12 s:6 m:4 l:3"
               class="card-item"
@@ -121,7 +122,7 @@
                       :src="card.cardPicThumbnails"
                       :alt="`การ์ด ${card.cardDetail}`"
                       width="100%"
-                      height="200"
+                      height="250"
                       object-fit="cover"
                       preview-disabled
                       class="card-cover"
@@ -161,6 +162,7 @@
                   <n-space justify="center">
                     <n-button
                       type="primary"
+                      secondary
                       @click.stop="openCardModal(card)"
                       class="view-button"
                     >
@@ -185,7 +187,7 @@
             <n-text depth="3" class="loading-text">
               {{ infiniteScrollLoading ? 'กำลังโหลดการ์ดเพิ่มเติม...' : 'เลื่อนลงเพื่อดูการ์ดเพิ่มเติม' }}
             </n-text>
-            <n-text v-if="cards.length > 0" depth="4" class="loading-stats">
+            <n-text v-if="cards.length > 0" depth="3" class="loading-stats">
               แสดงแล้ว {{ cards.length }} / {{ totalCards }} การ์ด
             </n-text>
           </div>
@@ -390,17 +392,39 @@ const tagOptions = computed((): TagOption[] => {
 const keywordOptions = computed((): KeywordOption[] => {
   if (!keywordInput.value) return []
 
-  // Generate keyword options from card details based on input
-  const keywords = cards.value.flatMap((card: any) =>
+  const input = keywordInput.value.trim()
+  const options = []
+
+  if (input && !searchKeywords.value.includes(input) && input.length > 0) {
+    options.push({
+      label: `"${input}" (พิมพ์แล้วกด Enter)`,
+      value: input
+    })
+  }
+
+  // Generate autocomplete suggestions based on input
+  const suggestions = cards.value.flatMap((card: any) =>
     card.cardDetail.split(' ').filter((word: any) =>
       word.length > 2 && word.toLowerCase().includes(keywordInput.value.toLowerCase())
     )
   )
-  const uniqueKeywords = Array.from(new Set(keywords))
-  return uniqueKeywords.slice(0, 10).map((keyword: any) => ({
-    label: keyword,
-    value: keyword
-  }))
+
+
+  suggestions.filter(word =>
+    word.toLowerCase().includes(input.toLowerCase()) &&
+    !searchKeywords.value.includes(word) &&
+    word !== input
+  )
+
+  // Add suggestions
+  suggestions.slice(0, 4).forEach(suggestion => {
+    options.push({
+      label: suggestion,
+      value: suggestion
+    })
+  })
+
+  return options
 })
 
 
@@ -420,16 +444,28 @@ const canGoPreviousDisabled = computed(() => !cardModal.canGoPrevious.value || u
 const canGoNextDisabled = computed(() => !cardModal.canGoNext.value || undefined)
 
 // Methods
+const handleKeywordSelect = (value: string): void => {
+  addKeyword(value)
+  // Force clear the input after selection with a small delay
+  setTimeout(() => {
+    keywordInput.value = ''
+  }, 10)
+}
+
 const addKeyword = (value: string): void => {
-  if (!value || searchKeywords.value.includes(value)) return
+  if (!value || searchKeywords.value.includes(value)) {
+    keywordInput.value = '' // Clear input even if keyword already exists
+    return
+  }
 
   if (searchKeywords.value.length >= 5) {
     message.warning('สามารถค้นหาได้สูงสุด 5 คำเท่านั้น')
+    keywordInput.value = '' // Clear input when limit reached
     return
   }
 
   searchKeywords.value.push(value)
-  keywordInput.value = ''
+  keywordInput.value = '' // Clear input after successful addition
 }
 
 const addKeywordFromInput = (): void => {
@@ -515,14 +551,14 @@ const openCardModal = (card: Card): void => {
   console.log('openCardModal called with card:', card)
   console.log('card.cardPic:', card.cardPic)
   console.log('card.cardDetail:', card.cardDetail)
-  
+
   // Track card view
   analytics.trackCardView({
     cardId: card.cardId,
     cardTitle: card.cardDetail,
     creatorId: card.creatorId
   })
-  
+
   cardModal.openCard(card, cards.value)
 }
 

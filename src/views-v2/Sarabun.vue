@@ -12,13 +12,13 @@
           <!-- Book Cover -->
           <n-gi :span="24" :tablet="12" :desktop="10">
             <div class="book-cover-section">
-              <n-skeleton 
+              <n-skeleton
                 v-if="loading"
                 width="250px"
                 height="350px"
                 class="book-cover-skeleton"
               />
-              <n-image 
+              <n-image
                 v-else
                 :src="bookSelected?.bookCover"
                 alt="Book Cover"
@@ -157,10 +157,9 @@
               class="chapter-item"
             >
               <template #prefix>
-                <n-avatar 
+                <n-avatar
                   :size="32"
-                  color="#f0f0f0"
-                  text-color="#666"
+                  color="#696969"
                   class="chapter-number"
                 >
                   {{ index + 1 }}
@@ -447,9 +446,9 @@ const loadMoreChapters = async (): Promise<void> => {
       })
 
       // Add minimum loading time for better UX
-      const loadingPromise = booksStore.setSarabun({ 
-        bookId: props.id, 
-        offset: offset 
+      const loadingPromise = booksStore.setSarabun({
+        bookId: props.id,
+        offset: offset
       })
 
       const minDelayPromise = new Promise(resolve => setTimeout(resolve, 1000))
@@ -558,7 +557,7 @@ const downloadBook = async (): Promise<void> => {
 const extractPdfFileName = (url: string): string | null => {
   const parts = url.split('/')
   const lastPart = parts[parts.length - 1]
-  
+
   if (lastPart.endsWith('.pdf')) {
     return lastPart
   }

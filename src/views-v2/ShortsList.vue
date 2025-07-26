@@ -100,7 +100,7 @@
             class="timeline-item"
           >
             <template #default>
-              <div 
+              <div
                 class="timeline-card-wrapper"
                 @click="openDetailModal(item)"
               >
@@ -259,7 +259,10 @@
             </template>
             {{ copyButtonText }}
           </n-button>
-          <n-button @click="closeDetailModal" type="primary">
+          <n-button @click="closeDetailModal" secondary type="error">
+            <template #icon>
+              <n-icon><CloseCircleOutlined /></n-icon>
+            </template>
             ออก
           </n-button>
         </n-space>
@@ -342,10 +345,10 @@ const filteredShorts = computed((): ShortItem[] => {
 
 const keywordOptions = computed(() => {
   if (!keywordInput.value) return []
-  
+
   const input = keywordInput.value.trim()
   const options = []
-  
+
   // Add current input as first option if it's not already in keywords and not empty
   if (input && !searchKeywords.value.includes(input) && input.length > 0) {
     options.push({
@@ -353,7 +356,7 @@ const keywordOptions = computed(() => {
       value: input
     })
   }
-  
+
   // Generate autocomplete suggestions based on input
   const suggestions = [
     'พระพุทธเจ้า',
@@ -373,12 +376,12 @@ const keywordOptions = computed(() => {
     'ปกิณกะ',
     'ข้อคิด',
     'คำสอน'
-  ].filter(word => 
+  ].filter(word =>
     word.toLowerCase().includes(input.toLowerCase()) &&
     !searchKeywords.value.includes(word) &&
     word !== input
   )
-  
+
   // Add suggestions
   suggestions.slice(0, 4).forEach(suggestion => {
     options.push({
@@ -386,7 +389,7 @@ const keywordOptions = computed(() => {
       value: suggestion
     })
   })
-  
+
   return options
 })
 
@@ -600,7 +603,7 @@ const copyDetailText = async (): Promise<void> => {
 onMounted(async () => {
   // Clear any previous data and load shorts
   searchStore.clear()
-  
+
   try {
     await searchStore.getShortsFromApi(creatorId.value)
     console.log('ShortsListV2 mounted with creator:', creatorId.value)

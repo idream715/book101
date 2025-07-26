@@ -21,7 +21,8 @@ configureCompat({
   COMPONENT_V_MODEL: 'suppress-warning',
   INSTANCE_ATTRS_CLASS_STYLE: 'suppress-warning',
   WATCH_ARRAY: 'suppress-warning',
-  COMPILER_V_BIND_OBJECT_ORDER: 'suppress-warning'
+  COMPILER_V_BIND_OBJECT_ORDER: 'suppress-warning',
+  RENDER_FUNCTION: false
 })
 
 const app = createApp(App)

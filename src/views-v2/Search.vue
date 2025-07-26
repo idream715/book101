@@ -16,10 +16,11 @@
                 :options="keywordOptions"
                 placeholder="พิมพ์คำค้นหา..."
                 class="keyword-input"
-                @select="addKeyword"
+                @select="handleKeywordSelect"
                 @keydown.enter="addKeywordFromInput"
                 @blur="addKeywordFromInput"
                 clearable
+                clear-after-select
               />
               <n-button
                 v-if="searchKeywords.length > 0"
@@ -144,7 +145,7 @@
                   </n-button>
 
                   <n-button
-                    v-if="result.chapterLinkPdf"
+                    v-if="checkPdfLink(result.chapterLinkPdf)"
                     @click="openPdf(result.chapterLinkPdf)"
                     type="error"
                     ghost
@@ -160,6 +161,8 @@
 
                   <n-button
                     @click="openDetailModal(result)"
+                    secondary
+                    strong
                     type="primary"
                     class="detail-button"
                   >
@@ -269,7 +272,10 @@
             </template>
             {{ copyButtonText }}
           </n-button>
-          <n-button @click="closeDetailModal" type="primary">
+          <n-button @click="closeDetailModal" secondary type="error">
+            <template #icon>
+              <n-icon><CloseCircleOutlined /></n-icon>
+            </template>
             ออก
           </n-button>
         </n-space>
@@ -320,7 +326,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted, nextTick } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useMessage } from 'naive-ui'
 import {
@@ -345,7 +351,7 @@ interface SearchResult {
   bookName: string
   bookId: string
   chapterLinkYouTube?: string
-  chapterLinkPdf?: string
+  chapterLinkPdf?: string | undefined
 }
 
 interface DetailModal {
@@ -394,7 +400,6 @@ const creatorId = computed((): string => (route.query.t as string) || '1')
 const loading = computed((): boolean => searchStore.overlay)
 const searchResults = computed((): SearchResult[] => searchStore.indexs || [])
 const totalResults = computed((): number => searchStore.totalsIndexs || 0)
-const notFound = computed((): boolean => searchStore.notfound)
 
 const searchDescription = computed((): string => {
   if (searchResults.value.length > 0) {
@@ -405,10 +410,10 @@ const searchDescription = computed((): string => {
 
 const keywordOptions = computed(() => {
   if (!keywordInput.value) return []
-  
+
   const input = keywordInput.value.trim()
   const options = []
-  
+
   // Add current input as first option if it's not already in keywords and not empty
   if (input && !searchKeywords.value.includes(input) && input.length > 0) {
     options.push({
@@ -416,12 +421,12 @@ const keywordOptions = computed(() => {
       value: input
     })
   }
-  
+
   // Generate autocomplete suggestions based on input
   const suggestions = [
     'พระพุทธเจ้า',
     'ธรรมะ',
-    'สังฆะ',
+    'สบาย',
     'สติ',
     'ปัญญา',
     'เมตตา',
@@ -430,15 +435,15 @@ const keywordOptions = computed(() => {
     'อุเบกขา',
     'ความเพียร',
     'สมาธิ',
-    'วิปัสสนา',
-    'กรรม',
+    'หลวงพ่อ',
+    'นั่งธรรมะ',
     'นิพพาน'
-  ].filter(word => 
+  ].filter(word =>
     word.toLowerCase().includes(input.toLowerCase()) &&
     !searchKeywords.value.includes(word) &&
     word !== input
   )
-  
+
   // Add suggestions
   suggestions.slice(0, 4).forEach(suggestion => {
     options.push({
@@ -446,7 +451,7 @@ const keywordOptions = computed(() => {
       value: suggestion
     })
   })
-  
+
   return options
 })
 
@@ -456,13 +461,6 @@ const canSearch = computed((): boolean => {
 
 
 // Methods
-const onKeywordChange = (value: string[]): void => {
-  if (value.length > 5) {
-    searchKeywords.value = value.slice(0, 5)
-    message.warning('สามารถค้นหาได้สูงสุด 5 คำเท่านั้น')
-  }
-}
-
 const performSearch = async (): Promise<void> => {
   if (!canSearch.value) {
     message.warning('กรุณาใส่คำที่ต้องการค้นหา')
@@ -508,6 +506,14 @@ const performSearch = async (): Promise<void> => {
   } finally {
     searching.value = false
   }
+}
+
+const handleKeywordSelect = (value: string): void => {
+  addKeyword(value)
+  // Force clear the input after selection with a small delay
+  setTimeout(() => {
+    keywordInput.value = ''
+  }, 10)
 }
 
 const addKeyword = (value: string): void => {
@@ -628,6 +634,10 @@ const loadMoreResults = async (): Promise<void> => {
   }
 }
 
+const checkPdfLink = (url: string | undefined): boolean => {
+  return (url) ? url.endsWith('.pdf') : false
+}
+
 
 const navigateToBook = (bookId: string): void => {
   const bookUrl = router.resolve({
@@ -695,7 +705,7 @@ const openYouTubeExternal = (): void => {
   }
 }
 
-const openPdf = (url: string): void => {
+const openPdf = (url: string | undefined): void => {
   window.open(url, '_blank')
 }
 
@@ -764,6 +774,7 @@ onMounted(async () => {
 }
 
 .search-button {
+  color: white;
   font-family: 'Sarabun', sans-serif;
   font-weight: 500;
 }

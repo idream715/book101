@@ -1,6 +1,6 @@
 <template>
   <div class="search-page">
-    <div 
+    <div
       class="search-background"
       :style="{ backgroundImage: `url(${backgroundImage})` }"
     >
@@ -8,9 +8,9 @@
         <!-- Navigation Header -->
         <div class="nav-header">
           <div v-if="!isMobile" class="nav-desktop">
-            <n-button 
-              v-if="isHomePage" 
-              text 
+            <n-button
+              v-if="isHomePage"
+              text
               @click="navigateTo('/v2/cards')"
               class="nav-button"
             >
@@ -21,9 +21,9 @@
               </template>
               การ์ดธรรมะ
             </n-button>
-            <n-button 
-              v-else 
-              text 
+            <n-button
+              v-else
+              text
               @click="navigateTo('/v2')"
               class="nav-button"
             >
@@ -34,8 +34,8 @@
               </template>
               หน้าหลัก
             </n-button>
-            <n-button 
-              text 
+            <n-button
+              text
               @click="navigateTo('/v2/books')"
               class="nav-button"
             >
@@ -46,8 +46,8 @@
               </template>
               หนังสือธรรมะ
             </n-button>
-            <n-button 
-              text 
+            <n-button
+              text
               @click="navigateTo('/v2/about')"
               class="nav-button"
             >
@@ -60,8 +60,8 @@
             </n-button>
           </div>
           <div v-else class="nav-mobile">
-            <n-dropdown 
-              :options="mobileMenuOptions" 
+            <n-dropdown
+              :options="mobileMenuOptions"
               @select="handleMobileMenuSelect"
               placement="bottom-start"
             >
@@ -91,9 +91,9 @@
               />
               <div v-else class="logo-placeholder"></div>
             </div>
-            
+
             <h1 class="search-title">{{ headingTitle }}</h1>
-            
+
             <div class="search-form">
               <n-form>
                 <n-form-item>
@@ -103,10 +103,11 @@
                       :options="keywordOptions"
                       :placeholder="searchPlaceholder"
                       class="keyword-input"
-                      @select="addKeyword"
+                      @select="handleKeywordSelect"
                       @keydown.enter="addKeywordFromInput"
                       @blur="addKeywordFromInput"
                       clearable
+                      clear-after-select
                     />
                     <n-button
                       v-if="searchKeywords.length > 0"
@@ -123,9 +124,15 @@
                     </n-button>
                   </n-input-group>
                 </n-form-item>
-                
+
                 <!-- Keyword Tags Display -->
-                <div v-if="searchKeywords.length > 0" class="keyword-tags">
+                <n-card
+                  v-if="searchKeywords.length > 0"
+                  class="keyword-tags"
+                  size="small"
+                  :bordered="false"
+                >
+                   คำที่จะค้นหา:
                   <n-tag
                     v-for="(keyword, index) in searchKeywords"
                     :key="keyword"
@@ -136,11 +143,11 @@
                   >
                     {{ keyword }}
                   </n-tag>
-                </div>
-                
-                <n-space class="search-buttons">
-                  <n-button 
-                    type="primary" 
+                </n-card>
+
+                <n-space class="search-buttons-panel">
+                  <n-button
+                    type="primary"
                     @click="performSearch"
                     :loading="searching || undefined"
                     :disabled="!canSearch || undefined"
@@ -153,9 +160,9 @@
                     </template>
                     ค้นหา
                   </n-button>
-                  
-                  <n-button 
-                    type="primary" 
+
+                  <n-button
+                    type="primary"
                     @click="performRandomSearch"
                     :loading="randomSearching || undefined"
                     class="random-button"
@@ -185,11 +192,11 @@
     >
       <div v-if="randomModal.content" class="random-content">
         <h3 class="random-title">{{ randomModal.content.chapterHeading }}</h3>
-        
+
         <div class="random-book-info">
-          <n-button 
-            text 
-            type="primary" 
+          <n-button
+            text
+            type="primary"
             @click="navigateToBook(randomModal.content.bookId)"
             class="book-link"
           >
@@ -201,12 +208,12 @@
             จากหนังสือ: {{ randomModal.content.bookName }}
           </n-button>
         </div>
-        
+
         <div class="random-detail">
           <p>{{ randomModal.content.chapterDetail }}</p>
         </div>
       </div>
-      
+
       <template #footer>
         <n-space justify="end">
           <n-button @click="performRandomSearch" :loading="randomSearching || undefined">
@@ -222,11 +229,11 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, h } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useMessage } from 'naive-ui'
-import { 
-  SearchOutlined, 
+import {
+  SearchOutlined,
   CreditCardOutlined,
   HomeOutlined,
   BookOutlined,
@@ -239,11 +246,6 @@ import { useSearchStore } from '@/stores/search'
 import { useAnalytics } from '@/composables/useAnalytics'
 
 // Types
-interface KeywordOption {
-  label: string
-  value: string
-}
-
 interface RandomContent {
   chapterHeading: string
   bookName: string
@@ -325,10 +327,10 @@ const canSearch = computed((): boolean => {
 
 const keywordOptions = computed(() => {
   if (!keywordInput.value) return []
-  
+
   const input = keywordInput.value.trim()
   const options = []
-  
+
   // Add current input as first option if it's not already in keywords and not empty
   if (input && !searchKeywords.value.includes(input) && input.length > 0) {
     options.push({
@@ -336,7 +338,7 @@ const keywordOptions = computed(() => {
       value: input
     })
   }
-  
+
   // Generate autocomplete suggestions based on input
   const suggestions = [
     'พระพุทธเจ้า',
@@ -353,12 +355,12 @@ const keywordOptions = computed(() => {
     'วิปัสสนา',
     'กรรม',
     'นิพพาน'
-  ].filter(word => 
+  ].filter(word =>
     word.toLowerCase().includes(input.toLowerCase()) &&
     !searchKeywords.value.includes(word) &&
     word !== input
   )
-  
+
   // Add suggestions
   suggestions.slice(0, 4).forEach(suggestion => {
     options.push({
@@ -366,13 +368,13 @@ const keywordOptions = computed(() => {
       value: suggestion
     })
   })
-  
+
   return options
 })
 
 const mobileMenuOptions = computed(() => {
   const options = []
-  
+
   if (isHomePage.value) {
     options.push({
       label: 'การ์ดธรรมะ',
@@ -386,7 +388,7 @@ const mobileMenuOptions = computed(() => {
       icon: () => h(HomeOutlined)
     })
   }
-  
+
   options.push(
     {
       label: 'หนังสือธรรมะ',
@@ -399,14 +401,24 @@ const mobileMenuOptions = computed(() => {
       icon: () => h(InfoCircleOutlined)
     }
   )
-  
+
   return options
 })
 
 // Methods
+const handleKeywordSelect = (value: string): void => {
+  addKeyword(value)
+  // Force clear the input after selection with a small delay
+  setTimeout(() => {
+    keywordInput.value = ''
+  }, 10)
+}
+
 const addKeyword = (value: string): void => {
-  const trimmedValue = value.trim()
-  if (!trimmedValue || searchKeywords.value.includes(trimmedValue)) {
+  // Remove the suggestion text if it exists
+  const cleanValue = value.replace(/ \(พิมพ์แล้วกด Enter\)$/, '').replace(/^"/, '').replace(/"$/, '').trim()
+
+  if (!cleanValue || searchKeywords.value.includes(cleanValue)) {
     keywordInput.value = '' // Clear input even if keyword already exists
     return
   }
@@ -417,7 +429,7 @@ const addKeyword = (value: string): void => {
     return
   }
 
-  searchKeywords.value.push(trimmedValue)
+  searchKeywords.value.push(cleanValue)
   keywordInput.value = '' // Clear input after successful addition
 }
 
@@ -434,14 +446,6 @@ const removeKeyword = (index: number): void => {
 const clearSearch = (): void => {
   searchKeywords.value = []
   keywordInput.value = ''
-}
-
-const onKeywordChange = (value: string[]): void => {
-  // Limit keywords to 5
-  if (value.length > 5) {
-    searchKeywords.value = value.slice(0, 5)
-    message.warning('สามารถค้นหาได้สูงสุด 5 คำเท่านั้น')
-  }
 }
 
 const performSearch = async (): Promise<void> => {
@@ -470,21 +474,22 @@ const performSearch = async (): Promise<void> => {
     analytics.trackSearch({
       keywords: searchKeywords.value,
       searchType: 'content',
-      creatorId: parseInt(creatorId.value)
+      creatorId: parseInt(creatorId.value),
+      resultCount: searchStore.search_indexs?.length || 0
     })
 
     // Navigate to search results with keywords as URL parameters
-    const queryParams = {
+    const queryParams: Record<string, string> = {
       t: creatorId.value
     }
-    
+
     // Add keywords as word1, word2, etc. parameters
     searchKeywords.value.forEach((keyword, index) => {
       if (index < 5) {
         queryParams[`word${index + 1}`] = keyword
       }
     })
-    
+
     await router.push({
       path: '/v2/search',
       query: queryParams
@@ -510,21 +515,27 @@ const performRandomSearch = async (): Promise<void> => {
     })
 
     const randomResult = searchStore.search_random
+    console.log('Random search result:', randomResult)
+    
     if (randomResult && randomResult.length > 0) {
       randomModal.value.content = randomResult[0]
       randomModal.value.visible = true
+      
+      // Track random search analytics
+      analytics.trackSearch({
+        keywords: ['random'],
+        searchType: 'random',
+        creatorId: parseInt(creatorId.value),
+        resultCount: 1
+      })
+    } else {
+      message.warning('ไม่พบข้อมูลสำหรับสุ่มอ่าน')
     }
-
-    // Track random search analytics
-    analytics.trackSearch({
-      keywords: ['random'],
-      searchType: 'random',
-      creatorId: parseInt(creatorId.value)
-    })
 
     console.log('Random search performed:', {
       creatorId: creatorId.value,
-      result: randomResult
+      result: randomResult,
+      modalContent: randomModal.value.content
     })
   } catch (error) {
     console.error('Random search error:', error)
@@ -684,6 +695,13 @@ onMounted(() => {
   margin-bottom: 16px;
 }
 
+.search-buttons-panel {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 12px;
+}
+
 .search-buttons {
   display: flex;
   justify-content: center;
@@ -701,9 +719,10 @@ onMounted(() => {
 
 .keyword-tags {
   display: flex;
+  background-color: transparent;
   flex-wrap: wrap;
+  color: black;
   gap: 8px;
-  margin-top: 16px;
   margin-bottom: 8px;
 }
 
@@ -716,6 +735,7 @@ onMounted(() => {
 .random-button {
   font-family: 'Sarabun', sans-serif;
   font-weight: 500;
+  color: white;
   padding: 0 24px;
   height: 40px;
 }
@@ -775,27 +795,27 @@ onMounted(() => {
   .nav-header {
     padding: 12px 16px;
   }
-  
+
   .search-content {
     padding: 0 16px;
   }
-  
+
   .search-title {
     font-size: 1.5rem;
     margin-bottom: 24px;
   }
-  
+
   .search-buttons {
     flex-direction: column;
     align-items: center;
   }
-  
+
   .search-button,
   .random-button {
     width: 100%;
     max-width: 200px;
   }
-  
+
   .random-modal {
     width: 95vw !important;
   }
@@ -805,16 +825,16 @@ onMounted(() => {
   .search-title {
     font-size: 1.25rem;
   }
-  
+
   .logo-container {
     margin-bottom: 16px;
   }
-  
+
   .creator-logo {
     width: 120px;
     height: 120px;
   }
-  
+
   .logo-placeholder {
     width: 120px;
     height: 120px;

@@ -1,7 +1,15 @@
 <template>
   <div class="app-navbar">
     <n-affix :top="0" v-if="!hideOnHome || !isHomePage">
-      <n-card class="navbar-card">
+      <n-card 
+        class="navbar-card"
+        :style="{ 
+          backgroundImage: `${creatorGradient}, url(${creatorBackground})`,
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+          backgroundBlendMode: 'overlay'
+        }"
+      >
         <div class="navbar-content">
           <!-- Logo Section -->
           <div class="logo-section">
@@ -132,7 +140,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref } from 'vue'
+import { computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useBreakpoints } from '@vueuse/core'
 import {
@@ -209,6 +217,33 @@ const homeRoute = computed(() => {
 })
 
 const showOverlay = computed(() => props.overlay)
+
+// Creator-specific background
+const creatorBackground = computed(() => {
+  switch (currentCreator.value) {
+    case '1':
+      return 'https://images.unsplash.com/photo-1503455637927-730bce8583c0?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1950&q=80'
+    case '2':
+      return 'https://i.imgur.com/PA4GVvR.jpeg'
+    case '4':
+      return 'https://i.postimg.cc/2yNjQ85Z/gold.jpg'
+    default:
+      return 'https://images.unsplash.com/photo-1503455637927-730bce8583c0?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1950&q=80'
+  }
+})
+
+const creatorGradient = computed(() => {
+  switch (currentCreator.value) {
+    case '1':
+      return 'linear-gradient(135deg, rgba(255, 182, 193, 0.8), rgba(255, 105, 180, 0.8))'
+    case '2':
+      return 'linear-gradient(135deg, rgba(173, 216, 230, 0.8), rgba(135, 206, 235, 0.8))'
+    case '4':
+      return 'linear-gradient(135deg, rgba(255, 223, 0, 0.8), rgba(255, 140, 0, 0.8))'
+    default:
+      return 'linear-gradient(135deg, rgba(255, 182, 193, 0.8), rgba(255, 105, 180, 0.8))'
+  }
+})
 
 // Creator options
 const creatorOptions = computed(() => [
@@ -291,14 +326,27 @@ const handleMobileMenuSelect = (key: string): void => {
 }
 
 .navbar-card {
-  background: rgba(255, 255, 255, 0.95);
   backdrop-filter: blur(10px);
   border: none;
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.2);
   border-radius: 0;
+  position: relative;
+}
+
+.navbar-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(255, 255, 255, 0.3);
+  z-index: 1;
 }
 
 .navbar-content {
+  position: relative;
+  z-index: 2;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -332,11 +380,8 @@ const handleMobileMenuSelect = (key: string): void => {
   font-family: 'Sarabun', sans-serif;
   font-size: 18px;
   font-weight: 600;
-  color: #1a202c;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+  color: white;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -348,11 +393,20 @@ const handleMobileMenuSelect = (key: string): void => {
 
 .nav-button {
   transition: all 0.3s ease;
+  background: rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
 }
 
 .nav-button:hover {
   transform: translateY(-2px);
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  background: rgba(255, 255, 255, 0.3);
+}
+
+.nav-button :deep(.n-icon) {
+  color: white;
+  filter: drop-shadow(1px 1px 2px rgba(0, 0, 0, 0.5));
 }
 
 .scroll-to-top-button {

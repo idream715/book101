@@ -1,6 +1,6 @@
 <template>
   <AppLayout>
-    <ContentLayout 
+    <ContentLayout
       title="📚 หนังสือธรรมะ"
       description="รวมหนังสือคำสอนของหลวงพ่อธัมมชโย และคุณครูไม่ใหญ่ ครบถ้วนทุกเล่ม"
       :loading="loading || undefined"
@@ -20,8 +20,8 @@
                 class="search-select"
                 @update:value="onFilterChange"
               />
-              <n-button 
-                v-if="filterBookValue" 
+              <n-button
+                v-if="filterBookValue"
                 @click="clearFilter"
                 type="primary"
                 ghost
@@ -35,7 +35,7 @@
               </n-button>
             </n-input-group>
           </n-form-item>
-          
+
           <!-- Filter Statistics -->
           <n-text depth="3" class="filter-stats">
             แสดง {{ filteredBooks.length }} เล่ม{{ filterBookValue ? ` จากการกรอง "${filterBookValue}"` : ' ทั้งหมด' }}
@@ -45,19 +45,15 @@
 
       <!-- Books Grid -->
       <div class="books-grid">
-        <n-grid 
-          :cols="2" 
-          :sm-cols="3"
-          :md-cols="4" 
-          :lg-cols="5"
-          :xl-cols="6"
-          :x-gap="16" 
-          :y-gap="20" 
+        <n-grid
+          cols="3 m:4 l:5 xl:6 2xl:8"
+          :x-gap="16"
+          :y-gap="20"
           responsive="screen"
           class="books-container"
         >
-          <n-grid-item 
-            v-for="book in filteredBooks" 
+          <n-grid-item
+            v-for="book in filteredBooks"
             :key="book.bookId"
             class="book-item"
           >
@@ -79,19 +75,19 @@
                     class="book-cover"
                     :fallback-src="'/src/assets/logo2.png'"
                   />
-                  
+
                   <!-- Category Badge -->
-                  <n-tag 
-                    v-if="book.categoryName" 
-                    size="small" 
-                    type="info" 
+                  <n-tag
+                    v-if="book.categoryName"
+                    size="small"
+                    type="info"
                     class="category-badge"
                   >
                     {{ book.categoryName }}
                   </n-tag>
                 </div>
               </template>
-              
+
               <template #header>
                 <div class="book-title-container">
                   <n-ellipsis :line-clamp="3" class="book-title">
@@ -99,11 +95,11 @@
                   </n-ellipsis>
                 </div>
               </template>
-              
+
               <template #action>
                 <n-space justify="center">
-                  <n-button 
-                    type="primary" 
+                  <n-button
+                    type="primary"
                     @click.stop="navigateToBook(book)"
                     class="read-button"
                   >
@@ -122,7 +118,7 @@
       </div>
 
       <!-- Empty State -->
-      <n-empty 
+      <n-empty
         v-if="!loading && filteredBooks.length === 0"
         description="ไม่พบหนังสือที่ค้นหา"
         class="empty-state"
@@ -133,7 +129,7 @@
           </n-button>
         </template>
       </n-empty>
-      
+
     </ContentLayout>
   </AppLayout>
 </template>
@@ -185,12 +181,12 @@ const searchOptions = computed((): SearchOption[] => {
     label: `📂 ${category}`,
     value: category
   }))
-  
+
   const bookOptions = books.value.map(book => ({
     label: `📖 ${book.bookName}`,
     value: book.bookName
   }))
-  
+
   return [...categoryOptions, ...bookOptions]
 })
 
@@ -198,14 +194,14 @@ const filteredBooks = computed((): Book[] => {
   if (!filterBookValue.value) {
     return books.value
   }
-  
+
   // Check if it's a category filter
   if (categories.value.includes(filterBookValue.value)) {
     return books.value.filter(book => book.categoryName === filterBookValue.value)
   }
-  
+
   // Otherwise, filter by book name
-  return books.value.filter(book => 
+  return books.value.filter(book =>
     book.bookName.toLowerCase().includes(filterBookValue.value!.toLowerCase())
   )
 })
@@ -226,14 +222,14 @@ const clearFilter = (): void => {
 const navigateToBook = (book: Book): void => {
   trackBookClick(book)
   const creatorId = route.query.t as string
-  
+
   console.log('Navigating to book:', {
     bookId: book.bookId,
     bookName: book.bookName,
     creatorId,
     targetPath: `/v2/book/${book.bookId}`
   })
-  
+
   router.push({
     path: `/v2/book/${book.bookId}`,
     query: creatorId ? { t: creatorId } : {}
@@ -244,7 +240,7 @@ const trackBookClick = (book: Book): void => {
   try {
     const instance = getCurrentInstance()
     const gtag = instance?.appContext.config.globalProperties.$gtag
-    
+
     if (gtag) {
       gtag.event('view_book_from_click', {
         event_category: 'view_item',
@@ -380,6 +376,7 @@ onMounted(() => {
   font-family: 'Sarabun', sans-serif;
   font-size: 13px;
   font-weight: 500;
+  color: white;
 }
 
 .empty-state {
@@ -397,28 +394,28 @@ onMounted(() => {
     width: 100%;
     padding: 0 8px;
   }
-  
+
   .book-item {
     display: flex;
     justify-content: center;
     width: 100%;
   }
-  
+
   .book-card {
     width: 100%;
     max-width: 160px;
     min-width: 140px;
   }
-  
+
   .book-title {
     font-size: 13px;
   }
-  
+
   .read-button {
     font-size: 12px;
     padding: 0 12px;
   }
-  
+
   .filter-stats {
     font-size: 13px;
   }
@@ -434,22 +431,22 @@ onMounted(() => {
     justify-content: center;
     width: 100%;
   }
-  
+
   .book-card {
     width: 100%;
     max-width: 140px;
     min-width: 120px;
   }
-  
+
   .book-title {
     font-size: 12px;
   }
-  
+
   .read-button {
     font-size: 11px;
     padding: 0 8px;
   }
-  
+
   .category-badge {
     font-size: 10px;
     padding: 2px 6px;

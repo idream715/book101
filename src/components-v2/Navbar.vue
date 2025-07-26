@@ -5,6 +5,7 @@
       v-if="!hideNavbar"
       class="navbar-header"
       :style="navbarStyle"
+      :class="navbarBackgroundClass"
       position="absolute"
     >
       <div class="navbar-content">
@@ -68,7 +69,7 @@
 
             <!-- Theme Toggle Button (Optional) -->
             <n-button
-              v-if="showThemeToggle"
+              v-if="props.showThemeToggle"
               circle
               quaternary
               type="primary"
@@ -153,12 +154,10 @@ import { useTheme } from '@/composables/useTheme'
 // Props
 interface NavbarProps {
   showThemeToggle?: boolean
-  backgroundImage?: string
 }
 
 const props = withDefaults(defineProps<NavbarProps>(), {
-  showThemeToggle: false,
-  backgroundImage: 'https://images.unsplash.com/photo-1503455637927-730bce8583c0?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1950&q=80'
+  showThemeToggle: false
 })
 
 console.log('NavbarV2 (Naive UI) component loaded!')
@@ -183,6 +182,33 @@ const hideNavbar = computed((): boolean => {
 
 const creator = computed((): string => {
   return (route.query.t as string) || '1'
+})
+
+// Creator-specific background
+const creatorBackground = computed((): string => {
+  switch (creator.value) {
+    case '1':
+      return 'https://images.unsplash.com/photo-1503455637927-730bce8583c0?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1950&q=80'
+    case '2':
+      return 'https://i.imgur.com/PA4GVvR.jpeg'
+    case '4':
+      return 'https://i.postimg.cc/2yNjQ85Z/gold.jpg'
+    default:
+      return 'https://images.unsplash.com/photo-1503455637927-730bce8583c0?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1950&q=80'
+  }
+})
+
+const creatorGradient = computed((): string => {
+  switch (creator.value) {
+    case '1':
+      return 'linear-gradient(135deg, rgba(255, 182, 193, 0.8), rgba(255, 105, 180, 0.8))'
+    case '2':
+      return 'linear-gradient(135deg, rgba(9, 16, 196, 0.8), rgba(0, 128, 180, 0.8))'
+    case '4':
+      return 'linear-gradient(135deg, rgba(255, 223, 0, 0.8), rgba(255, 140, 0, 0.8))'
+    default:
+      return 'linear-gradient(135deg, rgba(255, 182, 193, 0.8), rgba(255, 105, 180, 0.8))'
+  }
 })
 
 const headingWords = computed((): string => {
@@ -229,11 +255,16 @@ const showLoadingOverlay = computed((): boolean => {
   return searchStore.getoverlay && !hideNavbar.value && route.name !== 'Home'
 })
 
+const navbarBackgroundClass = computed(() => {
+  return `navbar-creator-${creator.value}`
+})
+
 const navbarStyle = computed(() => {
   return {
-    backgroundImage: `url(${props.backgroundImage})`,
-    backgroundSize: 'cover',
-    backgroundPosition: 'center',
+    backgroundImage: `${creatorGradient.value}, url(${creatorBackground.value}) !important`,
+    backgroundSize: 'cover !important',
+    backgroundPosition: 'center !important',
+    backgroundBlendMode: 'overlay !important',
     backdropFilter: 'blur(10px)',
     borderBottom: '1px solid rgba(255, 255, 255, 0.1)',
     zIndex: 1000
@@ -322,9 +353,37 @@ watch(() => route.path, () => {
   height: 64px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
   transition: all 0.3s ease;
+  position: relative;
+}
+
+.navbar-header :deep(.n-layout-header) {
+  background: transparent !important;
+}
+
+/* Force Naive UI background override */
+.navbar-container :deep(.n-layout-header) {
+  background: transparent !important;
+}
+
+.navbar-container :deep(.n-layout-header__header) {
+  background: transparent !important;
+}
+
+.navbar-header::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  z-index: 1;
 }
 
 .navbar-content {
+  position: relative;
+  z-index: 2;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -362,7 +421,7 @@ watch(() => route.path, () => {
   color: white;
   margin: 0;
   white-space: nowrap;
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
   transition: all 0.3s ease;
 }
 
@@ -393,7 +452,7 @@ watch(() => route.path, () => {
 
 .navbar-btn :deep(.n-icon) {
   color: white;
-  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.3));
+  filter: drop-shadow(1px 1px 2px rgba(0, 0, 0, 0.5));
 }
 
 .back-to-top-btn {

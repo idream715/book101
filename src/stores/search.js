@@ -93,12 +93,21 @@ export const useSearchStore = defineStore('search', {
       }
     },
 
-    async setSearchRandom() {
+    async setSearchRandom({ creator }) {
+      console.log('search_random')
       try {
-        const response = await callApi.getData('/indexs-rand')
-        this.search_random.push(response.data)
+        const response = await callApi.getData(`/indexs-rand??limit=1&offset=0&creator=${creator}`)
+        // Clear previous results
+        this.search_random = []
+        // Handle response.items which can be object or array
+        if (response.data.nItems > 0) {
+            console.log()
+            // If items is an object, wrap it in an array
+            this.search_random = [response.data.items]
+        }
       } catch (error) {
         console.error('Error fetching random search:', error)
+        this.search_random = []
       }
     },
 
@@ -160,11 +169,10 @@ export const useSearchStore = defineStore('search', {
 
       this.overlay = true
       this.flag = 1
-      
+
       try {
         const response = await callApi.getData(`/shorts/all/?limit=50&offset=0&creator=${creator}`)
         const data = response.data
-        
         this.notfound = false
         this.overlay = false
         this.totalsIndexs = data.nItems
@@ -195,7 +203,7 @@ export const useSearchStore = defineStore('search', {
         try {
           const response = await callApi.postData('/search', body)
           const data = response.data
-          
+
           if (data.items && data.items.length > 0) {
             this.indexs.push(...data.items)
           }
@@ -214,7 +222,7 @@ export const useSearchStore = defineStore('search', {
         try {
           const response = await callApi.getData(`/shorts/all?limit=50&offset=${page}&creator=${creator}`)
           const data = response.data
-          
+
           if (data.items && data.items.length > 0) {
             this.indexs.push(...data.items)
           }

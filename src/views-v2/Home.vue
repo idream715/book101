@@ -15,7 +15,7 @@
               </h1>
             </div>
           </n-gi>
-          
+
           <n-gi :span="24" :tablet="14" :desktop="10" class="section-menu">
             <div class="menu-grid">
               <n-grid :cols="1" :tablet-cols="2" :x-gap="16" :y-gap="20">
@@ -27,8 +27,8 @@
                     >
                       <template #header>
                         <div class="menu-card-header">
-                          <n-icon 
-                            :size="24" 
+                          <n-icon
+                            :size="24"
                             :color="getCreatorColor(feature.creator)"
                             class="menu-icon"
                           >
@@ -44,7 +44,7 @@
             </div>
           </n-gi>
         </n-grid>
-        
+
         <!-- Wave Border -->
         <div class="wave-border">
           <img src="/src/assets/borderWaves.svg" alt="Wave border" />
@@ -57,7 +57,7 @@
       <div class="section-background creator-1-bg">
         <!-- Top Gradient Overlay -->
         <div class="gradient-overlay gradient-top"></div>
-        
+
         <n-grid :cols="24" :x-gap="24" responsive="screen" class="section-content">
           <n-gi :span="24" :tablet="10" :desktop="14" class="section-text">
             <div class="main-logo">
@@ -76,7 +76,7 @@
               <h1 class="section-subtitle">(คุณครูไม่ใหญ่)</h1>
             </div>
           </n-gi>
-          
+
           <n-gi :span="24" :tablet="14" :desktop="10" class="section-menu">
             <div class="menu-grid">
               <n-grid :cols="2" :tablet-cols="2" :x-gap="16" :y-gap="20">
@@ -88,8 +88,8 @@
                     >
                       <template #header>
                         <div class="menu-card-header">
-                          <n-icon 
-                            :size="24" 
+                          <n-icon
+                            :size="24"
                             :color="getCreatorColor(feature.creator)"
                             class="menu-icon"
                           >
@@ -105,7 +105,7 @@
             </div>
           </n-gi>
         </n-grid>
-        
+
         <!-- Wave Border -->
         <div class="wave-border">
           <img src="/src/assets/borderWaves.svg" alt="Wave border" />
@@ -118,14 +118,14 @@
       <div class="section-background creator-2-bg">
         <!-- Top Gradient Overlay -->
         <div class="gradient-overlay gradient-top"></div>
-        
+
         <n-grid :cols="24" :x-gap="24" responsive="screen" class="section-content">
           <n-gi :span="24" :tablet="10" :desktop="14" class="section-text">
             <div class="section-titles">
               <h1 class="section-title">{{ titleYay }}</h1>
             </div>
           </n-gi>
-          
+
           <n-gi :span="24" :tablet="14" :desktop="10" class="section-menu">
             <div class="menu-grid">
               <n-grid :cols="1" :tablet-cols="3" :x-gap="16" :y-gap="20">
@@ -137,8 +137,8 @@
                     >
                       <template #header>
                         <div class="menu-card-header">
-                          <n-icon 
-                            :size="24" 
+                          <n-icon
+                            :size="24"
                             :color="getCreatorColor(feature.creator)"
                             class="menu-icon"
                           >
@@ -154,7 +154,7 @@
             </div>
           </n-gi>
         </n-grid>
-        
+
         <!-- Wave Border -->
         <div class="wave-border">
           <img src="/src/assets/borderWaves.svg" alt="Wave border" />
@@ -163,7 +163,7 @@
     </section>
 
     <!-- Navigation Anchor (Optional - for future smooth scroll) -->
-    <n-anchor 
+    <n-anchor
       v-if="!isMobile"
       class="page-anchor"
       :top="80"
@@ -182,7 +182,7 @@
             <template #header>
               <h2 class="info-title">ศูนย์รวมโอวาทมหาปูชนียาจารย์</h2>
             </template>
-            
+
             <div class="info-text">
               <p class="info-paragraph">
                 มรดกธรรมคำสอนพระมงคลเทพมุนี (สด จนฺทสโร) พระผู้ปราบมาร<br>
@@ -336,8 +336,8 @@ const features = ref<MenuFeature[]>([
 const title = computed((): string => 'คำสอนหลวงพ่อธัมมชโย')
 
 const titleYay = computed((): string => {
-  return !isMobile.value 
-    ? 'คำสอนคุณยายอาจารย์ มหารัตนอุบาสิกาจันทร์ ขนนกยูง' 
+  return !isMobile.value
+    ? 'คำสอนคุณยายอาจารย์ มหารัตนอุบาสิกาจันทร์ ขนนกยูง'
     : 'คำสอนคุณยายอาจารย์'
 })
 
@@ -357,7 +357,7 @@ const menuLuangPu = computed((): MenuFeature[] => {
 // Methods
 const navigateToFeature = (feature: MenuFeature): void => {
   console.log('Navigating to feature:', feature)
-  
+
   // Track analytics
   analytics.trackEvent('home_menu_click', {
     menu_item: feature.title,
@@ -368,9 +368,9 @@ const navigateToFeature = (feature: MenuFeature): void => {
   // Navigate to V2 routes with creator query parameter
   const targetPath = `/v2/${feature.routeTo}`
   const targetQuery = { t: feature.creator.toString() }
-  
+
   console.log('Router push:', { path: targetPath, query: targetQuery })
-  
+
   router.push({
     path: targetPath,
     query: targetQuery
@@ -385,13 +385,13 @@ const getCreatorColor = (creator: number): string => {
   // Matches original returnColor method
   switch (creator) {
     case 1:
-      return '#1976d2' // primary lighten-4 equivalent
+      return '#ff5679' // primary lighten-4 equivalent
     case 2:
       return '#42a5f5' // blue lighten-2 equivalent
     case 4:
       return '#f57c00' // yellow darken-2 equivalent
     default:
-      return '#1976d2'
+      return '#ff5679'
   }
 }
 
@@ -403,7 +403,7 @@ const getIconComponent = (iconName: string) => {
     'mdi-file-document-multiple': FileTextOutlined,
     'mdi-youtube': YoutubeOutlined
   }
-  
+
   return iconMap[iconName] || BookOutlined
 }
 
@@ -582,7 +582,7 @@ onMounted(() => {
 }
 
 .creator-1-card:hover {
-  border-color: #1976d2;
+  border-color: #fc4b6c;
   background: rgba(255, 255, 255, 1);
 }
 
@@ -656,7 +656,7 @@ onMounted(() => {
 
 .gradient-top {
   top: 0;
-  background: linear-gradient(to bottom, rgba(255, 255, 255, 0.8) 0%, rgba(255, 255, 255, 0.4) 50%, transparent 100%);
+  background: linear-gradient(to bottom, rgba(255, 255, 255, 1) 0%, rgba(255, 255, 255, 0.4) 60%, transparent 100%);
 }
 
 .gradient-bottom {

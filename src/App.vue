@@ -49,6 +49,8 @@ const isV2Route = computed(() => {
   return route.path.startsWith('/v2')
 })
 
+console.log('v2 route: ' + isV2Route.value)
+
 // Clear stores when creator changes to prevent state pollution
 watch(
   () => route.query.t,
