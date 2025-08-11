@@ -23,7 +23,6 @@ export const useBooksStore = defineStore('books', {
   actions: {
     async getBooksFromApi(creator) {
       try {
-        console.log(`creator`, creator)
         const response = await callApi.getData(`books/all?creator=${creator}`)
         this.books = response.data.items
         this.totalsBooks = response.data.nItems
@@ -44,7 +43,6 @@ export const useBooksStore = defineStore('books', {
     async setSarabun({ bookId, offset }) {
       try {
         const response = await callApi.getData(`books/${bookId}/index?offset=${offset}&limit=100`)
-        console.log('Sarabun API response:', response.data)
 
         if (offset === 0) {
           this.sarabunSelected = response.data.indexs || response.data.items || []

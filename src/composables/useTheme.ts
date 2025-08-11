@@ -1,5 +1,5 @@
 import { ref, computed, watch } from 'vue'
-import { darkTheme, lightTheme, type GlobalTheme } from 'naive-ui'
+import { darkTheme, type GlobalTheme } from 'naive-ui'
 
 /**
  * Theme Management Composable for Vue-Dhamma01

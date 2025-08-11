@@ -1,407 +1,937 @@
 <template>
-  <div name="sarabun" class="all">
-    <v-card flat max-width="800" class="mx-auto">
-      <v-skeleton-loader
-        v-if="loading===true"
-        max-width="600"
-        type="heading"
-        class="mx-auto d-flex justify-center mt-5"
-      ></v-skeleton-loader>
-      <v-card-title class="justify-center">
-        <div class="font-weight-bold">
-          {{ bookSelected?.bookName || 'Loading...' }}
-        </div>
-      </v-card-title>
-      <v-card-text >
-        <v-row>
-          <v-col
-            cols="12"
-            sm="12"
-            md="6"
-            class="
-              d-flex
-              align-center
-              align-sm-center
-              align-md-end
-              flex-column
-            "
-            >
-            <v-img
-              v-if="loading===true"
-              width="250"
-              height="350"
-              aspect-ratio="1"
-              class="grey lighten-2"
-            >
-              <template v-slot:placeholder>
-                <v-row
-                  class="fill-height ma-0"
-                  align="center"
-                  justify="center"
-                >
-                  <v-progress-circular indeterminate color="grey lighten-5"></v-progress-circular>
-                </v-row>
-              </template>
-            </v-img>
-            <v-img
-              v-else
-              width="250"
-              :src="bookSelected?.bookCover"
-              class="elevation-10"
-            ></v-img>
-          </v-col>
-          <v-col
-            cols="12"
-            sm="12"
-            md="6"
-            class="
-              d-flex
-              align-center
-              align-md-start
-              flex-column
-            "
-          >
-            <div v-if="loading===true">
-              <p v-for="(n,i) in 2" :key="i">
-                <v-skeleton-loader
-                  type="text"
-                  max-width="200"
-                ></v-skeleton-loader>
-              </p>
-              <v-skeleton-loader
-                type="actions"
-                class="d-flex justify-start"
-              ></v-skeleton-loader>
-            </div>
-            <div class="subtitle-1 justify-md-center" v-else>
-              <p>จำนวนสารบัญ
-                <span class="pink--text subtitle-1 font-weight-bold" v-text="sarabunTotal"></span>
-              </p>
-              <p>ชุดหนังสือ
-                <span class="pink--text subtitle-1 font-weight-bold" v-text="bookSelected?.categoryName"></span>
-              </p>
-              <v-btn
-                :href="bookSelected?.bookPdf"
-                target="_blank"
-                class="mr-3"
-                color="primary"
-                >
-                <v-icon>mdi-file-pdf</v-icon>
-                <div>PDF</div>
-              </v-btn>
-              <v-btn
-                v-show="bookSelected.bookText && bookSelected.bookText.includes('.txt')"
-                class="mr-3"
-                :href="bookSelected?.bookText"
-                target="_blank"
-                color="primary"
-                >
-                <v-icon class="mr-1">mdi-book-open-page-variant</v-icon>
-                <div>TEXT</div>
-              </v-btn>
-              <v-btn
-                color="primary"
-                @click.prevent="downloadItem({
-                  url: bookSelected?.bookPdf,
-                  label: bookSelected?.bookName
-                })"
+  <AppLayout>
+    <ContentLayout
+      :title="bookSelected?.bookName || 'กำลังโหลด...'"
+      description="สารบัญและรายละเอียดของหนังสือ"
+      :loading="loading ? true : undefined"
+      loading-text="กำลังโหลดข้อมูลหนังสือ..."
+    >
+      <!-- Book Information Section -->
+      <n-card class="book-info-card mb-6" :bordered="undefined">
+        <n-grid x-gap="12" y-gap="16" :cols="4" item-responsive>
+          <!-- Book Cover -->
+          <n-gi span="4 600:2">
+            <div class="book-cover-section">
+              <n-skeleton
+                v-if="loading"
+                class="book-cover-skeleton"
+              />
+              <n-image
+                v-else
+                :src="bookSelected?.bookCover"
+                alt="Book Cover"
+                object-fit="cover"
+                class="book-cover"
+                :preview-disabled="undefined"
               >
-                <v-icon class="mr-1">mdi-download</v-icon>
-                DOWNLOAD
-              </v-btn>
+                <template #placeholder>
+                  <div class="image-placeholder">
+                    <n-spin size="medium" />
+                  </div>
+                </template>
+              </n-image>
             </div>
-          </v-col>
-        </v-row>
-      </v-card-text>
-      <v-card
-        class="mx-auto elevation-10"
-      >
-        <v-list>
-          <v-list-subheader
-            class="primary--text title d-flex justify-center font-weight-bold"
-          >
-            <h4 class="sara">สารบัญ</h4>
-          </v-list-subheader>
-          <div v-for="(n,i) in 5" :key="i">
-            <v-skeleton-loader
-              v-if="loading"
-              type="list-item"
-              :loading="loading"
-              transition="fade-transition"
-              class="mx-auto"
-            ></v-skeleton-loader>
+          </n-gi>
+
+          <!-- Book Details -->
+          <n-gi span="4 600:2">
+            <div class="book-details-section">
+              <n-skeleton v-if="loading" text :repeat="4" />
+              <div v-else class="book-details">
+                <n-descriptions
+                  :column="1"
+                  label-placement="left"
+                  label-style="font-weight: 600; color: #666;"
+                  content-style="font-weight: 500;"
+                  class="book-meta"
+                >
+                  <n-descriptions-item label="จำนวนสารบัญ">
+                    <n-text type="primary" strong>{{ sarabunTotal }} รายการ</n-text>
+                  </n-descriptions-item>
+                  <n-descriptions-item label="ชุดหนังสือ">
+                    <n-text type="primary" strong>{{ bookSelected?.categoryName || 'ไม่ระบุ' }}</n-text>
+                  </n-descriptions-item>
+                </n-descriptions>
+
+                <!-- Action Buttons -->
+                <n-space class="book-actions mt-4" vertical size="medium">
+                  <n-space size="medium">
+                    <n-button
+                      v-if="bookSelected?.bookPdf"
+                      type="error"
+                      secondary
+                      @click="openPdf(bookSelected.bookPdf)"
+                      class="action-button"
+                    >
+                      <template #icon>
+                        <n-icon>
+                          <FilePdfOutlined />
+                        </n-icon>
+                      </template>
+                      เปิด PDF
+                    </n-button>
+
+                    <n-button
+                      v-if="bookSelected?.bookText && bookSelected.bookText.includes('.txt')"
+                      type="primary"
+                      secondary
+                      @click="openText(bookSelected.bookText)"
+                      class="action-button"
+                    >
+                      <template #icon>
+                        <n-icon>
+                          <BookOutlined />
+                        </n-icon>
+                      </template>
+                      เปิดไฟล์ TEXT
+                    </n-button>
+
+                    <n-button
+                      v-if="bookSelected?.bookPdf"
+                      type="success"
+                      secondary
+                      @click="downloadBook"
+                      :loading="downloadLoading ? true : undefined"
+                      class="action-button"
+                    >
+                      <template #icon>
+                        <n-icon>
+                          <DownloadOutlined />
+                        </n-icon>
+                      </template>
+                      ดาวน์โหลด PDF
+                    </n-button>
+                  </n-space>
+                </n-space>
+              </div>
+            </div>
+          </n-gi>
+        </n-grid>
+      </n-card>
+
+      <!-- Table of Contents -->
+      <n-card class="toc-card" :bordered="undefined">
+        <template #header>
+          <div class="toc-header">
+            <n-icon size="20" class="toc-icon">
+              <BookOutlined />
+            </n-icon>
+            <h3 class="toc-title">สารบัญ</h3>
           </div>
+        </template>
 
-          <v-list>
-            <template v-for="(item, i) in sarabunSelected" :key="item.chapterId">
-              <v-list-item>
-                <template v-slot:prepend>
-                  <v-avatar color="grey-lighten-1">
-                    <span>{{ i + 1 }}.</span>
-                  </v-avatar>
+        <!-- Loading Skeletons -->
+        <div v-if="loading" class="toc-loading">
+          <n-list>
+            <n-list-item v-for="i in 5" :key="i">
+              <template #prefix>
+                <n-skeleton circle size="medium" />
+              </template>
+              <n-skeleton text style="width: 60%" />
+              <template #suffix>
+                <n-space>
+                  <n-skeleton circle size="small" />
+                  <n-skeleton circle size="small" />
+                  <n-skeleton circle size="small" />
+                </n-space>
+              </template>
+            </n-list-item>
+          </n-list>
+        </div>
+
+        <!-- Table of Contents List with Infinite Scroll -->
+        <n-infinite-scroll
+          v-else-if="sarabunSelected.length > 0"
+          :distance="300"
+          @load="loadMoreChapters"
+          class="toc-list"
+        >
+          <n-list hoverable clickable>
+            <n-list-item
+              v-for="(item, index) in sarabunSelected"
+              :key="item.chapterId"
+              class="chapter-item"
+            >
+              <template #prefix>
+                <n-avatar
+                  :size="32"
+                  color="#696969"
+                  class="chapter-number"
+                >
+                  {{ index + 1 }}
+                </n-avatar>
+              </template>
+
+              <n-thing class="chapter-content">
+                <template #header>
+                  <span class="chapter-title">{{ item.chapterHeading }}</span>
                 </template>
+              </n-thing>
 
-                <v-list-item-title style="line-height: unset;">{{ item.chapterHeading }}</v-list-item-title>
-
-                <template v-slot:append>
-                  <v-btn
-                    v-show="item.chapterLinkYouTube && item.chapterLinkYouTube.length > 0"
-                    variant="text"
-                    icon
-                    @click="showDialogYoutube(item.chapterLinkYouTube)"
+              <template #suffix>
+                <div class="chapter-actions">
+                  <!-- YouTube Button -->
+                  <n-button
+                    v-if="item.chapterLinkYouTube && item.chapterLinkYouTube.length > 0"
+                    circle
+                    secondary
+                    type="error"
+                    size="small"
+                    @click="showYouTubeModal(item.chapterLinkYouTube)"
+                    class="action-btn"
                   >
-                    <v-icon color="red">mdi-youtube</v-icon>
-                  </v-btn>
-
-                  <v-btn :href="item.chapterLinkPdf" target="_blank" icon variant="text">
-                    <v-icon :color="item.chapterLinkPdf && item.chapterLinkPdf.length > 0 ? 'red' : 'grey'">mdi-file-pdf-box</v-icon>
-                  </v-btn>
-
-                  <v-dialog max-width="800" v-if="item.chapterDetail">
-                    <template v-slot:activator="{ props: activatorProps }">
-                      <v-btn
-                        v-bind="activatorProps"
-                        variant="text" 
-                        icon
-                      >
-                        <v-icon color="blue">
-                          mdi-book-open-page-variant
-                        </v-icon>
-                      </v-btn>
+                    <template #icon>
+                      <n-icon>
+                        <YoutubeOutlined />
+                      </n-icon>
                     </template>
+                  </n-button>
 
-                    <template v-slot:default="{ isActive }">
-                      <v-card>
-                        <v-card-title class="d-flex justify-center">
-                          {{ item.chapterHeading }}
-                        </v-card-title>
-                        <v-card-text style="white-space: pre-wrap;" class="d-flex justify-center">
-                          {{ item.chapterDetail }}
-                        </v-card-text>
-                        <v-card-actions>
-                          <v-btn
-                            color="primary"
-                            variant="text"
-                            @click="copyTextDetail(item.chapterDetail)"
-                          >
-                            คัดลอก
-                          </v-btn>
-                          <v-btn
-                            color="primary"
-                            variant="text"
-                            @click="isActive.value = false"
-                          >
-                            ออก
-                          </v-btn>
-                        </v-card-actions>
-                      </v-card>
-                    </template>
-                  </v-dialog>
-                  <v-btn
-                    v-else
-                    variant="text" icon
-                    disabled
+                  <!-- PDF Button -->
+                  <n-button
+                    circle
+                    secondary
+                    :type="item.chapterLinkPdf && item.chapterLinkPdf.length > 0 ? 'error' : 'default'"
+                    size="small"
+                    @click="openPdf(item.chapterLinkPdf)"
+                    :disabled="!item.chapterLinkPdf || item.chapterLinkPdf.length === 0 ? true : undefined"
+                    class="action-btn"
                   >
-                    <v-icon color="grey">
-                      mdi-book-open-page-variant
-                    </v-icon>
-                  </v-btn>
-                </template>
-              </v-list-item>
-              <v-divider
-                v-if="i + 1 < (sarabunSelected || []).length"
-              ></v-divider>
+                    <template #icon>
+                      <n-icon>
+                        <FilePdfOutlined />
+                      </n-icon>
+                    </template>
+                  </n-button>
+
+                  <!-- Read Detail Button -->
+                  <n-button
+                    circle
+                    secondary
+                    :type="item.chapterDetail ? 'primary' : 'default'"
+                    size="small"
+                    @click="openDetailModal(item)"
+                    :disabled="!item.chapterDetail ? true : undefined"
+                    class="action-btn"
+                  >
+                    <template #icon>
+                      <n-icon>
+                        <EyeOutlined />
+                      </n-icon>
+                    </template>
+                  </n-button>
+                </div>
+              </template>
+            </n-list-item>
+          </n-list>
+        </n-infinite-scroll>
+
+        <!-- Empty State -->
+        <n-empty
+          v-else-if="!loading"
+          description="ไม่พบสารบัญ"
+          class="empty-toc"
+        />
+      </n-card>
+
+    </ContentLayout>
+
+    <!-- Chapter Detail Modal -->
+    <n-modal
+      v-model:show="detailModal.visible"
+      preset="card"
+      :title="detailModal.title"
+      class="detail-modal"
+      :style="{ width: '90vw', maxWidth: '800px' }"
+    >
+      <div v-if="detailModal.content" class="chapter-detail-content">
+        <div class="chapter-text" ref="chapterTextRef">
+          {{ detailModal.content.chapterDetail }}
+        </div>
+      </div>
+
+      <template #footer>
+        <n-space justify="end">
+          <n-button @click="copyChapterText" secondary>
+            <template #icon>
+              <n-icon>
+                <CopyOutlined />
+              </n-icon>
             </template>
-          </v-list>
-          <v-row>
-            <v-col cols="12" v-if="(sarabunSelected || []).length>0 && (sarabunSelected || []).length < sarabunTotal">
-              <v-skeleton-loader
-                v-for="n in 3"
-                :key="n"
-                type="list-item"
-                class="mx-auto"
-                v-intersect="nextLoading"
-              ></v-skeleton-loader>
-            </v-col>
-          </v-row>
+            {{ copyButtonText }}
+          </n-button>
+          <n-button @click="closeDetailModal" type="primary">
+            ออก
+          </n-button>
+        </n-space>
+      </template>
+    </n-modal>
 
-        </v-list>
-      </v-card>
-    </v-card>
-    <v-row justify="center">
-      <v-dialog persistent v-model="dialogYoutube" max-width="640">
-        <v-card class="max-width-auto info" flat>
-          <youtube
-            class="d-flex justify-center"
-            :video-id="videoId"
-            :player-vars="{ autoplay: 1 }"
-          ></youtube>
-          <v-card-actions>
-            <v-spacer></v-spacer>
-            <v-btn color="accent lighten-1" variant="text" target="_blank" :href="videoURL">เข้าสู่เว็บหลักYoutube</v-btn>
-            <v-btn color="accent lighten-1" variant="text" @click="closeDialogYoutube">ออก</v-btn>
-          </v-card-actions>
-        </v-card>
-      </v-dialog>
-    </v-row>
-  </div>
+    <!-- YouTube Modal -->
+    <n-modal
+      v-model:show="youtubeModal.visible"
+      preset="card"
+      title="YouTube"
+      class="youtube-modal"
+      :style="{ width: '90vw', maxWidth: '700px' }"
+    >
+      <div v-if="youtubeModal.videoId" class="youtube-content">
+        <div class="youtube-embed">
+          <iframe
+            :src="`https://www.youtube.com/embed/${youtubeModal.videoId}?autoplay=1`"
+            frameborder="0"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            allowfullscreen
+            class="youtube-iframe"
+          ></iframe>
+        </div>
+      </div>
+
+      <template #footer>
+        <n-space justify="end">
+          <n-button
+            @click="openYouTubeExternal"
+            type="error"
+            secondary
+          >
+            <template #icon>
+              <n-icon>
+                <YoutubeOutlined />
+              </n-icon>
+            </template>
+            เข้าสู่เว็บหลัก YouTube
+          </n-button>
+          <n-button @click="closeYouTubeModal" type="primary">
+            ออก
+          </n-button>
+        </n-space>
+      </template>
+    </n-modal>
+  </AppLayout>
 </template>
 
-<script setup>
-import { ref, computed, onMounted, getCurrentInstance } from 'vue'
+<script setup lang="ts">
+import { ref, computed, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
-import Axios from 'axios'
+import { useMessage } from 'naive-ui'
+import {
+  BookOutlined,
+  FilePdfOutlined,
+  DownloadOutlined,
+  YoutubeOutlined,
+  EyeOutlined,
+  CopyOutlined
+} from '@vicons/antd'
+import AppLayout from '@/components/layouts/AppLayout.vue'
+import ContentLayout from '@/components/layouts/ContentLayout.vue'
 import { useBooksStore } from '@/stores/books'
 import { useSearchStore } from '@/stores/search'
+import { useAnalytics } from '@/composables/useAnalytics'
+import axios from 'axios'
 
-const props = defineProps({
-  id: String
-})
+// Types
+interface ChapterItem {
+  chapterId: string
+  chapterHeading: string
+  chapterDetail?: string
+  chapterLinkYouTube?: string
+  chapterLinkPdf?: string
+}
 
+interface BookInfo {
+  bookName: string
+  bookCover: string
+  categoryName: string
+  bookPdf: string
+  bookText?: string
+}
+
+interface DetailModal {
+  visible: boolean
+  title: string
+  content: ChapterItem | null
+}
+
+interface YouTubeModal {
+  visible: boolean
+  videoId: string
+  url: string
+}
+
+// Props
+const props = defineProps<{
+  id: string
+}>()
+
+
+// Composables
 const route = useRoute()
+const message = useMessage()
 const booksStore = useBooksStore()
 const searchStore = useSearchStore()
-const { $gtag } = getCurrentInstance().appContext.config.globalProperties
+const analytics = useAnalytics()
 
-const itemsPerPage = ref(50)
-const dialogYoutube = ref(false)
-const videoId = ref('')
-const videoURL = ref('')
+// Reactive data
+const itemsPerPage = ref<number>(50)
+const downloadLoading = ref<boolean>(false)
+const copyButtonText = ref<string>('คัดลอก')
+const chapterTextRef = ref<HTMLElement | null>(null)
 
-const bookSelected = computed(() => booksStore.getbook || {})
-const sarabunSelected = computed(() => booksStore.getSarabuns || [])
-const sarabunTotal = computed(() => booksStore.getTotalSarabun || 0)
-const pages = computed(() => Math.ceil(sarabunTotal.value / itemsPerPage.value))
-const loading = computed(() => searchStore.getoverlay)
+const detailModal = ref<DetailModal>({
+  visible: false,
+  title: '',
+  content: null
+})
 
-const showDialogYoutube = (url) => {
-  dialogYoutube.value = !dialogYoutube.value
-  const regExp = /^.*((youtu.be\/)|(v\/)|(\/u\/\w\/)|(embed\/)|(watch\?))\??v?=?([^#&?]*).*/
-  const match = url.match(regExp)
+const youtubeModal = ref<YouTubeModal>({
+  visible: false,
+  videoId: '',
+  url: ''
+})
 
-  let vid = (match && match[7].length == 11) ? match[7] : false
+// Computed properties
+const bookSelected = computed((): BookInfo | null => booksStore.getbook)
+const sarabunSelected = computed((): ChapterItem[] => booksStore.getSarabuns || [])
+const sarabunTotal = computed((): number => booksStore.getTotalSarabun || 0)
+const loading = computed((): boolean => searchStore.getoverlay)
+const pages = computed((): number => Math.ceil(sarabunTotal.value / itemsPerPage.value))
 
-  videoURL.value = url
-  videoId.value = vid
+// Loading state management for infinite scroll
+const infiniteScrollLoading = ref<boolean>(false)
+const lastLoadTime = ref<number>(0)
+const minLoadDelay = 1500
+const isLoadingChapters = ref<boolean>(false)
+
+const loadMoreChapters = async (): Promise<void> => {
+  // Strong debouncing: prevent ANY concurrent calls
+  if (infiniteScrollLoading.value || isLoadingChapters.value || loading.value) {
+    return Promise.resolve()
+  }
+
+  // Check if there are more chapters to load
+  if (sarabunSelected.value.length >= sarabunTotal.value) {
+    return Promise.resolve()
+  }
+
+  // Debouncing: prevent too frequent calls
+  const now = Date.now()
+  const timeSinceLastLoad = now - lastLoadTime.value
+  if (timeSinceLastLoad < minLoadDelay) {
+    return Promise.resolve()
+  }
+
+  // Set both loading flags immediately
+  infiniteScrollLoading.value = true
+  isLoadingChapters.value = true
+  lastLoadTime.value = now
+
+  try {
+    const timesLoaded = Math.ceil(sarabunSelected.value.length / itemsPerPage.value)
+    if (timesLoaded < pages.value) {
+      const nextPage = timesLoaded + 1
+      const offset = nextPage * itemsPerPage.value - itemsPerPage.value
+
+
+      // Add minimum loading time for better UX
+      const loadingPromise = booksStore.setSarabun({
+        bookId: props.id,
+        offset: offset
+      })
+
+      const minDelayPromise = new Promise(resolve => setTimeout(resolve, 1000))
+
+      await Promise.all([loadingPromise, minDelayPromise])
+
+    }
+  } catch (error) {
+
+    if (error instanceof Error) {
+      if (error.message.includes('Network')) {
+        message.error('เกิดข้อผิดพลาดในการเชื่อมต่อ กรุณาลองใหม่อีกครั้ง')
+      } else {
+        message.error('เกิดข้อผิดพลาดในการโหลดสารบัญเพิ่มเติม')
+      }
+    } else {
+      message.error('เกิดข้อผิดพลาดที่ไม่ทราบสาเหตุ')
+    }
+  } finally {
+    // Clear both loading flags
+    infiniteScrollLoading.value = false
+    isLoadingChapters.value = false
+  }
 }
 
-const closeDialogYoutube = () => {
-  dialogYoutube.value = !dialogYoutube.value
-  videoURL.value = ''
-  videoId.value = ''
+// Methods
+const openPdf = (url: string): void => {
+  if (!url) {
+    message.warning('ไม่มีลิงก์ PDF')
+    return
+  }
+  window.open(url, '_blank')
+
+  // Track analytics
+  analytics.trackEvent('open_pdf', {
+    book_id: props.id,
+    source: 'sarabun_page'
+  })
 }
 
-const copyTextDetail = (text) => {
-  if (navigator.clipboard && navigator.clipboard.writeText) {
-    navigator.clipboard.writeText(text).then(() => {
-      console.log('Text copied to clipboard')
-    }).catch(err => {
-      console.error('Failed to copy text: ', err)
+const openText = (url: string): void => {
+  if (!url) {
+    message.warning('ไม่มีไฟล์ TEXT')
+    return
+  }
+  window.open(url, '_blank')
+
+  // Track analytics
+  analytics.trackEvent('open_text', {
+    book_id: props.id,
+    source: 'sarabun_page'
+  })
+}
+
+const downloadBook = async (): Promise<void> => {
+  if (!bookSelected.value?.bookPdf) {
+    message.warning('ไม่มีไฟล์ PDF สำหรับดาวน์โหลด')
+    return
+  }
+
+  downloadLoading.value = true
+
+  try {
+    const pdfFileName = extractPdfFileName(bookSelected.value.bookPdf)
+    if (!pdfFileName) {
+      throw new Error('Invalid PDF URL')
+    }
+
+    const response = await axios({
+      url: `https://one.rgtcenter.com/dm01/api/download/book/${pdfFileName}`,
+      method: 'GET',
+      responseType: 'blob',
     })
-  } else {
-    // Fallback for older browsers
-    try {
+
+    const blob = new Blob([response.data], { type: 'application/pdf' })
+    const link = document.createElement('a')
+    link.href = window.URL.createObjectURL(blob)
+    link.setAttribute('download', `${bookSelected.value.bookName}.pdf`)
+    document.body.appendChild(link)
+    link.click()
+    link.parentNode?.removeChild(link)
+
+    message.success('ดาวน์โหลดสำเร็จ')
+
+    // Track analytics
+    analytics.trackEvent('download_book', {
+      book_id: props.id,
+      book_name: bookSelected.value.bookName,
+      source: 'sarabun_page'
+    })
+
+  } catch {
+    message.error('เกิดข้อผิดพลาดในการดาวน์โหลด')
+  } finally {
+    downloadLoading.value = false
+  }
+}
+
+const extractPdfFileName = (url: string): string | null => {
+  const parts = url.split('/')
+  const lastPart = parts[parts.length - 1]
+
+  if (lastPart.endsWith('.pdf')) {
+    return lastPart
+  }
+  return null
+}
+
+const openDetailModal = (item: ChapterItem): void => {
+  if (!item.chapterDetail) {
+    message.warning('ไม่มีเนื้อหารายละเอียด')
+    return
+  }
+
+  detailModal.value.visible = true
+  detailModal.value.title = item.chapterHeading
+  detailModal.value.content = item
+  copyButtonText.value = 'คัดลอก'
+
+  // Track analytics
+  analytics.trackEvent('view_chapter_detail', {
+    chapter_id: item.chapterId,
+    book_id: props.id,
+    source: 'sarabun_page'
+  })
+}
+
+const closeDetailModal = (): void => {
+  detailModal.value.visible = false
+  detailModal.value.content = null
+  copyButtonText.value = 'คัดลอก'
+}
+
+const copyChapterText = async (): Promise<void> => {
+  if (!detailModal.value.content?.chapterDetail) return
+
+  try {
+    const text = detailModal.value.content.chapterDetail
+
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      await navigator.clipboard.writeText(text)
+      copyButtonText.value = 'คัดลอกแล้ว'
+      message.success('คัดลอกข้อความสำเร็จ')
+    } else {
+      // Fallback for older browsers
       const textArea = document.createElement('textarea')
       textArea.value = text
       document.body.appendChild(textArea)
       textArea.select()
       document.execCommand('copy')
       document.body.removeChild(textArea)
-      console.log('Text copied using fallback method')
-    } catch (err) {
-      console.error('Failed to copy text: ', err)
+      copyButtonText.value = 'คัดลอกแล้ว'
+      message.success('คัดลอกข้อความสำเร็จ')
     }
+
+    // Reset button text after 2 seconds
+    setTimeout(() => {
+      copyButtonText.value = 'คัดลอก'
+    }, 2000)
+
+  } catch {
+    message.error('ไม่สามารถคัดลอกข้อความได้')
   }
 }
 
-const nextLoading = () => {
-  let timesLoaded = Math.ceil(booksStore.getSarabuns.length / itemsPerPage.value)
-  if (timesLoaded < pages.value) {
-    timesLoaded += 1
-    let offset = 0
-    offset = timesLoaded * itemsPerPage.value - itemsPerPage.value
-    booksStore.setSarabun({ bookId: props.id, offset: offset })
-  }
-}
+const showYouTubeModal = (url: string): void => {
+  const regExp = /^.*((youtu.be\/)|(v\/)|(\/u\/\w\/)|(embed\/)|(watch\?))\??v?=?([^#&?]*).*/
+  const match = url.match(regExp)
+  const videoId = (match && match[7].length === 11) ? match[7] : ''
 
-const selectText = (element) => {
-  var range
-  if (document.selection) {
-    // IE
-    range = document.body.createTextRange()
-    range.moveToElementText(element)
-    range.select()
-  } else if (window.getSelection) {
-    range = document.createRange()
-    range.selectNode(element)
-    window.getSelection().removeAllRanges()
-    window.getSelection().addRange(range)
-  }
-}
+  if (videoId) {
+    youtubeModal.value.visible = true
+    youtubeModal.value.videoId = videoId
+    youtubeModal.value.url = url
 
-const downloadItem = ({ url, label }) => {
-  const namepdf = extractPdfFileName(url)
-  Axios({
-    url: `https://one.rgtcenter.com/dm01/api/download/book/${namepdf}`,
-    method: 'GET',
-    responseType: 'blob',
-  })
-    .then(response => {
-      const blob = new Blob([response.data], { type: 'application/pdf' })
-      const link = document.createElement('a')
-      link.href = window.URL.createObjectURL(blob)
-      link.setAttribute('download', `${label}.pdf`)
-      document.body.appendChild(link)
-      link.click()
-      link.parentNode.removeChild(link)
-    }).catch(console.error)
-}
-
-const extractPdfFileName = (x) => {
-  // Split the URL by '/' and get the last part
-  const parts = x.split('/')
-  const lastPart = parts[parts.length - 1]
-
-  // Optional: Check if the last part ends with '.pdf'
-  if (lastPart.endsWith('.pdf')) {
-    return lastPart
+    // Track analytics
+    analytics.trackEvent('view_youtube', {
+      video_id: videoId,
+      book_id: props.id,
+      source: 'sarabun_page'
+    })
   } else {
-    return null // or handle this case as you see fit
+    message.error('ลิงก์ YouTube ไม่ถูกต้อง')
   }
 }
 
-onMounted(() => {
-  $gtag.event('page_view', {
-    'page_title': 'Book101 Sarabun',
-    'page_path': `/${route.params.id}`,
-  })
+const closeYouTubeModal = (): void => {
+  youtubeModal.value.visible = false
+  youtubeModal.value.videoId = ''
+  youtubeModal.value.url = ''
+}
 
-  booksStore.setbook(props.id)
-  booksStore.setSarabun({ bookId: props.id, offset: 0 })
+const openYouTubeExternal = (): void => {
+  if (youtubeModal.value.url) {
+    window.open(youtubeModal.value.url, '_blank')
+  }
+}
+
+// Lifecycle
+onMounted(async () => {
+  try {
+    // Track page view
+    analytics.trackPageView({
+      page_title: 'Book101 Sarabun',
+      page_path: `/${route.params.id}`,
+    })
+
+    // Load book and sarabun data
+    await Promise.all([
+      booksStore.setbook(props.id),
+      booksStore.setSarabun({ bookId: props.id, offset: 0 })
+    ])
+
+  } catch (error) {
+    console.error('Failed to load book data:', error)
+    message.error('เกิดข้อผิดพลาดในการโหลดข้อมูลหนังสือ')
+  }
 })
 </script>
 
-<style>
-  @import url('https://fonts.googleapis.com/css2?family=Sarabun&display=swap');
+<style scoped>
 
-  .v-application .font-weight-bold {
-    font-family: 'Sarabun', sans-serif;
-    font-size: 1.5rem;
+/* Book Information Section */
+.book-info-card {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  border-radius: 12px;
+  padding: 24px;
+}
+
+.book-cover-section {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.book-cover-skeleton {
+  width: 250px;
+  height: 350px;
+  border-radius: 8px;
+  margin: 0 auto;
+}
+
+.book-cover {
+  width: 250px;
+  height: 350px;
+  object-fit: cover;
+  border-radius: 8px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+  margin: 0 auto;
+}
+
+.image-placeholder {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 100%;
+  background-color: #f5f5f5;
+  border-radius: 8px;
+}
+
+.book-details-section {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  font-family: 'Sarabun', sans-serif;
+}
+
+.book-meta {
+  margin-bottom: 16px;
+}
+
+.book-actions {
+  width: 100%;
+}
+
+.action-button {
+  font-family: 'Sarabun', sans-serif;
+  font-weight: 500;
+}
+
+/* Table of Contents */
+.toc-card {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  border-radius: 12px;
+}
+
+.toc-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: 'Sarabun', sans-serif;
+}
+
+.toc-icon {
+  color: #1890ff;
+}
+
+.toc-title {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+  color: #333;
+}
+
+.toc-loading {
+  padding: 16px 0;
+}
+
+.toc-list {
+  font-family: 'Sarabun', sans-serif;
+}
+
+.chapter-item {
+  transition: all 0.2s ease;
+  border-radius: 8px;
+  margin-bottom: 4px;
+}
+
+.chapter-item:hover {
+  background-color: #fafafa;
+}
+
+.chapter-number {
+  font-weight: 600;
+}
+
+.chapter-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.chapter-title {
+  font-size: 15px;
+  font-weight: 500;
+  color: #333;
+  line-height: 1.4;
+  word-break: break-word;
+}
+
+.chapter-actions {
+  flex-shrink: 0;
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.action-btn {
+  transition: all 0.2s ease;
+}
+
+.action-btn:hover {
+  transform: scale(1.05);
+}
+
+.empty-toc {
+  margin: 60px 0;
+  font-family: 'Sarabun', sans-serif;
+}
+
+/* Modal Styles */
+.detail-modal,
+.youtube-modal {
+  font-family: 'Sarabun', sans-serif;
+}
+
+.chapter-detail-content {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.chapter-text {
+  font-size: 16px;
+  line-height: 1.6;
+  color: #555;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.youtube-content {
+  display: flex;
+  justify-content: center;
+}
+
+.youtube-embed {
+  position: relative;
+  width: 100%;
+  height: 0;
+  padding-bottom: 56.25%; /* 16:9 aspect ratio */
+}
+
+.youtube-iframe {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  border-radius: 8px;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .book-info-card {
+    padding: 16px;
   }
 
-  .all {
-    font-family: 'Sarabun', sans-serif;
+  .book-cover-section {
+    margin-bottom: 20px;
+    padding: 0 16px;
+    justify-content: center;
+    align-items: center;
   }
 
-  p {
-    font-family: 'Sarabun', sans-serif;
+  .book-cover {
+    width: 220px;
+    height: 308px;
   }
 
-  .sara {
-    font-family: 'Sarabun', sans-serif;
+  .book-cover-skeleton {
+    width: 220px;
+    height: 308px;
   }
 
-  .v-application .subtitle-1 {
-    font-family: 'Sarabun', sans-serif !important;
+  .chapter-title {
+    font-size: 14px;
   }
+
+  .action-button {
+    font-size: 13px;
+  }
+
+  .detail-modal,
+  .youtube-modal {
+    width: 95vw !important;
+  }
+
+  .toc-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+  }
+
+  .chapter-actions {
+    flex-direction: row !important;
+    gap: 6px;
+    align-items: center;
+    justify-content: flex-end;
+    display: flex !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .book-info-card {
+    padding: 12px;
+  }
+
+  .book-cover-section {
+    padding: 0 8px;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .book-cover {
+    width: 160px;
+    height: 224px;
+  }
+
+  .book-cover-skeleton {
+    width: 160px;
+    height: 224px;
+  }
+
+
+  .chapter-title {
+    font-size: 13px;
+  }
+
+  .chapter-text {
+    font-size: 15px;
+  }
+
+  .action-btn {
+    font-size: 11px;
+    min-width: 28px;
+    height: 28px;
+  }
+  
+  .chapter-actions {
+    gap: 4px;
+    flex-direction: row !important;
+    display: flex !important;
+    align-items: center;
+    justify-content: flex-end;
+  }
+}
 </style>

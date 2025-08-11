@@ -3,19 +3,19 @@ import { mount } from '@vue/test-utils'
 import { createRouter, createWebHistory } from 'vue-router'
 import { createApp } from 'vue'
 import naive from 'naive-ui'
-import Books from '@/views-v2/Books.vue'
-import AppLayout from '@/components-v2/layouts/AppLayout.vue'
-import ContentLayout from '@/components-v2/layouts/ContentLayout.vue'
+import Books from '@/views/Books.vue'
+import AppLayout from '@/components/layouts/AppLayout.vue'
+import ContentLayout from '@/components/layouts/ContentLayout.vue'
 import { createPinia } from 'pinia'
 
 // Mock the layouts to avoid complex dependencies
-vi.mock('@/components-v2/layouts/AppLayout.vue', () => ({
+vi.mock('@/components/layouts/AppLayout.vue', () => ({
   default: {
     template: '<div class="app-layout"><slot /></div>'
   }
 }))
 
-vi.mock('@/components-v2/layouts/ContentLayout.vue', () => ({
+vi.mock('@/components/layouts/ContentLayout.vue', () => ({
   default: {
     template: '<div class="content-layout"><h1>{{ title }}</h1><p>{{ description }}</p><slot /></div>',
     props: ['title', 'description', 'loading', 'loading-text']
@@ -43,8 +43,8 @@ describe('Books V2 (Naive UI)', () => {
       history: createWebHistory(),
       routes: [
         {
-          path: '/v2/books',
-          name: 'BooksV2',
+          path: '/books',
+          name: 'Books',
           component: Books
         }
       ]
@@ -106,7 +106,7 @@ describe('Books V2 (Naive UI)', () => {
   it('logs component load message', () => {
     const consoleSpy = vi.spyOn(console, 'log').mockImplementation(() => {})
     createWrapper()
-    expect(consoleSpy).toHaveBeenCalledWith('BooksV2 (Naive UI) component loaded!')
+    expect(consoleSpy).toHaveBeenCalledWith('Books (Naive UI) component loaded!')
     consoleSpy.mockRestore()
   })
 

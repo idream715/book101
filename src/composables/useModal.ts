@@ -181,7 +181,6 @@ export function useCardModal() {
     if (currentCard.value?.text) {
       navigator.clipboard.writeText(currentCard.value.text)
         .then(() => {
-          console.log('Card text copied to clipboard')
         })
         .catch(err => {
           console.error('Failed to copy card text:', err)

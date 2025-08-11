@@ -27,8 +27,7 @@
     "vue": "^3.5.0",
     "vue-gtag": "^2.0.1",
     "vue-router": "^4.0.0",
-    "vue-youtube-embed": "^2.2.2",
-    "vuetify": "^3.8.12"
+    "vue-youtube-embed": "^2.2.2"
   },
   "devDependencies": {
     "@testing-library/vue": "^8.1.0",
@@ -47,7 +46,6 @@
     "sass": "^1.70.0",
     "typescript": "^5.8.3",
     "vite": "^5.0.0",
-    "vite-plugin-vuetify": "^2.0.0",
     "vitest": "^3.2.4"
   }
 }

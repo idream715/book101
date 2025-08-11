@@ -1,12 +1,17 @@
 import axios from 'axios'
 
-// For development
-let baseURL = 'https://api3.rgtcenter.com:2053/dm01/'
+// Use environment variables for security
+const baseURL = import.meta.env.VITE_API_BASE_URL || 'https://api3.rgtcenter.com:2053/dm01/'
+const apiKey = import.meta.env.VITE_API_KEY
+
+if (!apiKey) {
+  console.error('⚠️  API Key not found. Please check your environment variables.')
+}
 
 const instance = axios.create({
   baseURL: baseURL,
   headers: {
-    'apiKey': 'i_WHrjpLqGa9PcP4BwaoKHXeQkYzzGEN7Pddk8kD',
+    'apiKey': apiKey || '',
   }
 });
 

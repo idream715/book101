@@ -3,7 +3,7 @@ import { mount } from '@vue/test-utils'
 import { createRouter, createWebHistory } from 'vue-router'
 import { createApp } from 'vue'
 import naive from 'naive-ui'
-import SearchPage from '@/views-v2/SearchPage.vue'
+import SearchPage from '@/views/SearchPage.vue'
 import { createPinia } from 'pinia'
 
 // Mock stores
@@ -32,7 +32,7 @@ vi.mock('vue-router', async (importOriginal) => {
     ...actual,
     useRoute: vi.fn(() => ({
       query: { t: '1' },
-      name: 'SearchPageV2'
+      name: 'SearchPage'
     })),
     useRouter: vi.fn(() => ({
       push: vi.fn(),
@@ -79,8 +79,8 @@ describe('SearchPage V2 (Naive UI)', () => {
       history: createWebHistory(),
       routes: [
         {
-          path: '/v2/search-page',
-          name: 'SearchPageV2',
+          path: '/search-page',
+          name: 'SearchPage',
           component: SearchPage
         }
       ]
@@ -157,7 +157,7 @@ describe('SearchPage V2 (Naive UI)', () => {
   it('logs component load message', () => {
     const consoleSpy = vi.spyOn(console, 'log').mockImplementation(() => {})
     createWrapper()
-    expect(consoleSpy).toHaveBeenCalledWith('SearchPageV2 (Naive UI) component loaded!')
+    expect(consoleSpy).toHaveBeenCalledWith('SearchPage (Naive UI) component loaded!')
     consoleSpy.mockRestore()
   })
 

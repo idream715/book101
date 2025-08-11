@@ -3,32 +3,32 @@ import { mount } from '@vue/test-utils'
 import { createRouter, createWebHistory } from 'vue-router'
 import { createApp } from 'vue'
 import naive from 'naive-ui'
-import About from '@/views-v2/About.vue'
-import AppLayout from '@/components-v2/layouts/AppLayout.vue'
-import ContentLayout from '@/components-v2/layouts/ContentLayout.vue'
+import About from '@/views/About.vue'
+import AppLayout from '@/components/layouts/AppLayout.vue'
+import ContentLayout from '@/components/layouts/ContentLayout.vue'
 
 // Mock the layouts to avoid complex dependencies
-vi.mock('@/components-v2/layouts/AppLayout.vue', () => ({
+vi.mock('@/components/layouts/AppLayout.vue', () => ({
   default: {
     template: '<div class="app-layout"><slot /></div>'
   }
 }))
 
-vi.mock('@/components-v2/layouts/ContentLayout.vue', () => ({
+vi.mock('@/components/layouts/ContentLayout.vue', () => ({
   default: {
     template: '<div class="content-layout"><h1>{{ title }}</h1><p>{{ description }}</p><slot /></div>',
     props: ['title', 'description']
   }
 }))
 
-describe('About V2 (Naive UI)', () => {
+describe('About (Naive UI)', () => {
   const createWrapper = () => {
     const router = createRouter({
       history: createWebHistory(),
       routes: [
         {
-          path: '/v2/about',
-          name: 'AboutV2',
+          path: '/about',
+          name: 'About',
           component: About
         }
       ]
@@ -49,7 +49,7 @@ describe('About V2 (Naive UI)', () => {
     })
   }
 
-  it('renders the About V2 component', () => {
+  it('renders the About component', () => {
     const wrapper = createWrapper()
     expect(wrapper.exists()).toBe(true)
   })
@@ -90,7 +90,7 @@ describe('About V2 (Naive UI)', () => {
   it('logs component load message', () => {
     const consoleSpy = vi.spyOn(console, 'log').mockImplementation(() => {})
     createWrapper()
-    expect(consoleSpy).toHaveBeenCalledWith('AboutV2 (Naive UI) component with layouts loaded!')
+    expect(consoleSpy).toHaveBeenCalledWith('About (Naive UI) component with layouts loaded!')
     consoleSpy.mockRestore()
   })
 

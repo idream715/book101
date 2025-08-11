@@ -107,10 +107,6 @@ const props = withDefaults(defineProps<SearchLayoutProps>(), {
   suggestions: () => []
 })
 
-// Emits
-const emit = defineEmits<{
-  'suggestion-click': [suggestion: string]
-}>()
 
 // Computed
 const resultText = computed(() => {

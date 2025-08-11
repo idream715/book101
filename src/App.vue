@@ -1,20 +1,12 @@
 <template>
   <div class="homep">
-    <!-- V1 Routes: Vuetify Layout -->
-    <v-app v-if="!isV2Route">
-      <navbar></navbar>
-      <v-main id="app">
-        <router-view/>
-      </v-main>
-    </v-app>
-
-    <!-- V2 Routes: Naive UI Layout -->
-    <n-config-provider v-else :theme="null">
+    <!-- Pure Naive UI Layout -->
+    <n-config-provider :theme="null">
       <n-message-provider>
         <n-notification-provider>
           <n-dialog-provider>
             <n-loading-bar-provider>
-              <div id="app-v2">
+              <div id="app">
                 <router-view/>
               </div>
             </n-loading-bar-provider>
@@ -26,8 +18,7 @@
 </template>
 
 <script setup>
-import navbar from '@/components/Navbar.vue'
-import { watch, computed } from 'vue'
+import { watch } from 'vue'
 import { useRoute } from 'vue-router'
 import { useSearchStore, useCardsStore, useBooksStore } from '@/stores'
 import {
@@ -43,13 +34,6 @@ const route = useRoute()
 const searchStore = useSearchStore()
 const cardsStore = useCardsStore()
 const booksStore = useBooksStore()
-
-// Detect if current route is V2 (Naive UI)
-const isV2Route = computed(() => {
-  return route.path.startsWith('/v2')
-})
-
-console.log('v2 route: ' + isV2Route.value)
 
 // Clear stores when creator changes to prevent state pollution
 watch(

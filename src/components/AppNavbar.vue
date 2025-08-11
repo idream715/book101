@@ -213,7 +213,7 @@ const displayTitle = computed(() => {
 })
 
 const homeRoute = computed(() => {
-  return route.path.startsWith('/v2') ? '/v2' : '/'
+  return '/'
 })
 
 const showOverlay = computed(() => props.overlay)
@@ -290,8 +290,7 @@ const navigateHome = (): void => {
 }
 
 const navigateBooks = (): void => {
-  const routePath = route.path.startsWith('/v2') ? '/v2/books' : '/Books'
-  routingTo(routePath, currentCreator.value)
+  routingTo('/books', currentCreator.value)
 }
 
 const routingTo = (path: string, creator: string): void => {

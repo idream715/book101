@@ -1,430 +1,1077 @@
 <template>
-  <div class="indexs">
-    <v-container  >
-
-      <v-row class="mb-1" align="center" justify="center">
-
-          <v-col cols="12" md="10" class="pb-1">
-              <v-combobox
-                v-model="search_pageindex"
-                :filter="filter"
-                :hide-no-data="!search"
-                :items="items"
-                v-model:search="search"
-                hide-selected
-                :label="label_search"
-                multiple
-                chips
-                variant="solo"
-                :delimiters="space"
+  <AppLayout>
+    <ContentLayout
+      title="🔍 ผลการค้นหา"
+      :description="searchDescription"
+      :loading="loading ? true : undefined"
+      loading-text="กำลังค้นหา..."
+    >
+      <!-- Search Form -->
+      <n-card class="search-form-card mb-6">
+        <n-form>
+          <n-form-item label="ค้นหาคำสอน">
+            <n-input-group>
+              <n-auto-complete
+                v-model:value="keywordInput"
+                :options="keywordOptions"
+                @select="handleKeywordSelect"
+                clearable
+                clear-after-select
               >
-                <template v-slot:no-data>
-                  <v-list-item>
-                    <span class="subheading mr-1">กด</span><kbd ><v-icon color="white" class="mb-2">mdi-keyboard-space</v-icon></kbd>
-                    <span class="subheading mr-1">{{text_exp}}</span>
-                    <v-chip
-                      :color="`${colors[nonce - 1]}-lighten-3`"
-                      label
-                      size="small"
+                <template #default="{ handleInput, handleBlur, handleFocus }">
+                  <div class="tags-input-container" :class="{ 'has-tags': searchKeywords.length > 0 }">
+                    <!-- Selected tags inside input -->
+                    <n-tag
+                      v-for="(keyword, index) in searchKeywords"
+                      :key="keyword"
+                      type="info"
+                      closable
+                      @close="removeKeyword(index)"
                     >
-                      {{ search }}
-                    </v-chip>
-                  </v-list-item>
-                </template>
-                <template v-slot:selection="{ attrs, item, parent, selected }">
-                  <v-chip
-                    v-bind="attrs"
-                    v-if="item === Object(item)"
-                    :color="`${item.color} lighten-3`"
-                    :selected="selected"
-                    label
-                    size="small" >
-                    <span class="pr-2">{{ item.text }} </span>
-                    <v-icon size="small" @click="parent.selectItem(item)">mdi-close</v-icon>
-                  </v-chip>
-                </template>
-              </v-combobox>
-          </v-col>
-          <v-col cols="12" md="2" class="mb-5">
-            <v-btn @click="clicksearch(search_pageindex)" class="mr-10" theme="dark" color="blue-lighten-1"><v-icon class="mr-3">mdi-magnify</v-icon>ค้นหา</v-btn>
-          </v-col>
-      </v-row>
-         <v-col v-if="setoverlay===false" cols="6" align="start" justify="center" class="pt-1">พบ {{getTotalIndexs}} รายการ</v-col>
+                      {{ keyword }}
+                    </n-tag>
 
-       <v-row v-if="setoverlay===false">
-       </v-row>
+                    <!-- Actual input for new keywords -->
+                    <input
+                      ref="inputRef"
+                      v-model="keywordInput"
+                      :placeholder="searchKeywords.length > 0 ? '' : 'พิมพ์คำค้นหา...'"
+                      @input="(e) => handleInput((e.target as HTMLInputElement).value)"
+                      @blur="handleBlur"
+                      @focus="handleFocus"
+                      @keydown.enter="addKeywordFromInput"
+                      @keydown.backspace="handleBackspace"
+                      class="tag-input"
+                    />
+                  </div>
+                </template>
+              </n-auto-complete>
+              <n-button
+                v-if="searchKeywords.length > 0"
+                @click="clearSearch"
+                type="error"
+                class="clear-button"
+                quaternary
+              >
+                <template #icon>
+                  <n-icon>
+                    <CloseCircleOutlined />
+                  </n-icon>
+                </template>
+              </n-button>
+            </n-input-group>
+          </n-form-item>
 
-       <v-row v-if="setoverlay===false">
-          <v-card
-            class="mx-auto"
-            max-width="100%"
-            flat
-            v-if="notfound===true"
-          >
-            <v-card-text  class="headline">
-              <div class="mb-3">คำค้นหาของคุณไม่ตรงกับเอกสารใดๆ</div>
-              <p v-for="(w,i) in search_pageindex" :key="i" :value="w" class="headline" style="color:red;">
-                - {{w.text}}
-              </p>
-              <div >
-                 คำแนะนำ :<br>
-                <p>- ตรวจดูให้แน่ใจว่าสะกดถูกต้องทุกคำ</p>
-                <p>- ลองใช้คำอื่นๆ</p>
-                <p>- ลองใช้คำที่กว้างขึ้น</p>
-                <p>- ลองใช้คำที่น้อยลง</p>
+          <n-space justify="end">
+            <n-button
+              type="primary"
+              @click="performSearch"
+              :loading="searching ? true : undefined"
+              :disabled="!canSearch ? true : undefined"
+              class="search-button"
+            >
+              <template #icon>
+                <n-icon>
+                  <SearchOutlined />
+                </n-icon>
+              </template>
+              ค้นหา
+            </n-button>
+          </n-space>
+        </n-form>
+      </n-card>
+
+      <!-- Search Results Stats -->
+      <div v-if="!loading && searchResults.length > 0" class="search-stats mb-4">
+        <n-text depth="3">
+          พบ {{ totalResults }} รายการ
+        </n-text>
+      </div>
+
+      <!-- Search Results with Infinite Scroll -->
+      <n-infinite-scroll
+        v-if="!loading && searchResults.length > 0"
+        :distance="300"
+        @load="loadMoreResults"
+        class="search-results"
+      >
+        <div
+          v-for="(result, index) in searchResults"
+          :key="index"
+          class="search-result-item"
+        >
+          <n-card hoverable class="result-card">
+            <div class="result-content">
+              <div class="result-header">
+                <h3 class="result-title">
+                  <n-highlight
+                    :text="result.mark_index"
+                    :patterns="searchKeywords"
+                  />
+                </h3>
+                <span class="result-number">{{ index + 1 }}</span>
               </div>
-            </v-card-text>
-          </v-card>
-       </v-row>
 
-       <v-row id="top" v-if="setoverlay===false">
-        <v-col cols="12" >
+              <div class="result-book-info">
+                <n-button
+                  text
+                  type="primary"
+                  @click="navigateToBook(result.bookId)"
+                  class="book-link"
+                >
+                  <template #icon>
+                    <n-icon>
+                      <BookOutlined />
+                    </n-icon>
+                  </template>
+                  จากหนังสือ: {{ result.bookName }}
+                </n-button>
+              </div>
 
-          <div v-for="(index,i) in indexs" :key="i" :value="index">
-            <v-card  height="" flat>
-                <v-col cols="12" class="pa-1">
-                  <v-card-text class="pa-1">
-                    <v-row>
-                      <v-col cols="10">
-                        <v-list-item-title class=" mb-1 " v-html="index.mark_index" style="line-height:2;font-size:24px;"></v-list-item-title>
-                      </v-col>
-                      <v-col cols="2">
-                        <v-list-item-title class="grey-text" align="end">{{i+1}}</v-list-item-title>
-                      </v-col>
-                    </v-row>
-
-                    <v-list-item-title class="mb-2"><v-btn variant="text" color="primary-lighten-1" @click="clickedSendbook(index.bookId)"><v-icon size="small" class="mr-2">mdi-book-open-page-variant</v-icon> จากหนังสือ:{{index.bookName}}</v-btn></v-list-item-title>
-                    <p v-html="text_render(index.mark_details)"></p>
-                  </v-card-text>
-                </v-col>
-                <v-col cols="12" class="pa-1">
-                  <v-card-actions class="d-flex justify-end pa-1">
-                     <v-btn
-                      v-show="index.chapterLinkYouTube.length > 0"
-                      text
-                      color="red"
-                      style="margin-right:10px;"
-                      @click="showDialogYoutube(index.chapterLinkYouTube)"
-                      >
-                        <v-icon>mdi-youtube</v-icon>
-                      </v-btn>
-                     <v-btn variant="text" color="red" style="margin-right:10px;" target="_blank" :href="index.chapterLinkPdf">PDF</v-btn>
-                     <v-btn variant="text" color="blue-lighten-1" @click="dialogs(index.mark_index,index.chapterDetail,index.mark_details,index.bookName,index.bookId)">อ่านทั้งหมด</v-btn>
-                  </v-card-actions>
-                </v-col>
-            </v-card><hr>
-          </div>
-          <v-row justify="center">
-            <v-dialog persistent v-model="dialogYoutube" max-width="640">
-              <v-card class="max-width-auto" flat>
-                <youtube
-                  class="d-flex justify-center"
-                  :video-id="videoId"
-                  :player-vars="{ autoplay: 1 }"
-                ></youtube>
-                <v-card-actions>
-                  <v-spacer></v-spacer>
-                  <v-btn color="primary-lighten-1" variant="text" target="_blank" :href="videoURL">เข้าสู่เว็บหลักYoutube</v-btn>
-                  <v-btn color="primary-lighten-1" variant="text" @click="closeDialogYoutube">ออก</v-btn>
-                </v-card-actions>
-              </v-card>
-            </v-dialog>
-          </v-row>
-
-          <v-dialog v-model="dialog" max-width="1024" align="center">
-            <v-card>
-              <v-card class="d-flex justify-center" flat>
-                <v-card class="max-width-auto"  flat>
-                  <v-card-text class=" lighten-2 " style="line-height:2;font-size:24px;" v-html="head_content" ></v-card-text>
-                  <v-list-item-title class="grey-text "><v-btn variant="text" color="primary-lighten-1" @click="clickedSendbook(book_id)"><v-icon size="small" class="mr-2">mdi-book-open-page-variant</v-icon>จากหนังสือ:{{frombook}}</v-btn></v-list-item-title>
-                <div >
-                  <v-card-text ref="textCopy" v-html="content_copy" style="font-size: 17px; white-space: pre-wrap;" ></v-card-text>
+              <div class="result-excerpt">
+                <div class="excerpt-content">
+                  <n-highlight
+                    :text="result.mark_details"
+                    :patterns="searchKeywords"
+                  />
                 </div>
-                </v-card>
+              </div>
 
-              </v-card>
-              <v-card-actions>
-                <v-spacer></v-spacer>
-                <v-btn color="primary-lighten-1" variant="text" @click="copyTextDetail">{{word_copy}}</v-btn>
-                <v-btn color="primary-lighten-1" variant="text" @click="closs">ออก</v-btn>
+              <div class="result-actions">
+                <n-space>
+                  <n-button
+                    v-if="result.chapterLinkYouTube && result.chapterLinkYouTube.length > 0"
+                    @click="showYouTubeModal(result.chapterLinkYouTube)"
+                    type="error"
+                    ghost
+                    class="youtube-button"
+                  >
+                    <template #icon>
+                      <n-icon>
+                        <YoutubeOutlined />
+                      </n-icon>
+                    </template>
+                    YouTube
+                  </n-button>
 
-              </v-card-actions>
-              </v-card>
-          </v-dialog>
+                  <n-button
+                    v-if="checkPdfLink(result.chapterLinkPdf)"
+                    @click="openPdf(result.chapterLinkPdf)"
+                    type="error"
+                    ghost
+                    class="pdf-button"
+                  >
+                    <template #icon>
+                      <n-icon>
+                        <FilePdfOutlined />
+                      </n-icon>
+                    </template>
+                    PDF
+                  </n-button>
 
-        </v-col>
-      </v-row><br>
+                  <n-button
+                    @click="openDetailModal(result)"
+                    secondary
+                    strong
+                    type="primary"
+                    class="detail-button"
+                  >
+                    <template #icon>
+                      <n-icon>
+                        <EyeOutlined />
+                      </n-icon>
+                    </template>
+                    อ่านทั้งหมด
+                  </n-button>
+                </n-space>
+              </div>
+            </div>
+          </n-card>
+        </div>
+      </n-infinite-scroll>
 
-        <div v-if="setoverlay">
-          <v-col cols="12" v-for="(item,i) in 10" :key="i">
-            <v-card >
+      <!-- Loading Skeleton -->
+      <div v-if="loading" class="loading-skeleton">
+        <n-card v-for="i in 5" :key="i" class="skeleton-card mb-4">
+          <n-skeleton text :repeat="4" />
+          <n-skeleton text style="width: 60%" />
+          <n-skeleton text style="width: 30%" />
+        </n-card>
+      </div>
 
-                <v-skeleton-loader
-                  ref="skeleton"
-                  type= "article, actions"
-                  class="mx-auto"
-                ></v-skeleton-loader>
+      <!-- Empty State -->
+      <n-empty
+        v-if="!loading && searchResults.length === 0 && hasSearched"
+        description="ไม่พบผลลัพธ์ที่ค้นหา"
+        class="empty-state"
+      >
+        <template #extra>
+          <div class="empty-suggestions">
+            <n-text tag="div" class="mb-3">
+              คำค้นหาของคุณไม่ตรงกับเอกสารใดๆ
+            </n-text>
+            <n-text
+              v-for="(keyword, i) in searchKeywords"
+              :key="i"
+              type="error"
+              class="keyword-display"
+            >
+              - {{ keyword }}
+            </n-text>
+            <div class="suggestions">
+              <n-text tag="div" class="suggestions-title">คำแนะนำ:</n-text>
+              <n-text tag="div">- ตรวจดูให้แน่ใจว่าสะกดถูกต้องทุกคำ</n-text>
+              <n-text tag="div">- ลองใช้คำอื่นๆ</n-text>
+              <n-text tag="div">- ลองใช้คำที่กว้างขึ้น</n-text>
+              <n-text tag="div">- ลองใช้คำที่น้อยลง</n-text>
+            </div>
+          </div>
+        </template>
+      </n-empty>
 
-            </v-card><br>
-          </v-col>
+    </ContentLayout>
+
+    <!-- Detail Modal -->
+    <n-modal
+      v-model:show="detailModal.visible"
+      preset="card"
+      :title="detailModal.title"
+      class="detail-modal"
+      :style="{ width: '90vw', maxWidth: '900px' }"
+    >
+      <div v-if="detailModal.content" class="detail-content">
+        <div class="detail-header">
+          <h3>
+            <n-highlight
+              :text="detailModal.content.mark_index"
+              :patterns="searchKeywords"
+            />
+          </h3>
+          <div class="detail-book-info">
+            <n-button
+              text
+              type="primary"
+              @click="navigateToBook(detailModal.content.bookId)"
+              class="book-link"
+            >
+              <template #icon>
+                <n-icon>
+                  <BookOutlined />
+                </n-icon>
+              </template>
+              จากหนังสือ: {{ detailModal.content.bookName }}
+            </n-button>
+          </div>
         </div>
 
-        <v-col cols="12" v-if="indexs.length<getTotalIndexs">
-          <v-card >
+        <div class="detail-text" ref="detailTextRef">
+          <n-highlight
+            :text="detailModal.content.mark_details"
+            :patterns="searchKeywords"
+          />
+        </div>
+      </div>
 
-            <v-skeleton-loader
-              ref="skeleton"
-              type= "article, actions"
-              class="mx-auto"
-              v-intersect="search_infenit"
-            ></v-skeleton-loader>
+      <template #footer>
+        <n-space justify="end">
+          <n-button @click="copyDetailText" type="primary" ghost>
+            <template #icon>
+              <n-icon>
+                <CopyOutlined />
+              </n-icon>
+            </template>
+            {{ copyButtonText }}
+          </n-button>
+          <n-button @click="closeDetailModal" secondary type="error">
+            <template #icon>
+              <n-icon><CloseCircleOutlined /></n-icon>
+            </template>
+            ออก
+          </n-button>
+        </n-space>
+      </template>
+    </n-modal>
 
-          </v-card><br>
-        </v-col>
-    </v-container>
-  </div>
+    <!-- YouTube Modal -->
+    <n-modal
+      v-model:show="youtubeModal.visible"
+      preset="card"
+      title="YouTube"
+      class="youtube-modal"
+      :style="{ width: '90vw', maxWidth: '700px' }"
+    >
+      <div v-if="youtubeModal.videoId" class="youtube-content">
+        <div class="youtube-embed">
+          <iframe
+            :src="`https://www.youtube.com/embed/${youtubeModal.videoId}?autoplay=1`"
+            frameborder="0"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            allowfullscreen
+            class="youtube-iframe"
+          ></iframe>
+        </div>
+      </div>
+
+      <template #footer>
+        <n-space justify="end">
+          <n-button
+            @click="openYouTubeExternal"
+            type="error"
+            ghost
+          >
+            <template #icon>
+              <n-icon>
+                <YoutubeOutlined />
+              </n-icon>
+            </template>
+            เข้าสู่เว็บหลัก YouTube
+          </n-button>
+          <n-button @click="closeYouTubeModal" type="primary">
+            ออก
+          </n-button>
+        </n-space>
+      </template>
+    </n-modal>
+  </AppLayout>
 </template>
 
-<script>
+<script setup lang="ts">
+import { ref, computed, onMounted } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
+import { useMessage } from 'naive-ui'
+import {
+  SearchOutlined,
+  CloseCircleOutlined,
+  BookOutlined,
+  YoutubeOutlined,
+  FilePdfOutlined,
+  EyeOutlined,
+  CopyOutlined
+} from '@vicons/antd'
+import AppLayout from '@/components/layouts/AppLayout.vue'
+import ContentLayout from '@/components/layouts/ContentLayout.vue'
 import { useSearchStore } from '@/stores/search'
+import { useAnalytics } from '@/composables/useAnalytics'
 
-export default {
-  setup() {
-    const searchStore = useSearchStore()
-    return { searchStore }
-  },
-  data () {
-    return {
-      dialog: false,
-      label_search:"ค้นหาคำสอน",
-      content:"",
-      content_copy:"",
-      head_content:"",
-      frombook:"",
-      book_id:"",
-      search:"",
-      word_copy:'คัดลอก',
-      activator: null,
-      attach: null,
-      colors: ['green', 'purple', 'indigo', 'cyan', 'teal', 'orange'],
-      editing: null,
-      index: -1,
-      items: [{ header: 'สามารถใส่คำค้นหาได้สูงสุด 5 คำ' }],
-      nonce: 1,
-      menu: false,
-      x: 0,
-      y: 0,
-      space:[' '],
-      dialogYoutube: false,
-      videoId: '',
-      videoURL: ''
+
+// Types
+interface SearchResult {
+  mark_index: string
+  mark_details: string
+  bookName: string
+  bookId: string
+  chapterLinkYouTube?: string
+  chapterLinkPdf?: string | undefined
+}
+
+interface DetailModal {
+  visible: boolean
+  title: string
+  content: SearchResult | null
+}
+
+interface YouTubeModal {
+  visible: boolean
+  videoId: string
+  url: string
+}
+
+
+// Composables
+const route = useRoute()
+const router = useRouter()
+const message = useMessage()
+const searchStore = useSearchStore()
+const analytics = useAnalytics()
+
+// Reactive data
+const searchKeywords = ref<string[]>([])
+const keywordInput = ref<string>('')
+const searching = ref<boolean>(false)
+const hasSearched = ref<boolean>(false)
+const copyButtonText = ref<string>('คัดลอก')
+const detailTextRef = ref<HTMLElement | null>(null)
+const inputRef = ref<HTMLInputElement | null>(null)
+
+const detailModal = ref<DetailModal>({
+  visible: false,
+  title: '',
+  content: null
+})
+
+const youtubeModal = ref<YouTubeModal>({
+  visible: false,
+  videoId: '',
+  url: ''
+})
+
+// Computed properties
+const creatorId = computed((): string => (route.query.t as string) || '1')
+const loading = computed((): boolean => searchStore.overlay)
+const searchResults = computed((): SearchResult[] => searchStore.indexs || [])
+const totalResults = computed((): number => searchStore.totalsIndexs || 0)
+
+const searchDescription = computed((): string => {
+  if (searchResults.value.length > 0) {
+    return `ผลการค้นหาสำหรับ "${searchKeywords.value.join(' ')}" - พบ ${totalResults.value} รายการ`
+  }
+  return 'ค้นหาในเนื้อหาธรรมะ'
+})
+
+// Predefined search suggestions for better performance
+const SEARCH_SUGGESTIONS = [
+  'พระพุทธเจ้า', 'ธรรมะ', 'สบาย', 'สติ', 'ปัญญา',
+  'เมตตา', 'กรุณา', 'มุทิตา', 'อุเบกขา', 'ความเพียร',
+  'สมาธิ', 'หลวงพ่อ', 'นั่งธรรมะ', 'นิพพาน'
+]
+
+const keywordOptions = computed(() => {
+  const input = keywordInput.value?.trim()
+  if (!input) return []
+
+  const options = []
+  
+  // Add current input as first option
+  if (!searchKeywords.value.includes(input)) {
+    options.push({
+      label: `"${input}" (พิมพ์แล้วกด Enter)`,
+      value: input
+    })
+  }
+
+  // Filter suggestions efficiently
+  const inputLower = input.toLowerCase()
+  let count = 0
+  
+  for (const word of SEARCH_SUGGESTIONS) {
+    if (count >= 4) break
+    
+    if (word.toLowerCase().includes(inputLower) &&
+        !searchKeywords.value.includes(word) &&
+        word !== input) {
+      options.push({ label: word, value: word })
+      count++
     }
-  },
-  created () {
-    let queryString = this.$route.query
-    if ('word1' in queryString) {
-      let input = []
+  }
 
-      for (const [key, value] of Object.entries(queryString)) {
-        console.log(key)
-        let attribute = {
-          color: "pink",
-          text: value
-        }
-        input.push(attribute)
+  return options
+})
+
+const canSearch = computed((): boolean => {
+  return searchKeywords.value.length > 0
+})
+
+
+// Methods
+const performSearch = async (): Promise<void> => {
+  if (!canSearch.value) {
+    message.warning('กรุณาใส่คำที่ต้องการค้นหา')
+    return
+  }
+
+  searching.value = true
+  hasSearched.value = true
+
+  // Reset infinite scroll state when performing new search
+  infiniteScrollLoading.value = false
+  isLoadingResults.value = false
+  lastLoadTime.value = 0
+
+  try {
+    const searchWords = searchKeywords.value.map(keyword => ({
+      text: keyword,
+      color: 'primary'
+    }))
+
+    await searchStore.setFirstIndexsFromApi({
+      words: searchWords,
+      page: 0,
+      creator: creatorId.value,
+      type: 'books'
+    })
+
+    // Track search analytics
+    analytics.trackSearch({
+      keywords: searchKeywords.value,
+      resultCount: searchResults.value.length,
+      searchType: 'content',
+      creatorId: parseInt(creatorId.value)
+    })
+
+  } catch {
+    message.error('เกิดข้อผิดพลาดในการค้นหา')
+  } finally {
+    searching.value = false
+  }
+}
+
+const handleKeywordSelect = (value: string): void => {
+  addKeyword(value)
+  // Force clear the input after selection with a small delay
+  setTimeout(() => {
+    keywordInput.value = ''
+  }, 10)
+}
+
+const addKeyword = (value: string): void => {
+  const trimmedValue = value.trim()
+  if (!trimmedValue || searchKeywords.value.includes(trimmedValue)) {
+    keywordInput.value = '' // Clear input even if keyword already exists
+    return
+  }
+
+  if (searchKeywords.value.length >= 5) {
+    message.warning('สามารถค้นหาได้สูงสุด 5 คำเท่านั้น')
+    keywordInput.value = '' // Clear input when limit reached
+    return
+  }
+
+  searchKeywords.value.push(trimmedValue)
+  keywordInput.value = '' // Clear input after successful addition
+}
+
+const addKeywordFromInput = (): void => {
+  if (keywordInput.value.trim()) {
+    addKeyword(keywordInput.value.trim())
+  }
+}
+
+const removeKeyword = (index: number): void => {
+  searchKeywords.value.splice(index, 1)
+}
+
+const clearSearch = (): void => {
+  searchKeywords.value = []
+  keywordInput.value = ''
+}
+
+const handleBackspace = (event: KeyboardEvent): void => {
+  // If input is empty and backspace is pressed, remove the last keyword
+  if (keywordInput.value === '' && searchKeywords.value.length > 0) {
+    event.preventDefault()
+    searchKeywords.value.pop()
+  }
+}
+
+// Loading state management for infinite scroll
+const infiniteScrollLoading = ref<boolean>(false)
+const lastLoadTime = ref<number>(0)
+const minLoadDelay = 1500 // Minimum delay between loads (ms)
+const isLoadingResults = ref<boolean>(false) // Additional flag to prevent multiple calls
+
+const loadMoreResults = async (): Promise<void> => {
+  // Strong debouncing: prevent ANY concurrent calls
+  if (infiniteScrollLoading.value || isLoadingResults.value || loading.value) {
+    return Promise.resolve()
+  }
+
+  // Check if there are more results to load
+  if (searchResults.value.length >= totalResults.value) {
+    return Promise.resolve()
+  }
+
+  // Debouncing: prevent too frequent calls
+  const now = Date.now()
+  const timeSinceLastLoad = now - lastLoadTime.value
+  if (timeSinceLastLoad < minLoadDelay) {
+    return Promise.resolve()
+  }
+
+  // Set both loading flags immediately
+  infiniteScrollLoading.value = true
+  isLoadingResults.value = true
+  lastLoadTime.value = now
+
+  try {
+    const offset = searchResults.value.length
+    const searchWords = searchKeywords.value.map(keyword => ({
+      text: keyword,
+      color: 'primary'
+    }))
+
+
+    // Add minimum loading time for better UX
+    const loadingPromise = searchStore.setFirstIndexsFromApi_infenit({
+      words: searchWords,
+      page: offset,
+      creator: creatorId.value,
+      type: 'books'
+    })
+
+    // Ensure minimum loading time for better UX
+    const minDelayPromise = new Promise(resolve => setTimeout(resolve, 1000))
+
+    await Promise.all([loadingPromise, minDelayPromise])
+
+
+  } catch (error) {
+
+    // More specific error handling
+    if (error instanceof Error) {
+      if (error.message.includes('Network')) {
+        message.error('เกิดข้อผิดพลาดในการเชื่อมต่อ กรุณาลองใหม่อีกครั้ง')
+      } else {
+        message.error('เกิดข้อผิดพลาดในการโหลดข้อมูลเพิ่มเติม')
       }
+    } else {
+      message.error('เกิดข้อผิดพลาดที่ไม่ทราบสาเหตุ')
+    }
 
-      this.searchStore.setFirstIndexsFromApi({
-        words:input,
-        page:0,
-        creator:1
+    // Don't re-throw to prevent breaking the infinite scroll component
+  } finally {
+    // Clear both loading flags
+    infiniteScrollLoading.value = false
+    isLoadingResults.value = false
+  }
+}
+
+const checkPdfLink = (url: string | undefined): boolean => {
+  return (url) ? url.endsWith('.pdf') : false
+}
+
+
+const navigateToBook = (bookId: string): void => {
+  const bookUrl = router.resolve({
+    path: `/book/${bookId}`,
+    query: { t: creatorId.value }
+  })
+  window.open(bookUrl.href, '_blank')
+}
+
+const openDetailModal = (result: SearchResult): void => {
+  detailModal.value.visible = true
+  detailModal.value.title = result.mark_index
+  detailModal.value.content = result
+  copyButtonText.value = 'คัดลอก'
+}
+
+const closeDetailModal = (): void => {
+  detailModal.value.visible = false
+  detailModal.value.content = null
+  copyButtonText.value = 'คัดลอก'
+}
+
+const copyDetailText = async (): Promise<void> => {
+  if (!detailTextRef.value) return
+
+  try {
+    // Select text
+    const range = document.createRange()
+    range.selectNode(detailTextRef.value)
+    window.getSelection()?.removeAllRanges()
+    window.getSelection()?.addRange(range)
+
+    // Copy to clipboard
+    const successful = document.execCommand('copy')
+    copyButtonText.value = successful ? 'คัดลอกแล้ว' : 'คัดลอกไม่สำเร็จ'
+
+    window.getSelection()?.removeAllRanges()
+  } catch {
+    message.error('ไม่สามารถคัดลอกข้อความได้')
+  }
+}
+
+const showYouTubeModal = (url: string): void => {
+  const regExp = /^.*((youtu.be\/)|(v\/)|(\/u\/\w\/)|(embed\/)|(watch\?))\??v?=?([^#&?]*).*/
+  const match = url.match(regExp)
+  const videoId = (match && match[7].length === 11) ? match[7] : ''
+
+  if (videoId) {
+    youtubeModal.value.visible = true
+    youtubeModal.value.videoId = videoId
+    youtubeModal.value.url = url
+  }
+}
+
+const closeYouTubeModal = (): void => {
+  youtubeModal.value.visible = false
+  youtubeModal.value.videoId = ''
+  youtubeModal.value.url = ''
+}
+
+const openYouTubeExternal = (): void => {
+  if (youtubeModal.value.url) {
+    window.open(youtubeModal.value.url, '_blank')
+  }
+}
+
+const openPdf = (url: string | undefined): void => {
+  window.open(url, '_blank')
+}
+
+// Lifecycle
+onMounted(async () => {
+  const queryString = route.query
+
+  // Handle URL parameters for direct search
+  if ('word1' in queryString) {
+    const searchWords = []
+    for (const [key, value] of Object.entries(queryString)) {
+      if (key.startsWith('word') && typeof value === 'string') {
+        searchWords.push(value)
+      }
+    }
+
+    if (searchWords.length > 0) {
+      searchKeywords.value = searchWords
+      hasSearched.value = true
+
+      const formattedWords = searchWords.map(word => ({
+        text: word,
+        color: 'primary'
+      }))
+
+      await searchStore.setFirstIndexsFromApi({
+        words: formattedWords,
+        page: 0,
+        creator: creatorId.value,
+        type: 'books'
       })
     }
-  },
-  computed:{
-    text_exp(){
-      if (this.$vuetify.display.xs){
-        return 'ที่แป้นพิมพ์เพื่อยืนยัน'
-      }
-        return  '(spacebar,เว้นวรรค) ที่แป้นพิมพ์เพื่อยืนยัน'
-    },
-    notfound(){
-      return this.searchStore.notfound
-    },
-    setoverlay(){
-      return this.searchStore.overlay
-      },
-    indexs(){
-      return this.searchStore.indexs
-    },
-    getTotalIndexs(){
-      return this.searchStore.totalsIndexs
-    },
-    search_pageindex: {
-			get() {
-				return this.searchStore.words_search
-			},
-			set(value) {
-        this.searchStore.setwordssearch(value)
-      },
-    }
-  },
-  methods:{
-    dialogs(head,content,content_copy,book,id){
-      this.dialog=!this.dialog
-      this.content=content
-      this.content_copy=content_copy
-      this.head_content=head
-      this.frombook=book
-      this.book_id=id
-    },
-    closs(){
-      this.dialog=!this.dialog
-      window.getSelection().removeAllRanges()
-      this.word_copy = 'คัดลอก'
-      this.content=""
-      this.head_content=""
-    },
-    showDialogYoutube (url) {
-
-      this.dialogYoutube = !this.dialogYoutube
-      const regExp = /^.*((youtu.be\/)|(v\/)|(\/u\/\w\/)|(embed\/)|(watch\?))\??v?=?([^#&?]*).*/
-      const match = url.match(regExp)
-
-      let vid = (match && match[7].length == 11) ? match[7] : false
-
-      this.videoURL = url
-      this.videoId = vid
-    },
-    closeDialogYoutube () {
-      this.dialogYoutube = !this.dialogYoutube
-      this.videoURL = ''
-      this.videoId = ''
-    },
-    text_render(input){
-      if(!input.includes("<mark>")) return input
-
-       let text = input.split("html")
-       if(text.length>1){
-        let t = input.split("html").slice(1).join(' ')
-        let b = t.replace('<mark>',`$<mark>`)
-        let s = b.split("$")
-        let x = s[0].split(" ")
-        let value =`${x[x.length-1]}${s[1]}`
-        return value
-       }else{
-        let b = input.replace('<mark>',`$<mark>`)
-        let s = b.split("$")
-        let x = s[0].split(" ")
-        let value =`${x[x.length-1]}${s[1]}`
-        return value
-       }
-    },
-    clicksearch(input){
-      if(input.length!==0){
-      this.searchStore.setFirstIndexsFromApi({words:input,page:0,creator: 1})
-      }else{
-        this.label_search='กรุณาใส่คำที่่ต้องการค้นหา'
-      }
-    },
-    search_infenit(){
-      let offset = this.searchStore.indexs.length
-      this.searchStore.setFirstIndexsFromApi_infenit({words:this.search_pageindex,page:offset,creator: 1})
-    },
-    copyTextDetail () {
-        this.selectText(this.$refs.textCopy); // e.g. <div ref="text">
-
-        try {
-          var successful = document.execCommand('copy');
-          var msg = successful ? 'คัดลอกแล้ว' : 'คัดลอกไม่สำเร็จ';
-          this.word_copy = `${msg}`
-        } catch (err) {
-          alert('Oops, unable to copy');
-        }
-    },
-    clickedSendbook(bookname2) {
-      let openBook = this.$router.resolve({path: `/book/${bookname2}`});
-      window.open(openBook.href, '_blank')
-    },
-    filter (item, queryText, itemText) {
-      if (item.header) return false
-
-        const hasValue = val => val != null ? val : ''
-
-        const text = hasValue(itemText)
-        const query = hasValue(queryText)
-
-        return text.toString()
-        .toLowerCase()
-        .indexOf(query.toString().toLowerCase()) > -1
-    },
-    selectText(element) {
-        var range;
-        if (document.selection) {
-          // IE
-          range = document.body.createTextRange();
-          range.moveToElementText(element);
-          range.select();
-        } else if (window.getSelection) {
-          range = document.createRange();
-          range.selectNode(element);
-          window.getSelection().removeAllRanges();
-          window.getSelection().addRange(range);
-        }
-    },
-  },
-  watch: {
-    search_pageindex: {
-      handler(val, prev) {
-        if (val.length === prev.length) return
-
-        if (val.length > 5) {
-          this.$nextTick(() =>this.search_pageindex.pop())
-        }
-        this.search_pageindex = val.map(v => {
-          if (typeof v === 'string') {
-            v = {
-              text: v,
-              color: this.colors[this.nonce - 1],
-            }
-
-            this.items.push(v)
-
-            this.nonce++
-          }
-
-          return v
-        })
-      },
-      deep: true
-    }
-  },
-}
-</script>
-<style>
-/* @media (min-width: 320px) {
-  h5.heading {
-    font-size: 0.8em;
   }
-} */
-@import url('https://fonts.googleapis.com/css2?family=Sarabun&display=swap');
 
-p{
+})
+</script>
+
+<style scoped>
+
+.search-form-card {
+  border: none;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  margin-bottom: 24px;
+}
+
+.keyword-input {
+  flex: 1;
+}
+
+.clear-button {
+  margin-left: 8px;
+}
+
+/* Inline Tags Input Styling */
+.tags-input-container {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px;
+  padding: 10px 16px;
+  min-height: 36px;
+  max-height: 120px;
+  overflow-y: auto;
+  background: white;
+  border-radius: 6px;
+  border: 2px solid #e6e6e6;
+  transition: all 0.3s ease;
+  width: 100%;
+}
+
+.tags-input-container:focus-within {
+  border-color: #1890ff;
+  box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.15);
+}
+
+
+.tag-input {
+  border: none;
+  outline: none;
+  flex: 1;
+  min-width: 100px;
+  background: transparent;
+  font-size: 14px;
+  font-family: 'Sarabun', sans-serif;
+  color: #333;
+  line-height: 1.5;
+}
+
+.tag-input::placeholder {
+  color: #999;
+  font-family: 'Sarabun', sans-serif;
+}
+
+/* Input Group Styling */
+.keyword-input {
+  flex: 1;
+  min-width: 0;
+}
+
+.clear-button {
+  margin-left: 8px;
+  height: 36px;
+  border-radius: 6px;
+  min-width: 36px;
+  padding: 0 10px;
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.search-button {
+  color: white;
+  font-family: 'Sarabun', sans-serif;
+  font-weight: 500;
+}
+
+.search-stats {
+  font-family: 'Sarabun', sans-serif;
+  font-size: 14px;
+  color: #666;
+  margin-bottom: 16px;
+}
+
+.search-results {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.search-result-item {
+  font-family: 'Sarabun', sans-serif;
+}
+
+.result-card {
+  border: none;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+}
+
+.result-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+}
+
+.result-content {
+  padding: 16px;
+}
+
+.result-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 12px;
+}
+
+.result-title {
+  font-size: 20px;
+  font-weight: 600;
+  color: #333;
+  margin: 0;
+  line-height: 1.4;
+  flex: 1;
+}
+
+.result-number {
+  font-size: 14px;
+  color: #999;
+  margin-left: 16px;
+}
+
+.result-book-info {
+  margin-bottom: 12px;
+}
+
+.book-link {
+  font-size: 14px;
+  color: #1890ff;
+}
+
+.result-excerpt {
+  margin-bottom: 16px;
+}
+
+.excerpt-content {
+  font-size: 16px;
+  line-height: 1.6;
+  color: #555;
   display: -webkit-box;
   -webkit-line-clamp: 3;
   -webkit-box-orient: vertical;
   overflow: hidden;
   text-overflow: ellipsis;
-  font-size: 17px;
-  font-family: 'Sarabun', sans-serif;
 }
-.indexs{
-  font-family: 'Sarabun', sans-serif;
+
+.result-actions {
+  display: flex;
+  justify-content: flex-end;
 }
-.headline{
+
+.youtube-button,
+.pdf-button,
+.detail-button {
+  font-family: 'Sarabun', sans-serif;
+  font-size: 14px;
+}
+
+.loading-skeleton {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.skeleton-card {
+  padding: 16px;
+}
+
+.empty-state {
+  margin: 60px 0;
   font-family: 'Sarabun', sans-serif;
 }
 
+.empty-suggestions {
+  text-align: left;
+  max-width: 400px;
+  margin: 0 auto;
+}
 
-</style>
+.keyword-display {
+  display: block;
+  margin-bottom: 4px;
+  font-size: 16px;
+  font-weight: 600;
+}
 
+.suggestions {
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid #eee;
+}
+
+.suggestions-title {
+  font-weight: 600;
+  margin-bottom: 8px;
+  display: block;
+}
+
+.suggestions div {
+  margin-bottom: 4px;
+}
+
+.infinite-scroll-trigger {
+  margin-top: 24px;
+}
+
+.loading-more {
+  padding: 16px;
+  text-align: center;
+}
+
+/* Modal Styles */
+.detail-modal,
+.youtube-modal {
+  font-family: 'Sarabun', sans-serif;
+}
+
+.detail-content {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.detail-header {
+  border-bottom: 1px solid #eee;
+  padding-bottom: 16px;
+}
+
+.detail-header h3 {
+  font-size: 18px;
+  font-weight: 600;
+  color: #333;
+  margin: 0 0 8px 0;
+}
+
+.detail-book-info {
+  display: flex;
+  align-items: center;
+}
+
+.detail-text {
+  font-size: 16px;
+  line-height: 1.6;
+  color: #555;
+  white-space: pre-wrap;
+}
+
+.detail-text p {
+  margin: 0;
+}
+
+.youtube-content {
+  display: flex;
+  justify-content: center;
+}
+
+.youtube-embed {
+  position: relative;
+  width: 100%;
+  height: 0;
+  padding-bottom: 56.25%; /* 16:9 aspect ratio */
+}
+
+.youtube-iframe {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  border-radius: 8px;
+}
+
+/* Search Highlighting */
+.search-highlight {
+  background-color: #ffeb3b;
+  color: #333;
+  padding: 1px 2px;
+  border-radius: 2px;
+  font-weight: 600;
+}
+
+/* Mobile Responsiveness */
+@media (max-width: 768px) {
+  .result-header {
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .result-number {
+    align-self: flex-end;
+    margin-left: 0;
+  }
+
+  .result-title {
+    font-size: 18px;
+  }
+
+  .result-actions {
+    justify-content: center;
+  }
+
+  .detail-modal,
+  .youtube-modal {
+    width: 95vw !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .result-title {
+    font-size: 16px;
+  }
+
+  .result-excerpt p {
+    font-size: 15px;
+  }
+
+  .youtube-button,
+  .pdf-button,
+  .detail-button {
+    font-size: 12px;
+    padding: 0 8px;
+  }
+}</style>

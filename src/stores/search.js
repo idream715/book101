@@ -94,14 +94,12 @@ export const useSearchStore = defineStore('search', {
     },
 
     async setSearchRandom({ creator }) {
-      console.log('search_random')
       try {
         const response = await callApi.getData(`/indexs-rand??limit=1&offset=0&creator=${creator}`)
         // Clear previous results
         this.search_random = []
         // Handle response.items which can be object or array
         if (response.data.nItems > 0) {
-            console.log()
             // If items is an object, wrap it in an array
             this.search_random = [response.data.items]
         }

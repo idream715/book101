@@ -84,7 +84,9 @@ export interface RouteMetaCustom {
 }
 
 declare module 'vue-router' {
-  interface RouteMeta extends RouteMetaCustom {}
+  interface RouteMeta extends RouteMetaCustom {
+    title?: string
+  }
 }
 
 // Store types (for Pinia)
@@ -106,6 +108,3 @@ export interface ImportMetaEnv {
   readonly VITE_GA_ID: string
 }
 
-interface ImportMeta {
-  readonly env: ImportMetaEnv
-}

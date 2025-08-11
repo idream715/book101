@@ -1,9 +1,9 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import Home from '../views/Home.vue'
-import { routesV2 } from './routes-v2'
 
-// Legacy V1 routes (Vuetify)
-const routesV1 = [
+// Main routes using V2 Naive UI components
+const routes = [
+  // Home routes
   {
     path: '/',
     name: 'Home',
@@ -14,56 +14,57 @@ const routesV1 = [
     name: 'Cards-Home',
     component: Home
   },
-  {
-    path: '/indexs',
-    name: 'Indexs',
-    component: () => import(/* webpackChunkName: "about" */ '../views/Indexs.vue'),
-  },
-  {
-    path: '/search',
-    name: 'Search',
-    component: () => import(/* webpackChunkName: "search" */ '../views/Search.vue')
-  },
+  
+  // Books routes
   {
     path: '/books',
     name: 'Books',
-    // route level code-splitting
-    // this generates a separate chunk (about.[hash].js) for this route
-    // which is lazy-loaded when the route is visited.
-    component: () => import(/* webpackChunkName: "about" */ '../views/Books.vue')
+    component: () => import('../views/Books.vue')
   },
   {
     path: '/book/:id',
     name: 'Book',
     component: () => import('../views/Sarabun.vue'),
-    props:true
+    props: true
   },
+  
+  // Cards routes
   {
-    path: '/about',
-    name: 'About',
-    component: () => import('../views/About.vue')
+    path: '/cards',
+    name: 'Cards',
+    component: () => import('../views/Cards.vue')
+  },
+  
+  // Search routes
+  {
+    path: '/search',
+    name: 'Search',
+    component: () => import('../views/Search.vue')
   },
   {
     path: '/search-page',
     name: 'SearchPage',
-    component: () => import('@/views/SearchPage.vue')
+    component: () => import('../views/SearchPage.vue')
   },
   {
-    path: '/cards',
-    name: 'Cards',
-    component: () => import('@/views/CardsList.vue')
+    path: '/indexs',
+    name: 'Indexs',
+    component: () => import('../views/Search.vue')  // Use Search.vue instead of removed Indexs.vue
   },
+  
+  // Shorts routes
   {
     path: '/shorts',
     name: 'Shorts',
-    component: () => import('@/views/ShortsList.vue')
+    component: () => import('../views/ShortsList.vue')
   },
-]
-
-// Combine V2 and V1 routes (V2 routes must come first for proper matching)
-const routes = [
-  ...routesV2,
-  ...routesV1
+  
+  // About route
+  {
+    path: '/about',
+    name: 'About',
+    component: () => import('../views/About.vue')
+  }
 ]
 
 const router = createRouter({

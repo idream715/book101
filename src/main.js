@@ -2,17 +2,16 @@ import { createApp, configureCompat } from 'vue'
 import App from './App.vue'
 import router from './router'
 import { pinia } from './stores'
-import vuetify from './plugins/vuetify'
 import VueGtag from "vue-gtag"
 import VueYouTubeEmbed from 'vue-youtube-embed'
 
-// Vuetify 3 styles
-import 'vuetify/styles'
-import 'roboto-fontface/css/roboto/roboto-fontface.css'
-import '@mdi/font/css/materialdesignicons.css'
-
-// Naive UI setup for V2 routes
+// Naive UI setup
 import naive from 'naive-ui'
+
+// Global typography and fonts
+import 'roboto-fontface/css/roboto/roboto-fontface.css'
+import './assets/styles/typography.css'
+import './assets/styles/responsive.css'
 
 // Configure Vue 3 compatibility mode
 configureCompat({
@@ -22,19 +21,19 @@ configureCompat({
   INSTANCE_ATTRS_CLASS_STYLE: 'suppress-warning',
   WATCH_ARRAY: 'suppress-warning',
   COMPILER_V_BIND_OBJECT_ORDER: 'suppress-warning',
-  RENDER_FUNCTION: false
+  RENDER_FUNCTION: false,
+  ATTR_FALSE_VALUE: false
 })
 
 const app = createApp(App)
 
 app.use(router)
 app.use(pinia)
-app.use(vuetify)
 app.use(naive)
 app.use(VueGtag, {
   appName: 'Dhamma01.com',
   pageTrackerScreenviewEnabled: true,
-  config: { id: "G-XFFXK5N9GH" }
+  config: { id: import.meta.env.VITE_GA_ID || "G-XFFXK5N9GH" }
 }, router)
 app.use(VueYouTubeEmbed)
 

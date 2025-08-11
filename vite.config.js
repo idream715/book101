@@ -1,6 +1,5 @@
 import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
-import vuetify from 'vite-plugin-vuetify'
 import { fileURLToPath, URL } from 'node:url'
 
 // https://vitejs.dev/config/
@@ -16,9 +15,6 @@ export default defineConfig({
           }
         }
       }
-    }),
-    vuetify({
-      autoImport: true
     })
   ],
   resolve: {
@@ -63,7 +59,7 @@ export default defineConfig({
     rollupOptions: {
       output: {
         manualChunks: {
-          vendor: ['vue', 'vuetify', 'vue-router', 'pinia'],
+          vendor: ['vue', 'vue-router', 'pinia'],
           'naive-ui': ['naive-ui']
         }
       }

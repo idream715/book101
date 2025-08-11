@@ -54,13 +54,11 @@ export function useInfiniteScroll<T>(
     if (enableAdvancedDebouncing) {
       // Strong debouncing: prevent ANY concurrent calls
       if (loading.value || isLoadingResults.value) {
-        console.log('Load already in progress, skipping...')
         return Promise.resolve()
       }
 
       // Check if there are more results to load based on total count
       if (totalCount.value > 0 && items.value.length >= totalCount.value) {
-        console.log('No more results to load')
         hasMore.value = false
         return Promise.resolve()
       }
@@ -69,7 +67,6 @@ export function useInfiniteScroll<T>(
       const now = Date.now()
       const timeSinceLastLoad = now - lastLoadTime.value
       if (timeSinceLastLoad < debounceMs) {
-        console.log(`Debouncing: ${debounceMs - timeSinceLastLoad}ms remaining`)
         return Promise.resolve()
       }
 
@@ -88,12 +85,6 @@ export function useInfiniteScroll<T>(
     try {
       const currentOffset = items.value.length
       
-      console.log('Loading more items:', {
-        currentOffset,
-        limit,
-        totalCount: totalCount.value,
-        timeSinceLastLoad: enableAdvancedDebouncing ? Date.now() - lastLoadTime.value : 'N/A'
-      })
 
       // Add minimum loading time for better UX (matching Cards/Search)
       const loadingPromise = fetchFn(currentOffset, limit)
@@ -105,7 +96,6 @@ export function useInfiniteScroll<T>(
       
       if (result.items.length === 0) {
         hasMore.value = false
-        console.log('No more items to load')
       } else {
         items.value = [...items.value, ...result.items]
         offset.value = items.value.length
@@ -119,12 +109,6 @@ export function useInfiniteScroll<T>(
           }
         }
         
-        console.log('Items loaded successfully:', {
-          newItems: result.items.length,
-          totalItems: items.value.length,
-          totalCount: totalCount.value,
-          hasMore: hasMore.value
-        })
       }
     } catch (err) {
       error.value = err instanceof Error ? err.message : 'Unknown error occurred'
@@ -251,12 +235,10 @@ export function useElementInfiniteScroll<T>(
     // Enhanced debouncing logic (same as main function)
     if (enableAdvancedDebouncing) {
       if (loading.value || isLoadingResults.value) {
-        console.log('Element scroll: Load already in progress, skipping...')
         return Promise.resolve()
       }
 
       if (totalCount.value > 0 && items.value.length >= totalCount.value) {
-        console.log('Element scroll: No more results to load')
         hasMore.value = false
         return Promise.resolve()
       }
@@ -264,7 +246,6 @@ export function useElementInfiniteScroll<T>(
       const now = Date.now()
       const timeSinceLastLoad = now - lastLoadTime.value
       if (timeSinceLastLoad < debounceMs) {
-        console.log(`Element scroll: Debouncing: ${debounceMs - timeSinceLastLoad}ms remaining`)
         return Promise.resolve()
       }
 

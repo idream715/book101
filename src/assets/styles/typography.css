@@ -1,0 +1,38 @@
+/* Google Fonts - Sarabun Font Family */
+@import url('https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&display=swap');
+
+/* Global Typography Settings */
+body,
+html {
+  font-family: 'Sarabun', sans-serif;
+}
+
+/* Sarabun Font Classes for Components */
+.font-sarabun {
+  font-family: 'Sarabun', sans-serif;
+}
+
+.font-sarabun-light {
+  font-family: 'Sarabun', sans-serif;
+  font-weight: 300;
+}
+
+.font-sarabun-regular {
+  font-family: 'Sarabun', sans-serif;
+  font-weight: 400;
+}
+
+.font-sarabun-medium {
+  font-family: 'Sarabun', sans-serif;
+  font-weight: 500;
+}
+
+.font-sarabun-semibold {
+  font-family: 'Sarabun', sans-serif;
+  font-weight: 600;
+}
+
+.font-sarabun-bold {
+  font-family: 'Sarabun', sans-serif;
+  font-weight: 700;
+}
