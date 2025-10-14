@@ -72,6 +72,21 @@
                     </n-button>
 
                     <n-button
+                      v-if="bookSelected?.bookWord && bookSelected.bookWord.includes('.doc')"
+                      type="primary"
+                      secondary
+                      @click="openText(bookSelected.bookWord)"
+                      class="action-button"
+                    >
+                      <template #icon>
+                        <n-icon>
+                          <BookOutlined />
+                        </n-icon>
+                      </template>
+                      เปิดไฟล์ WORD
+                    </n-button>
+
+                    <n-button
                       v-if="bookSelected?.bookText && bookSelected.bookText.includes('.txt')"
                       type="primary"
                       secondary
@@ -343,6 +358,7 @@ interface BookInfo {
   bookCover: string
   categoryName: string
   bookPdf: string
+  bookWord?: string
   bookText?: string
 }
 
@@ -925,7 +941,7 @@ onMounted(async () => {
     min-width: 28px;
     height: 28px;
   }
-  
+
   .chapter-actions {
     gap: 4px;
     flex-direction: row !important;

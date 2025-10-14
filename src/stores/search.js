@@ -87,9 +87,12 @@ export const useSearchStore = defineStore('search', {
           }))
 
           this.indexs.push(...processedIndexs)
+          return true
         }
+        return false
       } catch (error) {
         console.error('Error in infinite search:', error)
+        throw error
       }
     },
 

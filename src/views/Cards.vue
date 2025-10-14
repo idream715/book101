@@ -77,8 +77,21 @@
             </n-input-group>
           </n-form-item>
 
-          <!-- Search Button -->
+          <!-- Search and Refresh Buttons -->
           <n-space justify="end">
+            <n-button
+              @click="refreshCards"
+              :loading="refreshing || undefined"
+              ghost
+            >
+              <template #icon>
+                <n-icon>
+                  <ReloadOutlined />
+                </n-icon>
+              </template>
+              รีเฟรช
+            </n-button>
+
             <n-button
               type="primary"
               @click="performSearch"
@@ -103,7 +116,7 @@
 
       <!-- Cards Grid with Infinite Scroll -->
       <n-infinite-scroll
-        :distance="1200"
+        :distance="800"
         @load="loadMoreCards"
         :loading="infiniteScrollLoadingAttr"
         class="cards-infinite-scroll"
@@ -121,7 +134,7 @@
               :key="card.cardId"
               class="card-item"
             >
-              <div class="card-click-wrapper" @click="openCardModal(card)">
+              <div class="card-click-wrapper" @click="openCardModal(card)" role="button" tabindex="0">
                 <n-card
                   class="card-wrapper"
                   header-class="card-header-custom"
@@ -138,35 +151,19 @@
                       object-fit="cover"
                       preview-disabled
                       class="card-cover"
-                      :fallback-src="'/src/assets/logo2.png'"
+                      :fallback-src="'/logo2.png'"
                     />
-
-                    <!-- Tags Badge -->
-                    <div v-if="card.cardTags && card.cardTags.length > 0" class="tags-container">
-                      <n-tag
-                        v-for="tag in card.cardTags.slice(0, 2)"
-                        :key="tag"
-                        size="small"
-                        type="info"
-                        class="tag-badge"
-                      >
-                        {{ tag }}
-                      </n-tag>
-                      <n-tag
-                        v-if="card.cardTags.length > 2"
-                        size="small"
-                        type="default"
-                        class="tag-badge"
-                      >
-                        +{{ card.cardTags.length - 2 }}
-                      </n-tag>
-                    </div>
                   </div>
                 </template>
 
                 <template #header>
                   <n-ellipsis :line-clamp="2" class="card-title">
-                    {{ card.cardDetail }}
+                    <n-highlight
+                      v-if="isSearchMode"
+                      :text="card.cardDetail"
+                      :patterns="expandedSearchPatterns"
+                    />
+                    <template v-else>{{ card.cardDetail }}</template>
                   </n-ellipsis>
                 </template>
 
@@ -228,10 +225,52 @@
             object-fit="contain"
             class="modal-image"
           />
+
+          <!-- Navigation buttons overlay on image -->
+          <div class="navigation-overlay">
+            <n-button
+              @click="cardModal.goToPrevious"
+              :disabled="canGoPreviousDisabled"
+              type="primary"
+              quaternary
+              circle
+              size="large"
+              class="nav-button nav-button-left"
+            >
+              <template #icon>
+                <n-icon size="24">
+                  <LeftOutlined />
+                </n-icon>
+              </template>
+            </n-button>
+
+            <n-button
+              @click="cardModal.goToNext"
+              :disabled="canGoNextDisabled"
+              type="primary"
+              quaternary
+              circle
+              size="large"
+              class="nav-button nav-button-right"
+            >
+              <template #icon>
+                <n-icon size="24">
+                  <RightOutlined />
+                </n-icon>
+              </template>
+            </n-button>
+          </div>
         </div>
 
         <div class="modal-details">
-          <h3 class="modal-title">{{ cardModal.currentCard.value.cardDetail }}</h3>
+          <h3 class="modal-title">
+            <n-highlight
+              v-if="isSearchMode"
+              :text="cardModal.currentCard.value.cardDetail"
+              :patterns="expandedSearchPatterns"
+            />
+            <template v-else>{{ cardModal.currentCard.value.cardDetail }}</template>
+          </h3>
 
           <div v-if="cardModal.currentCard.value.cardTags" class="modal-tags">
             <n-tag
@@ -246,6 +285,18 @@
 
           <div class="modal-actions">
             <n-space>
+              <n-button
+                @click="goToCardDetail"
+                type="primary"
+              >
+                <template #icon>
+                  <n-icon>
+                    <EyeOutlined />
+                  </n-icon>
+                </template>
+                ดูรายละเอียด
+              </n-button>
+
               <n-button
                 @click="copyCardText"
                 type="primary"
@@ -277,38 +328,8 @@
       </div>
 
       <template #footer>
-        <n-space justify="space-between">
-          <n-space>
-            <n-button
-              @click="cardModal.goToPrevious"
-              :disabled="canGoPreviousDisabled"
-              type="primary"
-              ghost
-            >
-              <template #icon>
-                <n-icon>
-                  <LeftOutlined />
-                </n-icon>
-              </template>
-              ก่อนหน้า
-            </n-button>
-
-            <n-button
-              @click="cardModal.goToNext"
-              :disabled="canGoNextDisabled"
-              type="primary"
-              ghost
-            >
-              <template #icon>
-                <n-icon>
-                  <RightOutlined />
-                </n-icon>
-              </template>
-              ถัดไป
-            </n-button>
-          </n-space>
-
-          <n-text depth="3">
+        <n-space justify="center">
+          <n-text depth="3" class="page-counter">
             {{ cardModal.currentIndex.value + 1 }} / {{ cardModal.cardList.value.length }}
           </n-text>
         </n-space>
@@ -320,7 +341,7 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
-import { useRoute } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import { useMessage } from 'naive-ui'
 import {
   CloseCircleOutlined,
@@ -328,7 +349,9 @@ import {
   CopyOutlined,
   ShareAltOutlined,
   LeftOutlined,
-  RightOutlined
+  RightOutlined,
+  EyeOutlined,
+  ReloadOutlined
 } from '@vicons/antd'
 import AppLayout from '@/components/layouts/AppLayout.vue'
 import ContentLayout from '@/components/layouts/ContentLayout.vue'
@@ -360,6 +383,7 @@ interface KeywordOption {
 
 // Composables
 const route = useRoute()
+const router = useRouter()
 const message = useMessage()
 const cardsStore = useCardsStore()
 const cardModal = useCardModal()
@@ -370,6 +394,7 @@ const selectedTags = ref<string[]>([])
 const searchKeywords = ref<string[]>([])
 const keywordInput = ref<string>('')
 const searching = ref<boolean>(false)
+const refreshing = ref<boolean>(false)
 const inputRef = ref<HTMLInputElement | null>(null)
 
 // Computed properties
@@ -391,7 +416,7 @@ const keywordOptions = computed((): KeywordOption[] => {
 
   const input = keywordInput.value.trim()
   if (!input) return []
-  
+
   const options: KeywordOption[] = []
 
   // Add current input as first option
@@ -405,14 +430,14 @@ const keywordOptions = computed((): KeywordOption[] => {
   // Generate autocomplete suggestions based on input (optimized)
   const inputLower = input.toLowerCase()
   const uniqueSuggestions = new Set<string>()
-  
+
   // Limit card processing for performance
   const cardsToProcess = cards.value.slice(0, 100) // Process only first 100 cards
-  
+
   for (const card of cardsToProcess) {
     const words = card.cardDetail.split(' ')
     for (const word of words) {
-      if (word.length > 2 && 
+      if (word.length > 2 &&
           word.toLowerCase().includes(inputLower) &&
           !searchKeywords.value.includes(word) &&
           word !== input) {
@@ -441,6 +466,55 @@ const hasActiveFilters = computed((): boolean => {
 
 const canSearch = computed((): boolean => {
   return searchKeywords.value.length > 0 || selectedTags.value.length > 0
+})
+
+// Utility functions for Thai-Arabic number conversion (copied from Search.vue)
+const thaiDigits = ['๐', '๑', '๒', '๓', '๔', '๕', '๖', '๗', '๘', '๙']
+const arabicDigits = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9']
+
+const convertThaiToArabic = (text: string): string => {
+  return text.split('').map(char => {
+    const index = thaiDigits.indexOf(char)
+    return index !== -1 ? arabicDigits[index] : char
+  }).join('')
+}
+
+const convertArabicToThai = (text: string): string => {
+  return text.split('').map(char => {
+    const index = arabicDigits.indexOf(char)
+    return index !== -1 ? thaiDigits[index] : char
+  }).join('')
+}
+
+const hasNumbers = (text: string): boolean => {
+  return /[\d๐-๙]/.test(text)
+}
+
+// Check if currently in search mode (has keywords, not just tags)
+const isSearchMode = computed((): boolean => {
+  return searchKeywords.value.length > 0
+})
+
+// Expanded search patterns including both Thai and Arabic numerals
+const expandedSearchPatterns = computed((): string[] => {
+  if (!isSearchMode.value) return []
+
+  const patterns: string[] = []
+
+  searchKeywords.value.forEach(keyword => {
+    patterns.push(keyword) // Original keyword
+
+    if (hasNumbers(keyword)) {
+      // If contains numbers, add both Thai and Arabic versions
+      const arabicVersion = convertThaiToArabic(keyword)
+      const thaiVersion = convertArabicToThai(keyword)
+
+      if (arabicVersion !== keyword) patterns.push(arabicVersion)
+      if (thaiVersion !== keyword) patterns.push(thaiVersion)
+    }
+  })
+
+  return [...new Set(patterns)] // Remove duplicates
 })
 
 // Computed properties for proper attribute handling in Vue 3
@@ -549,6 +623,33 @@ const clearSearch = (): void => {
   searchKeywords.value = []
 }
 
+const refreshCards = async (): Promise<void> => {
+  refreshing.value = true
+
+  try {
+    const creatorId = route.query.t as string
+
+    // Force clear cache to fetch fresh data
+    cardsStore.currentCreator = null
+    cardsStore.cardToolbarFlag = ''
+
+    // Reset infinite scroll state
+    infiniteScrollLoading.value = false
+    isLoadingCards.value = false
+    lastLoadTime.value = 0
+
+    // Reload cards from API
+    await cardsStore.getCardFromApi(parseInt(creatorId))
+
+    message.success('รีเฟรชข้อมูลสำเร็จ')
+  } catch (error) {
+    console.error('Refresh error:', error)
+    message.error('เกิดข้อผิดพลาดในการรีเฟรช')
+  } finally {
+    refreshing.value = false
+  }
+}
+
 const clearFilters = async (): Promise<void> => {
   selectedTags.value = []
   searchKeywords.value = []
@@ -575,6 +676,24 @@ const openCardModal = (card: Card): void => {
   cardModal.openCard(card, cards.value)
 }
 
+const goToCardDetail = (): void => {
+  if (!cardModal.currentCard.value) return
+
+  const card = cardModal.currentCard.value
+  const creatorParam = route.query.t ? `?t=${route.query.t}` : ''
+  const cardDetailUrl = `/card/${card.cardId}${creatorParam}`
+
+  // Open in new window/tab
+  window.open(cardDetailUrl, '_blank')
+
+  // Track navigation
+  analytics.trackCardView({
+    cardId: card.cardId,
+    cardTitle: card.cardDetail,
+    creatorId: card.creatorId
+  })
+}
+
 const copyCardText = async (): Promise<void> => {
   if (!cardModal.currentCard.value) return
 
@@ -594,30 +713,202 @@ const copyCardText = async (): Promise<void> => {
   }
 }
 
+// Helper: Detect mobile device
+const isMobileDevice = (): boolean => {
+  return /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent) ||
+         navigator.maxTouchPoints > 2
+}
+
+// Helper: Detect LINE in-app browser
+const isLineInAppBrowser = (): boolean => {
+  const ua = navigator.userAgent.toLowerCase()
+  return ua.includes('line/')
+}
+
+// Helper: Fetch image and convert to File object
+const fetchImageAsFile = async (imageUrl: string, filename: string): Promise<File> => {
+  try {
+    const response = await fetch(imageUrl, {
+      mode: 'cors',
+      cache: 'no-cache'
+    })
+
+    if (!response.ok) {
+      throw new Error(`Failed to fetch image: ${response.statusText}`)
+    }
+
+    const blob = await response.blob()
+
+    // Determine file extension from blob type or URL
+    let extension = 'jpg'
+    if (blob.type === 'image/png') extension = 'png'
+    else if (blob.type === 'image/jpeg') extension = 'jpg'
+    else if (blob.type === 'image/webp') extension = 'webp'
+
+    const file = new File([blob], `${filename}.${extension}`, {
+      type: blob.type,
+      lastModified: Date.now()
+    })
+
+    return file
+  } catch (error) {
+    console.error('Image fetch error:', error)
+    throw error
+  }
+}
+
+// Helper: Download image directly (for LINE in-app browser)
+const downloadImage = async (imageUrl: string, filename: string): Promise<void> => {
+  try {
+    const response = await fetch(imageUrl, {
+      mode: 'cors',
+      cache: 'no-cache'
+    })
+
+    if (!response.ok) {
+      throw new Error(`Failed to fetch image: ${response.statusText}`)
+    }
+
+    const blob = await response.blob()
+
+    // Create download link
+    const url = window.URL.createObjectURL(blob)
+    const link = document.createElement('a')
+    link.href = url
+    link.download = `${filename}.jpg`
+    link.style.display = 'none'
+    document.body.appendChild(link)
+    link.click()
+
+    // Cleanup
+    setTimeout(() => {
+      document.body.removeChild(link)
+      window.URL.revokeObjectURL(url)
+    }, 100)
+  } catch (error) {
+    console.error('Image download error:', error)
+    throw error
+  }
+}
+
+// Loading state for image sharing
+const sharingImage = ref<boolean>(false)
+
 const shareCard = async (): Promise<void> => {
   if (!cardModal.currentCard.value) return
 
+  const card = cardModal.currentCard.value
+  const isMobile = isMobileDevice()
+  const isLineApp = isLineInAppBrowser()
+
+  // Generate shareable URL for this specific card
+  const creatorParam = route.query.t ? `?t=${route.query.t}` : ''
+  const cardUrl = `${window.location.origin}/card/${card.cardId}${creatorParam}`
+
   try {
+    // Special handling for LINE in-app browser
+    if (isLineApp) {
+      sharingImage.value = true
+      message.loading('กำลังเตรียมรูปภาพ...', { duration: 0 })
+
+      try {
+        // Download image directly for LINE browser
+        await downloadImage(card.cardPic, `card-${card.cardId}`)
+
+        message.destroyAll()
+        message.success('ดาวน์โหลดรูปภาพสำเร็จ! กรุณาแชร์จากแกลเลอรี่', { duration: 5000 })
+
+        // Track download
+        analytics.trackCardShare({
+          cardId: card.cardId,
+          cardTitle: card.cardDetail,
+          creatorId: card.creatorId
+        })
+
+        return
+      } catch (downloadError) {
+        console.error('LINE download failed:', downloadError)
+        message.destroyAll()
+        message.warning('ไม่สามารถดาวน์โหลดรูปภาพได้ กรุณาลองอีกครั้ง')
+        return
+      } finally {
+        sharingImage.value = false
+      }
+    }
+
+    // Mobile (non-LINE): Try to share image file
+    if (isMobile && navigator.share) {
+      try {
+        // Check if browser supports file sharing
+        if (navigator.canShare && navigator.canShare({ files: [] })) {
+          sharingImage.value = true
+          message.loading('กำลังเตรียมรูปภาพ...', { duration: 0 })
+
+          // Fetch image as File object
+          const imageFile = await fetchImageAsFile(
+            card.cardPic,
+            `card-${card.cardId}`
+          )
+
+          // Share with image file
+          await navigator.share({
+            title: card.cardDetail,
+            text: card.cardDetail,
+            files: [imageFile]
+          })
+
+          message.destroyAll()
+          message.success('แชร์รูปภาพสำเร็จ')
+
+          // Track successful image share
+          analytics.trackCardShare({
+            cardId: card.cardId,
+            cardTitle: card.cardDetail,
+            creatorId: card.creatorId
+          })
+
+          return
+        }
+      } catch (imageError) {
+        console.warn('Image sharing failed, fallback to URL:', imageError)
+        message.destroyAll()
+        // Continue to fallback below
+      } finally {
+        sharingImage.value = false
+      }
+    }
+
+    // Fallback: Share URL pointing to specific card (Desktop or if image sharing failed)
     if (navigator.share) {
       await navigator.share({
-        title: cardModal.currentCard.value.cardDetail,
-        url: window.location.href
+        title: card.cardDetail,
+        text: card.cardDetail,
+        url: cardUrl
       })
+
+      message.success('แชร์สำเร็จ')
     } else {
-      // Fallback: copy URL to clipboard
-      await navigator.clipboard.writeText(window.location.href)
+      // Final fallback: Copy card URL to clipboard
+      await navigator.clipboard.writeText(cardUrl)
       message.success('คัดลอกลิงก์แล้ว')
     }
 
     // Track share analytics
     analytics.trackCardShare({
-      cardId: cardModal.currentCard.value.cardId,
-      cardTitle: cardModal.currentCard.value.cardDetail,
-      creatorId: cardModal.currentCard.value.creatorId
+      cardId: card.cardId,
+      cardTitle: card.cardDetail,
+      creatorId: card.creatorId
     })
+
   } catch (error) {
-    console.error('Share failed:', error)
-    message.error('ไม่สามารถแชร์ได้')
+    sharingImage.value = false
+    message.destroyAll()
+
+    // Only show error if user didn't cancel
+    if ((error as Error).name !== 'AbortError') {
+      console.error('Share failed:', error)
+      message.error('ไม่สามารถแชร์ได้')
+    }
   }
 }
 
@@ -774,6 +1065,7 @@ onMounted(async () => {
   min-height: 36px;
   max-height: 120px;
   overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
   background: white;
   border-radius: 6px;
   border: 2px solid #e6e6e6;
@@ -848,7 +1140,6 @@ onMounted(async () => {
 
 .card-click-wrapper {
   width: 100%;
-  max-width: 250px;
   cursor: pointer;
   transition: all 0.3s ease;
 }
@@ -861,8 +1152,8 @@ onMounted(async () => {
 }
 
 .card-click-wrapper:hover .card-wrapper {
-  transform: translateY(-4px);
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12);
 }
 
 .card-click-wrapper:active .card-wrapper {
@@ -894,7 +1185,7 @@ onMounted(async () => {
 }
 
 .card-click-wrapper:hover .card-cover {
-  transform: scale(1.05);
+  transform: scale(1.02);
 }
 
 .tags-container {
@@ -908,8 +1199,8 @@ onMounted(async () => {
 }
 
 .tag-badge {
-  backdrop-filter: blur(4px);
-  background: rgba(255, 255, 255, 0.9);
+  background: rgba(255, 255, 255, 0.95);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
   font-size: 10px;
 }
 
@@ -939,12 +1230,65 @@ onMounted(async () => {
 }
 
 .modal-image-container {
+  position: relative;
   text-align: center;
 }
 
 .modal-image {
   max-height: 400px;
   border-radius: 8px;
+}
+
+/* Navigation overlay on image */
+.navigation-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 16px;
+  pointer-events: none;
+  z-index: 10;
+}
+
+.nav-button {
+  pointer-events: auto;
+  opacity: 0.7;
+  transition: all 0.3s ease;
+  background: rgba(255, 255, 255, 0.95) !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+}
+
+.nav-button:hover {
+  opacity: 1;
+  transform: scale(1.1);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.35);
+}
+
+.nav-button:active {
+  transform: scale(0.95);
+}
+
+.nav-button:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+.nav-button-left {
+  margin-right: auto;
+}
+
+.nav-button-right {
+  margin-left: auto;
+}
+
+.page-counter {
+  font-size: 16px;
+  font-weight: 500;
+  font-family: 'Sarabun', sans-serif;
 }
 
 .modal-details {
@@ -985,7 +1329,7 @@ onMounted(async () => {
   align-items: center;
   gap: 12px;
   padding: 24px;
-  background: linear-gradient(to bottom, transparent, rgba(0, 0, 0, 0.02));
+  background: rgba(0, 0, 0, 0.02);
   border-radius: 8px;
   margin-top: 16px;
   transition: all 0.3s ease;
@@ -1015,15 +1359,56 @@ onMounted(async () => {
 }
 
 
+/* iOS Specific Fixes */
+.card-cover,
+.modal-image {
+  /* Force hardware acceleration */
+  -webkit-transform: translateZ(0);
+  transform: translateZ(0);
+  /* Prevent iOS rendering glitches */
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+}
+
+.card-click-wrapper {
+  /* Enable touch events on iOS */
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  user-select: none;
+  /* iOS click handler fix */
+  cursor: pointer;
+}
+
+/* Fix for iOS Safari object-fit issues */
+.modal-image img,
+.card-cover img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+}
+
+/* iOS scroll optimization */
+.cards-infinite-scroll {
+  /* Smooth scrolling on iOS */
+  -webkit-overflow-scrolling: touch;
+  /* Prevent scroll bounce on overscroll */
+  overscroll-behavior: contain;
+}
+
+/* Grid layout iOS fixes */
+.cards-container {
+  /* Prevent flex issues on iOS Safari */
+  -webkit-box-sizing: border-box;
+  box-sizing: border-box;
+}
+
 /* Mobile Responsiveness */
 @media (max-width: 768px) {
   .filter-card {
     margin-bottom: 16px;
   }
 
-  .card-click-wrapper {
-    max-width: 180px;
-  }
 
   .card-title {
     font-size: 13px;
@@ -1045,6 +1430,32 @@ onMounted(async () => {
   .card-modal {
     width: 95vw !important;
   }
+
+  /* Navigation buttons - smaller on mobile */
+  .nav-button {
+    opacity: 0.8;
+  }
+
+  .navigation-overlay {
+    padding: 0 8px;
+  }
+
+  .page-counter {
+    font-size: 14px;
+  }
+
+  /* iOS-specific optimizations */
+  .card-wrapper {
+    -webkit-transform: translateZ(0);
+    -webkit-backface-visibility: hidden;
+    transform: translateZ(0);
+    backface-visibility: hidden;
+  }
+
+  .card-cover {
+    -webkit-transform: translateZ(0);
+    transform: translateZ(0);
+  }
 }
 
 @media (max-width: 480px) {
@@ -1064,6 +1475,15 @@ onMounted(async () => {
   .tag-badge {
     font-size: 8px;
     padding: 2px 6px;
+  }
+
+  /* Smaller navigation buttons on very small screens */
+  .navigation-overlay {
+    padding: 0 4px;
+  }
+
+  .page-counter {
+    font-size: 13px;
   }
 }
 </style>

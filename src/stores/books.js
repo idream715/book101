@@ -8,7 +8,8 @@ export const useBooksStore = defineStore('books', {
     bookSelected: {},
     sarabunSelected: [],
     totalsSarabun: 0,
-    flag: 1
+    flag: 1,
+    currentCreator: null // Track current creator to avoid unnecessary reloads
   }),
 
   getters: {
@@ -22,10 +23,17 @@ export const useBooksStore = defineStore('books', {
 
   actions: {
     async getBooksFromApi(creator) {
+      // Skip if already loaded for same creator
+      if (this.currentCreator === creator && this.books.length > 0) {
+        console.log('Books already loaded for creator', creator)
+        return
+      }
+
       try {
         const response = await callApi.getData(`books/all?creator=${creator}`)
         this.books = response.data.items
         this.totalsBooks = response.data.nItems
+        this.currentCreator = creator // Save current creator
       } catch (error) {
         console.error('Error fetching books:', error)
       }
@@ -80,6 +88,7 @@ export const useBooksStore = defineStore('books', {
       this.totalsSarabun = 0
       this.bookSelected = {}
       this.flag = 1
+      this.currentCreator = null
     }
   }
 })

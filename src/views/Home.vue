@@ -11,7 +11,7 @@
                 มรดกธรรมคำสอน <br> พระมงคลเทพมุนี
               </h1>
               <h1 class="section-subtitle">
-                (หลวงพ่อวัดปากน้ำ)
+                (หลวงปู่วัดปากน้ำ)
               </h1>
             </div>
           </n-gi>
@@ -295,7 +295,7 @@ const showCreatorNav = ref(false)
 const creatorList = ref<Creator[]>([
   {
     id: 4,
-    name: 'พระมงคลเทพมุนี (หลวงพ่อวัดปากน้ำ)',
+    name: 'พระมงคลเทพมุนี (หลวงปู่วัดปากน้ำ)',
     shortName: 'พระมงคลเทพมุนี'
   },
   {

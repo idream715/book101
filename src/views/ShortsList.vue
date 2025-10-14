@@ -6,72 +6,80 @@
       :loading="loading ? true : undefined"
       loading-text="กำลังโหลด..."
     >
-      <!-- Search Form Card -->
+      <!-- Search Form Card (แบบเดียวกับ Search.vue) -->
       <n-card class="search-form-card mb-6">
-        <n-collapse :default-expanded-names="['search']">
-          <n-collapse-item title="ค้นหาในเนื้อหาปกิณกะ" name="search">
-            <n-form>
-              <n-form-item label="ค้นหาข้อความปกิณกะ">
-                <n-input-group>
-                  <n-auto-complete
-                    v-model:value="keywordInput"
-                    :options="keywordOptions"
-                    placeholder="พิมพ์คำค้นหา..."
-                    class="keyword-input"
-                    @select="addKeyword"
-                    @keydown.enter="addKeywordFromInput"
-                    @blur="addKeywordFromInput"
-                    clearable
-                  />
-                  <n-button
-                    v-if="searchKeywords.length > 0"
-                    @click="clearSearch"
-                    type="primary"
-                    ghost
-                    class="clear-button"
-                  >
-                    <template #icon>
-                      <n-icon>
-                        <CloseCircleOutlined />
-                      </n-icon>
-                    </template>
-                  </n-button>
-                </n-input-group>
-              </n-form-item>
+        <n-form>
+          <n-form-item label="ค้นหาในเนื้อหาปกิณกะ">
+            <n-input-group>
+              <n-auto-complete
+                v-model:value="keywordInput"
+                :options="keywordOptions"
+                @select="handleKeywordSelect"
+                clearable
+                clear-after-select
+              >
+                <template #default="{ handleInput, handleBlur, handleFocus }">
+                  <div class="tags-input-container" :class="{ 'has-tags': searchKeywords.length > 0 }">
+                    <!-- Selected tags inside input -->
+                    <n-tag
+                      v-for="(keyword, index) in searchKeywords"
+                      :key="keyword"
+                      type="info"
+                      size="small"
+                      closable
+                      @close="removeKeyword(index)"
+                    >
+                      {{ keyword }}
+                    </n-tag>
 
-              <!-- Keyword Tags Display -->
-              <div v-if="searchKeywords.length > 0" class="keyword-tags mb-4">
-                <n-tag
-                  v-for="(keyword, index) in searchKeywords"
-                  :key="keyword"
-                  type="primary"
-                  closable
-                  @close="removeKeyword(index)"
-                  class="keyword-tag"
-                >
-                  {{ keyword }}
-                </n-tag>
-              </div>
+                    <!-- Actual input for new keywords -->
+                    <input
+                      ref="inputRef"
+                      v-model="keywordInput"
+                      :placeholder="searchKeywords.length > 0 ? '' : 'พิมพ์คำค้นหา...'"
+                      @input="(e) => handleInput((e.target as HTMLInputElement).value)"
+                      @blur="handleBlur"
+                      @focus="handleFocus"
+                      @keydown.enter="addKeywordFromInput"
+                      @keydown.backspace="handleBackspace"
+                      class="tag-input"
+                    />
+                  </div>
+                </template>
+              </n-auto-complete>
+              <n-button
+                v-if="searchKeywords.length > 0"
+                @click="clearSearch"
+                type="error"
+                class="clear-button"
+                quaternary
+              >
+                <template #icon>
+                  <n-icon>
+                    <CloseCircleOutlined />
+                  </n-icon>
+                </template>
+              </n-button>
+            </n-input-group>
+          </n-form-item>
 
-              <n-space justify="end">
-                <n-button
-                  v-if="searchKeywords.length > 0"
-                  type="primary"
-                  @click="performSearch"
-                  :loading="searching ? true : undefined"
-                  class="search-button"
-                >
-                  <template #icon>
-                    <n-icon>
-                      <SearchOutlined />
-                    </n-icon>
-                  </template>
-                  ค้นหา
-                </n-button>
-              </n-space>
-            </n-form>
-          </n-collapse-item>
-        </n-collapse>
+          <n-space justify="end">
+            <n-button
+              type="primary"
+              @click="performSearch"
+              :loading="searching ? true : undefined"
+              :disabled="!canSearch ? true : undefined"
+              class="search-button"
+            >
+              <template #icon>
+                <n-icon>
+                  <SearchOutlined />
+                </n-icon>
+              </template>
+              ค้นหา
+            </n-button>
+          </n-space>
+        </n-form>
       </n-card>
 
       <!-- Search Results Stats -->
@@ -314,6 +322,7 @@ const searchKeywords = ref<string[]>([])
 const keywordInput = ref<string>('')
 const searching = ref<boolean>(false)
 const copyButtonText = ref<string>('คัดลอก')
+const inputRef = ref<HTMLInputElement | null>(null)
 const detailTextRef = ref<HTMLElement | null>(null)
 
 const detailModal = ref<DetailModal>({
@@ -505,6 +514,14 @@ const performSearch = (): void => {
   }
 }
 
+const handleKeywordSelect = (value: string): void => {
+  addKeyword(value)
+  // Force clear the input after selection with a small delay
+  setTimeout(() => {
+    keywordInput.value = ''
+  }, 10)
+}
+
 const addKeyword = (value: string): void => {
   const trimmedValue = value.trim()
   if (!trimmedValue || searchKeywords.value.includes(trimmedValue)) {
@@ -530,6 +547,14 @@ const addKeywordFromInput = (): void => {
 
 const removeKeyword = (index: number): void => {
   searchKeywords.value.splice(index, 1)
+}
+
+const handleBackspace = (event: KeyboardEvent): void => {
+  // If input is empty and backspace is pressed, remove the last keyword
+  if (keywordInput.value === '' && searchKeywords.value.length > 0) {
+    event.preventDefault()
+    searchKeywords.value.pop()
+  }
 }
 
 const clearSearch = (): void => {
@@ -747,6 +772,64 @@ onMounted(async () => {
 
 .suggestions div {
   margin-bottom: 4px;
+}
+
+/* Inline Tags Input Styling (แบบเดียวกับ Search.vue) */
+.tags-input-container {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px;
+  padding: 10px 16px;
+  min-height: 36px;
+  max-height: 120px;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  background: white;
+  border-radius: 6px;
+  border: 2px solid #e6e6e6;
+  transition: all 0.3s ease;
+  width: 100%;
+}
+
+.tags-input-container:focus-within {
+  border-color: #1890ff;
+  box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.15);
+}
+
+.tag-input {
+  border: none;
+  outline: none;
+  flex: 1;
+  min-width: 100px;
+  background: transparent;
+  font-size: 14px;
+  font-family: 'Sarabun', sans-serif;
+  color: #333;
+  line-height: 1.5;
+}
+
+.tag-input::placeholder {
+  color: #999;
+  font-family: 'Sarabun', sans-serif;
+}
+
+.clear-button {
+  margin-left: 8px;
+  height: 36px;
+  border-radius: 6px;
+  min-width: 36px;
+  padding: 0 10px;
+}
+
+/* Search Highlighting - สไตล์เดียวกับ Search.vue */
+:deep(.n-highlight mark) {
+  background-color: #ffeb3b;
+  color: #333;
+  padding: 2px 4px;
+  border-radius: 3px;
+  font-weight: 600;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
 }
 
 /* Modal Styles */

@@ -34,6 +34,12 @@ const routes = [
     name: 'Cards',
     component: () => import('../views/Cards.vue')
   },
+  {
+    path: '/card/:id',
+    name: 'CardDetail',
+    component: () => import('../views/CardDetail.vue'),
+    props: true
+  },
   
   // Search routes
   {
@@ -69,7 +75,19 @@ const routes = [
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
-  routes
+  routes,
+  scrollBehavior(to, from, savedPosition) {
+    // Always scroll to top when navigating
+    // This ensures users see the nav bar on every page
+    if (savedPosition) {
+      // When using browser back/forward buttons, restore saved position
+      // But we want to scroll to top instead
+      return { top: 0, behavior: 'instant' }
+    } else {
+      // For new navigation, always scroll to top
+      return { top: 0, behavior: 'instant' }
+    }
+  }
 })
 
 export default router

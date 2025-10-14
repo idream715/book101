@@ -1,6 +1,7 @@
 {
   "hosting": {
     "public": "dist",
+    "predeploy": ["yarn build"],
     "ignore": [
       "firebase.json",
       "**/.*",
@@ -21,7 +22,7 @@
             "value": "DENY"
           },
           {
-            "key": "X-XSS-Protection", 
+            "key": "X-XSS-Protection",
             "value": "1; mode=block"
           },
           {

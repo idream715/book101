@@ -93,6 +93,7 @@
         v-if="!loading && searchResults.length > 0"
         :distance="300"
         @load="loadMoreResults"
+        :loading="infiniteScrollLoading || undefined"
         class="search-results"
       >
         <div
@@ -106,7 +107,7 @@
                 <h3 class="result-title">
                   <n-highlight
                     :text="result.mark_index"
-                    :patterns="searchKeywords"
+                    :patterns="expandedSearchPatterns"
                   />
                 </h3>
                 <span class="result-number">{{ index + 1 }}</span>
@@ -132,7 +133,7 @@
                 <div class="excerpt-content">
                   <n-highlight
                     :text="result.mark_details"
-                    :patterns="searchKeywords"
+                    :patterns="expandedSearchPatterns"
                   />
                 </div>
               </div>
@@ -188,6 +189,19 @@
             </div>
           </n-card>
         </div>
+
+        <!-- Loading indicator -->
+        <template #loading>
+          <div class="infinite-loading">
+            <n-spin size="medium" />
+            <n-text depth="3" class="loading-text">
+              {{ infiniteScrollLoading ? 'กำลังโหลดผลลัพธ์เพิ่มเติม...' : 'เลื่อนลงเพื่อดูผลลัพธ์เพิ่มเติม' }}
+            </n-text>
+            <n-text v-if="searchResults.length > 0" depth="3" class="loading-stats">
+              แสดงแล้ว {{ searchResults.length }} / {{ totalResults }} รายการ
+            </n-text>
+          </div>
+        </template>
       </n-infinite-scroll>
 
       <!-- Loading Skeleton -->
@@ -244,7 +258,7 @@
           <h3>
             <n-highlight
               :text="detailModal.content.mark_index"
-              :patterns="searchKeywords"
+              :patterns="expandedSearchPatterns"
             />
           </h3>
           <div class="detail-book-info">
@@ -267,7 +281,7 @@
         <div class="detail-text" ref="detailTextRef">
           <n-highlight
             :text="detailModal.content.mark_details"
-            :patterns="searchKeywords"
+            :patterns="expandedSearchPatterns"
           />
         </div>
       </div>
@@ -461,6 +475,48 @@ const canSearch = computed((): boolean => {
   return searchKeywords.value.length > 0
 })
 
+// Utility functions for Thai-Arabic number conversion
+const thaiDigits = ['๐', '๑', '๒', '๓', '๔', '๕', '๖', '๗', '๘', '๙']
+const arabicDigits = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9']
+
+const convertThaiToArabic = (text: string): string => {
+  return text.split('').map(char => {
+    const index = thaiDigits.indexOf(char)
+    return index !== -1 ? arabicDigits[index] : char
+  }).join('')
+}
+
+const convertArabicToThai = (text: string): string => {
+  return text.split('').map(char => {
+    const index = arabicDigits.indexOf(char)
+    return index !== -1 ? thaiDigits[index] : char
+  }).join('')
+}
+
+const hasNumbers = (text: string): boolean => {
+  return /[\d๐-๙]/.test(text)
+}
+
+// Expanded search patterns including both Thai and Arabic numerals
+const expandedSearchPatterns = computed((): string[] => {
+  const patterns: string[] = []
+
+  searchKeywords.value.forEach(keyword => {
+    patterns.push(keyword) // Original keyword
+
+    if (hasNumbers(keyword)) {
+      // If contains numbers, add both Thai and Arabic versions
+      const arabicVersion = convertThaiToArabic(keyword)
+      const thaiVersion = convertArabicToThai(keyword)
+
+      if (arabicVersion !== keyword) patterns.push(arabicVersion)
+      if (thaiVersion !== keyword) patterns.push(thaiVersion)
+    }
+  })
+
+  return [...new Set(patterns)] // Remove duplicates
+})
+
 
 // Methods
 const performSearch = async (): Promise<void> => {
@@ -561,7 +617,7 @@ const isLoadingResults = ref<boolean>(false) // Additional flag to prevent multi
 
 const loadMoreResults = async (): Promise<void> => {
   // Strong debouncing: prevent ANY concurrent calls
-  if (infiniteScrollLoading.value || isLoadingResults.value || loading.value) {
+  if (infiniteScrollLoading.value || isLoadingResults.value) {
     return Promise.resolve()
   }
 
@@ -954,13 +1010,40 @@ onMounted(async () => {
   margin-bottom: 4px;
 }
 
-.infinite-scroll-trigger {
-  margin-top: 24px;
+/* Infinite Scroll Loading Indicator */
+.infinite-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  padding: 24px;
+  background: rgba(0, 0, 0, 0.02);
+  border-radius: 8px;
+  margin-top: 16px;
+  transition: all 0.3s ease;
 }
 
-.loading-more {
-  padding: 16px;
-  text-align: center;
+.loading-text {
+  font-family: 'Sarabun', sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  transition: opacity 0.3s ease;
+}
+
+.loading-stats {
+  font-family: 'Sarabun', sans-serif;
+  font-size: 12px;
+  opacity: 0.7;
+  margin-top: 4px;
+}
+
+/* Loading animation improvements */
+.infinite-loading .n-spin {
+  transition: transform 0.3s ease;
+}
+
+.infinite-loading:hover .n-spin {
+  transform: scale(1.1);
 }
 
 /* Modal Styles */

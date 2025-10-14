@@ -1,7 +1,7 @@
 import axios from 'axios'
 
 // Use environment variables for security
-const baseURL = import.meta.env.VITE_API_BASE_URL || 'https://api3.rgtcenter.com:2053/dm01/'
+const baseURL = import.meta.env.VITE_API_BASE_URL || 'https://api.dhamma01.com/dm01/'
 const apiKey = import.meta.env.VITE_API_KEY
 
 if (!apiKey) {

@@ -47,7 +47,6 @@
       <div class="books-grid">
         <n-grid
           cols="2 m:4 l:5 xl:6 2xl:8"
-          :x-gap="16"
           :y-gap="20"
           responsive="screen"
           class="books-container"
@@ -354,11 +353,6 @@ onMounted(() => {
     margin-bottom: 16px;
   }
 
-  .books-container {
-    width: 100%;
-    padding: 0 8px;
-  }
-
   .book-item {
     display: flex;
     justify-content: center;
@@ -367,7 +361,6 @@ onMounted(() => {
 
   .book-card {
     width: 100%;
-    max-width: 160px;
     min-width: 140px;
   }
 
@@ -386,9 +379,6 @@ onMounted(() => {
 }
 
 @media (max-width: 480px) {
-  .books-container {
-    padding: 0 4px;
-  }
 
   .book-item {
     display: flex;

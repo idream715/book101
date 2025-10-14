@@ -4,6 +4,7 @@ import router from './router'
 import { pinia } from './stores'
 import VueGtag from "vue-gtag"
 import VueYouTubeEmbed from 'vue-youtube-embed'
+import { createHead } from '@unhead/vue/client'
 
 // Naive UI setup
 import naive from 'naive-ui'
@@ -26,10 +27,12 @@ configureCompat({
 })
 
 const app = createApp(App)
+const head = createHead()
 
 app.use(router)
 app.use(pinia)
 app.use(naive)
+app.use(head)
 app.use(VueGtag, {
   appName: 'Dhamma01.com',
   pageTrackerScreenviewEnabled: true,
