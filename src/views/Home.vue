@@ -79,7 +79,7 @@
 
           <n-gi :span="24" :tablet="14" :desktop="10" class="section-menu">
             <div class="menu-grid">
-              <n-grid :cols="2" :tablet-cols="2" :x-gap="16" :y-gap="20">
+              <n-grid :cols="1" :tablet-cols="3" :x-gap="16" :y-gap="20">
                 <n-gi v-for="(feature, i) in menuLuangpor" :key="i">
                   <div @click="navigateToFeature(feature)" class="clickable-wrapper">
                     <n-card
@@ -334,13 +334,13 @@ const features = ref<MenuFeature[]>([
     creator: 1,
     routeTo: 'search-page'
   },
-  {
-    logo: 'mdi-file-document-multiple',
-    title: "ปกิณกะ",
-    text: "เรื่องสั้น ๆ ของหลวงพ่อที่สอนใจ",
-    creator: 1,
-    routeTo: 'shorts'
-  },
+  // {
+  //   logo: 'mdi-file-document-multiple',
+  //   title: "ปกิณกะ",
+  //   text: "เรื่องสั้น ๆ ของหลวงพ่อที่สอนใจ",
+  //   creator: 1,
+  //   routeTo: 'shorts'
+  // },
   // Creator 2 (คุณยายอาจารย์) - 3 เมนู
   {
     logo: 'mdi-book-open-page-variant',
