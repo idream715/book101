@@ -109,7 +109,7 @@
 
           <!-- Filter Statistics -->
           <n-text depth="3" class="filter-stats">
-            แสดง {{ cards.length }} การ์ด{{ hasActiveFilters ? ' จากการกรอง' : ' ทั้งหมด' }}
+            แสดง {{ totalCards }} การ์ด{{ hasActiveFilters ? ' จากการกรอง' : ' ทั้งหมด' }}
           </n-text>
         </n-space>
       </n-card>
@@ -158,11 +158,7 @@
 
                 <template #header>
                   <n-ellipsis :line-clamp="2" class="card-title">
-                    <n-highlight
-                      v-if="isSearchMode"
-                      :text="card.cardDetail"
-                      :patterns="expandedSearchPatterns"
-                    />
+                    <span v-if="isSearchMode" v-html="highlightText(card.cardDetail)"></span>
                     <template v-else>{{ card.cardDetail }}</template>
                   </n-ellipsis>
                 </template>
@@ -341,7 +337,7 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
+import { useRoute } from 'vue-router'
 import { useMessage } from 'naive-ui'
 import {
   CloseCircleOutlined,
@@ -383,7 +379,6 @@ interface KeywordOption {
 
 // Composables
 const route = useRoute()
-const router = useRouter()
 const message = useMessage()
 const cardsStore = useCardsStore()
 const cardModal = useCardModal()
@@ -525,6 +520,26 @@ const canGoPreviousDisabled = computed(() => !cardModal.canGoPrevious.value || u
 const canGoNextDisabled = computed(() => !cardModal.canGoNext.value || undefined)
 
 // Methods
+// Highlight text function for manual highlighting with v-html
+const highlightText = (text: string): string => {
+  if (!isSearchMode.value || !text) return text
+
+  let result = text
+  const patterns = expandedSearchPatterns.value
+
+  // Sort patterns by length (longest first) to avoid partial matches
+  const sortedPatterns = [...patterns].sort((a, b) => b.length - a.length)
+
+  sortedPatterns.forEach(pattern => {
+    // Escape special regex characters
+    const escapedPattern = pattern.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+    const regex = new RegExp(`(${escapedPattern})`, 'gi')
+    result = result.replace(regex, '<mark class="highlight-mark">$1</mark>')
+  })
+
+  return result
+}
+
 const handleKeywordSelect = (value: string): void => {
   addKeyword(value)
   // Force clear the input after selection with a small delay
@@ -1210,6 +1225,16 @@ onMounted(async () => {
   font-weight: 500;
   line-height: 1.4;
   color: #333;
+}
+
+/* Highlight mark styling for card titles */
+.card-title :deep(.highlight-mark),
+.card-title :deep(mark.highlight-mark) {
+  background-color: #fff3cd;
+  color: #856404;
+  padding: 2px 4px;
+  border-radius: 3px;
+  font-weight: 600;
 }
 
 

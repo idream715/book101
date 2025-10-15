@@ -9,7 +9,7 @@
         <n-card class="logo-card">
           <div class="logo-container">
             <n-image
-              src="/src/assets/logo2.png"
+              :src="logo2"
               alt="Dhamma01 Logo"
               :width="200"
               :height="200"
@@ -47,7 +47,7 @@
 <script setup lang="ts">
 import AppLayout from '@/components/layouts/AppLayout.vue'
 import ContentLayout from '@/components/layouts/ContentLayout.vue'
-
+import logo2 from '@/assets/logo2.png'
 </script>
 
 <style scoped>

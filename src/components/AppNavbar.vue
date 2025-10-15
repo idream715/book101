@@ -17,7 +17,7 @@
               <n-avatar
                 :size="40"
                 :src="logoUrl"
-                fallback-src="/src/assets/logo2.png"
+                :fallback-src="logo2"
                 round
                 class="logo-avatar"
               />
@@ -151,6 +151,7 @@ import {
   Menu as MenuIcon,
   ChevronUp as ChevronUpIcon
 } from '@vicons/ionicons5'
+import logo2 from '@/assets/logo2.png'
 
 // Props
 interface AppNavbarProps {
@@ -167,7 +168,7 @@ const props = withDefaults(defineProps<AppNavbarProps>(), {
   showBooksButton: true,
   showCreatorSwitcher: true,
   showScrollToTop: true,
-  logoUrl: '/src/assets/logo2.png',
+  logoUrl: logo2,
   overlay: false
 })
 

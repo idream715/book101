@@ -47,7 +47,7 @@
 
         <!-- Wave Border -->
         <div class="wave-border">
-          <img src="/src/assets/borderWaves.svg" alt="Wave border" />
+          <img :src="borderWaves" alt="Wave border" />
         </div>
       </div>
     </section>
@@ -62,7 +62,7 @@
           <n-gi :span="24" :tablet="10" :desktop="14" class="section-text">
             <div class="main-logo">
               <n-image
-                src="/src/assets/logo1.png"
+                :src="logo1"
                 alt="Logo"
                 width="100"
                 height="100"
@@ -108,7 +108,7 @@
 
         <!-- Wave Border -->
         <div class="wave-border">
-          <img src="/src/assets/borderWaves.svg" alt="Wave border" />
+          <img :src="borderWaves" alt="Wave border" />
         </div>
       </div>
     </section>
@@ -157,7 +157,7 @@
 
         <!-- Wave Border -->
         <div class="wave-border">
-          <img src="/src/assets/borderWaves.svg" alt="Wave border" />
+          <img :src="borderWaves" alt="Wave border" />
         </div>
       </div>
     </section>
@@ -258,6 +258,8 @@ import {
   YoutubeOutlined
 } from '@vicons/antd'
 import { useAnalytics } from '@/composables/useAnalytics'
+import logo1 from '@/assets/logo1.png'
+import borderWaves from '@/assets/borderWaves.svg'
 
 // Types
 interface MenuFeature {

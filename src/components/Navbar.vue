@@ -13,7 +13,7 @@
         <div class="navbar-brand">
           <n-image
             v-if="!isMobile"
-            src="/src/assets/logo1.png"
+            :src="logo1"
             alt="Dhamma01 Logo"
             width="45"
             height="45"
@@ -127,6 +127,7 @@ import { useBooksStore } from '@/stores/books'
 import { useSearchStore } from '@/stores/search'
 import { useResponsiveLayout } from '@/composables/useResponsiveLayout'
 import { useTheme } from '@/composables/useTheme'
+import logo1 from '@/assets/logo1.png'
 
 // Props
 interface NavbarProps {

@@ -125,7 +125,13 @@
                       <BookOutlined />
                     </n-icon>
                   </template>
-                  จากหนังสือ: {{ result.bookName }}
+                  <span>
+                    จากหนังสือ:
+                    <n-highlight
+                      :text="result.bookName"
+                      :patterns="expandedSearchPatterns"
+                    />
+                  </span>
                 </n-button>
               </div>
 
@@ -273,7 +279,13 @@
                   <BookOutlined />
                 </n-icon>
               </template>
-              จากหนังสือ: {{ detailModal.content.bookName }}
+              <span>
+                จากหนังสือ:
+                <n-highlight
+                  :text="detailModal.content.bookName"
+                  :patterns="expandedSearchPatterns"
+                />
+              </span>
             </n-button>
           </div>
         </div>
@@ -516,6 +528,7 @@ const expandedSearchPatterns = computed((): string[] => {
 
   return [...new Set(patterns)] // Remove duplicates
 })
+
 
 
 // Methods
@@ -954,6 +967,17 @@ onMounted(async () => {
   text-overflow: ellipsis;
 }
 
+/* Styling for n-highlight marks */
+.excerpt-content :deep(.n-highlight__mark) {
+  background-color: #fff3cd;
+  color: #856404;
+  padding: 2px 4px;
+  border-radius: 3px;
+  font-weight: 600;
+  border: 1px solid #ffc107;
+  box-shadow: 0 1px 3px rgba(255, 193, 7, 0.3);
+}
+
 .result-actions {
   display: flex;
   justify-content: flex-end;
@@ -1084,6 +1108,17 @@ onMounted(async () => {
 
 .detail-text p {
   margin: 0;
+}
+
+/* Mark tag styling in detail modal */
+.detail-text :deep(.n-highlight__mark) {
+  background-color: #fff3cd;
+  color: #856404;
+  padding: 2px 4px;
+  border-radius: 3px;
+  font-weight: 600;
+  border: 1px solid #ffc107;
+  box-shadow: 0 1px 3px rgba(255, 193, 7, 0.3);
 }
 
 .youtube-content {

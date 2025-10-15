@@ -55,7 +55,7 @@
         <div class="search-content">
           <div class="search-header">
             <div class="logo-container" v-if="creatorId === '1'">
-              <n-image :src="'/src/assets/logo1.png'" :alt="'Logo'" width="150" height="150" object-fit="contain"
+              <n-image :src="logo1" :alt="'Logo'" width="150" height="150" object-fit="contain"
                 class="creator-logo" />
             </div>
 
@@ -194,6 +194,7 @@ import {
 import { Shuffle } from '@vicons/ionicons5'
 import { useSearchStore } from '@/stores/search'
 import { useAnalytics } from '@/composables/useAnalytics'
+import logo1 from '@/assets/logo1.png'
 
 // Types
 interface RandomContent {
@@ -616,8 +617,8 @@ onMounted(() => {
 }
 
 .creator-logo {
+  background: transparent;
   border-radius: 8px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
 .logo-placeholder {
