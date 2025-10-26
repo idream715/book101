@@ -371,7 +371,7 @@ interface TagOption {
   value: string
 }
 
-interface KeywordOption {
+type KeywordOption = {
   label: string
   value: string
 }
@@ -397,7 +397,7 @@ const loading = computed((): boolean => cardsStore.getoverlay)
 const cards = computed((): Card[] => cardsStore.getCards || [])
 const totalCards = computed((): number => cardsStore.getTotalCards || 0)
 
-const tagOptions = computed((): TagOption[] => {
+const tagOptions = computed(() => {
   // Use tags from API (cardsStore.getTags) instead of extracting from cards
   const apiTags = cardsStore.getTags || []
   return apiTags.map((tag: any) => ({
@@ -406,7 +406,7 @@ const tagOptions = computed((): TagOption[] => {
   }))
 })
 
-const keywordOptions = computed((): KeywordOption[] => {
+const keywordOptions = computed(() => {
   if (!keywordInput.value) return []
 
   const input = keywordInput.value.trim()

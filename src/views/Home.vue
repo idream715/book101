@@ -630,6 +630,8 @@ onMounted(() => {
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
   background: rgba(255, 255, 255, 0.95);
   backdrop-filter: blur(10px);
+  position: relative;
+  z-index: 10;
 }
 
 .menu-card:hover {
@@ -695,7 +697,7 @@ onMounted(() => {
   bottom: 0;
   left: 0;
   right: 0;
-  z-index: 10;
+  z-index: 0;
 }
 
 .wave-border img {
