@@ -73,7 +73,7 @@
                       clear-after-select
                       size="medium"
                     >
-                      <template #default="{ handleInput, handleBlur, handleFocus }">
+                      <template #default="{ handleInput, handleBlur, handleFocus, value: slotValue }">
                         <div class="tags-input-container" :class="{ 'has-tags': searchKeywords.length > 0 }">
                           <!-- Selected tags inside input -->
                           <n-tag
@@ -91,7 +91,7 @@
                           <!-- Actual input for new keywords -->
                           <input
                             ref="inputRef"
-                            v-model="keywordInput"
+                            :value="slotValue"
                             :placeholder="searchKeywords.length > 0 ? '' : searchPlaceholder"
                             @input="(e) => handleInput((e.target as HTMLInputElement).value)"
                             @blur="handleBlur"
@@ -180,6 +180,7 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted, h } from 'vue'
+import { refDebounced } from '@vueuse/core'
 import { useRoute, useRouter } from 'vue-router'
 import { useMessage } from 'naive-ui'
 import {
@@ -220,6 +221,7 @@ const analytics = useAnalytics()
 // Reactive data
 const searchKeywords = ref<string[]>([])
 const keywordInput = ref<string>('')
+const debouncedKeywordInput = refDebounced(keywordInput, 300)
 const searching = ref<boolean>(false)
 const randomSearching = ref<boolean>(false)
 const inputRef = ref<HTMLInputElement | null>(null)
@@ -297,7 +299,7 @@ const DHARMA_SUGGESTIONS = [
 ]
 
 const keywordOptions = computed(() => {
-  const input = keywordInput.value?.trim()
+  const input = debouncedKeywordInput.value?.trim()
   if (!input) return []
 
   const options = []

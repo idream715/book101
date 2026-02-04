@@ -86,8 +86,15 @@ export const useSearchStore = defineStore('search', {
             bookId: item.bookId || item.searchId || ''
           }))
 
-          this.indexs.push(...processedIndexs)
-          return true
+          // Limit items to not exceed totalsIndexs
+          const remainingSlots = this.totalsIndexs - this.indexs.length
+          if (remainingSlots <= 0) return false
+
+          const itemsToAdd = processedIndexs.slice(0, remainingSlots)
+          if (itemsToAdd.length > 0) {
+            this.indexs.push(...itemsToAdd)
+            return true
+          }
         }
         return false
       } catch (error) {

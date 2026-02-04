@@ -18,7 +18,7 @@
                 clearable
                 clear-after-select
               >
-                <template #default="{ handleInput, handleBlur, handleFocus }">
+                <template #default="{ handleInput, handleBlur, handleFocus, value: slotValue }">
                   <div class="tags-input-container" :class="{ 'has-tags': searchKeywords.length > 0 }">
                     <!-- Selected tags inside input -->
                     <n-tag
@@ -34,7 +34,7 @@
                     <!-- Actual input for new keywords -->
                     <input
                       ref="inputRef"
-                      v-model="keywordInput"
+                      :value="slotValue"
                       :placeholder="searchKeywords.length > 0 ? '' : 'พิมพ์คำค้นหา...'"
                       @input="(e) => handleInput((e.target as HTMLInputElement).value)"
                       @blur="handleBlur"
@@ -290,7 +290,7 @@
           </div>
         </div>
 
-        <div class="detail-text" ref="detailTextRef">
+        <div class="detail-text">
           <n-highlight
             :text="detailModal.content.mark_details"
             :patterns="expandedSearchPatterns"
@@ -363,6 +363,7 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
+import { refDebounced } from '@vueuse/core'
 import { useRoute, useRouter } from 'vue-router'
 import { useMessage } from 'naive-ui'
 import {
@@ -413,10 +414,10 @@ const analytics = useAnalytics()
 // Reactive data
 const searchKeywords = ref<string[]>([])
 const keywordInput = ref<string>('')
+const debouncedKeywordInput = refDebounced(keywordInput, 300)
 const searching = ref<boolean>(false)
 const hasSearched = ref<boolean>(false)
 const copyButtonText = ref<string>('คัดลอก')
-const detailTextRef = ref<HTMLElement | null>(null)
 const inputRef = ref<HTMLInputElement | null>(null)
 
 const detailModal = ref<DetailModal>({
@@ -452,7 +453,7 @@ const SEARCH_SUGGESTIONS = [
 ]
 
 const keywordOptions = computed(() => {
-  const input = keywordInput.value?.trim()
+  const input = debouncedKeywordInput.value?.trim()
   if (!input) return []
 
   const options = []
@@ -721,20 +722,13 @@ const closeDetailModal = (): void => {
 }
 
 const copyDetailText = async (): Promise<void> => {
-  if (!detailTextRef.value) return
+  if (!detailModal.value.content) return
 
   try {
-    // Select text
-    const range = document.createRange()
-    range.selectNode(detailTextRef.value)
-    window.getSelection()?.removeAllRanges()
-    window.getSelection()?.addRange(range)
-
-    // Copy to clipboard
-    const successful = document.execCommand('copy')
-    copyButtonText.value = successful ? 'คัดลอกแล้ว' : 'คัดลอกไม่สำเร็จ'
-
-    window.getSelection()?.removeAllRanges()
+    // Copy original text directly to preserve \n formatting
+    const textToCopy = detailModal.value.content.mark_details
+    await navigator.clipboard.writeText(textToCopy)
+    copyButtonText.value = 'คัดลอกแล้ว'
   } catch {
     message.error('ไม่สามารถคัดลอกข้อความได้')
   }

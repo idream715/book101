@@ -32,7 +32,7 @@
                 clearable
                 clear-after-select
               >
-                <template #default="{ handleInput, handleBlur, handleFocus }">
+                <template #default="{ handleInput, handleBlur, handleFocus, value: slotValue }">
                   <div class="tags-input-container" :class="{ 'has-tags': searchKeywords.length > 0 }">
                     <!-- Selected tags inside input -->
                     <n-tag
@@ -49,7 +49,7 @@
                     <!-- Actual input for new keywords -->
                     <input
                       ref="inputRef"
-                      v-model="keywordInput"
+                      :value="slotValue"
                       :placeholder="searchKeywords.length > 0 ? '' : 'พิมพ์คำค้นหา...'"
                       @input="(e) => handleInput((e.target as HTMLInputElement).value)"
                       @blur="handleBlur"
@@ -337,6 +337,7 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
+import { refDebounced } from '@vueuse/core'
 import { useRoute } from 'vue-router'
 import { useMessage } from 'naive-ui'
 import {
@@ -388,6 +389,7 @@ const analytics = useAnalytics()
 const selectedTags = ref<string[]>([])
 const searchKeywords = ref<string[]>([])
 const keywordInput = ref<string>('')
+const debouncedKeywordInput = refDebounced(keywordInput, 300)
 const searching = ref<boolean>(false)
 const refreshing = ref<boolean>(false)
 const inputRef = ref<HTMLInputElement | null>(null)
@@ -407,9 +409,9 @@ const tagOptions = computed(() => {
 })
 
 const keywordOptions = computed(() => {
-  if (!keywordInput.value) return []
+  if (!debouncedKeywordInput.value) return []
 
-  const input = keywordInput.value.trim()
+  const input = debouncedKeywordInput.value.trim()
   if (!input) return []
 
   const options: KeywordOption[] = []
@@ -512,6 +514,20 @@ const expandedSearchPatterns = computed((): string[] => {
   return [...new Set(patterns)] // Remove duplicates
 })
 
+// Memoize compiled regex patterns for better performance
+const compiledHighlightPatterns = computed(() => {
+  const patterns = expandedSearchPatterns.value
+  if (patterns.length === 0) return []
+
+  // Sort by length (longest first) and compile regex once
+  return [...patterns]
+    .sort((a, b) => b.length - a.length)
+    .map(pattern => {
+      const escaped = pattern.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+      return new RegExp(`(${escaped})`, 'gi')
+    })
+})
+
 // Computed properties for proper attribute handling in Vue 3
 const searchLoadingAttr = computed(() => searching.value || undefined)
 const infiniteScrollLoadingAttr = computed(() => infiniteScrollLoading.value || undefined)
@@ -520,20 +536,12 @@ const canGoPreviousDisabled = computed(() => !cardModal.canGoPrevious.value || u
 const canGoNextDisabled = computed(() => !cardModal.canGoNext.value || undefined)
 
 // Methods
-// Highlight text function for manual highlighting with v-html
+// Highlight text function using memoized compiled regex patterns
 const highlightText = (text: string): string => {
   if (!isSearchMode.value || !text) return text
 
   let result = text
-  const patterns = expandedSearchPatterns.value
-
-  // Sort patterns by length (longest first) to avoid partial matches
-  const sortedPatterns = [...patterns].sort((a, b) => b.length - a.length)
-
-  sortedPatterns.forEach(pattern => {
-    // Escape special regex characters
-    const escapedPattern = pattern.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
-    const regex = new RegExp(`(${escapedPattern})`, 'gi')
+  compiledHighlightPatterns.value.forEach(regex => {
     result = result.replace(regex, '<mark class="highlight-mark">$1</mark>')
   })
 
