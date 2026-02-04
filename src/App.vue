@@ -21,13 +21,7 @@
 import { watch } from 'vue'
 import { useRoute } from 'vue-router'
 import { useSearchStore, useCardsStore, useBooksStore } from '@/stores'
-import {
-  NConfigProvider,
-  NMessageProvider,
-  NNotificationProvider,
-  NDialogProvider,
-  NLoadingBarProvider
-} from 'naive-ui'
+// Naive UI components are auto-imported via unplugin-vue-components
 
 // Initialize stores
 const route = useRoute()
