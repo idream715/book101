@@ -353,6 +353,7 @@ import {
 import AppLayout from '@/components/layouts/AppLayout.vue'
 import ContentLayout from '@/components/layouts/ContentLayout.vue'
 import { useCardsStore } from '@/stores/cards'
+import { useSearchStore } from '@/stores/search'
 import { useCardModal } from '@/composables/useModal'
 import { useAnalytics } from '@/composables/useAnalytics'
 import { validateCreatorId, validateSearchKeywords, sanitizeTagName } from '@/utils/security'
@@ -382,6 +383,7 @@ type KeywordOption = {
 const route = useRoute()
 const message = useMessage()
 const cardsStore = useCardsStore()
+const searchStore = useSearchStore()
 const cardModal = useCardModal()
 const analytics = useAnalytics()
 
@@ -409,10 +411,18 @@ const tagOptions = computed(() => {
 })
 
 const keywordOptions = computed(() => {
-  if (!debouncedKeywordInput.value) return []
+  const input = debouncedKeywordInput.value?.trim()
 
-  const input = debouncedKeywordInput.value.trim()
-  if (!input) return []
+  // When input is empty, show search history
+  if (!input) {
+    const history = searchStore.getSearchHistory
+    if (history.length === 0) return []
+
+    return history.map((entry: any, index: number) => ({
+      label: `${entry.keywords.join(', ')}`,
+      value: `__history__${index}__${entry.keywords.join('|')}`
+    }))
+  }
 
   const options: KeywordOption[] = []
 
@@ -424,12 +434,26 @@ const keywordOptions = computed(() => {
     })
   }
 
-  // Generate autocomplete suggestions based on input (optimized)
+  // Show matching history entries
   const inputLower = input.toLowerCase()
+  const history = searchStore.getSearchHistory
+  let historyCount = 0
+
+  for (const entry of history) {
+    if (historyCount >= 3) break
+    const joined = (entry as any).keywords.join(', ')
+    if (joined.toLowerCase().includes(inputLower)) {
+      const val = `__history__${historyCount}__${(entry as any).keywords.join('|')}`
+      options.push({ label: `${joined}`, value: val })
+      historyCount++
+    }
+  }
+
+  // Generate autocomplete suggestions based on input (optimized)
   const uniqueSuggestions = new Set<string>()
 
   // Limit card processing for performance
-  const cardsToProcess = cards.value.slice(0, 100) // Process only first 100 cards
+  const cardsToProcess = cards.value.slice(0, 100)
 
   for (const card of cardsToProcess) {
     const words = card.cardDetail.split(' ')
@@ -549,6 +573,16 @@ const highlightText = (text: string): string => {
 }
 
 const handleKeywordSelect = (value: string): void => {
+  // Handle history entry selection
+  if (value.startsWith('__history__')) {
+    const keywords = value.split('__').pop()?.split('|') || []
+    searchKeywords.value = keywords.filter(k => k.trim())
+    keywordInput.value = ''
+    // Auto-search when selecting from history
+    performSearch()
+    return
+  }
+
   addKeyword(value)
   // Force clear the input after selection with a small delay
   setTimeout(() => {
@@ -608,6 +642,11 @@ const performSearch = async (): Promise<void> => {
     // Validate and sanitize search inputs
     const validKeywords = validateSearchKeywords(searchKeywords.value)
     const validTags = selectedTags.value.map(tag => sanitizeTagName(tag)).filter(tag => tag.length > 0)
+
+    // Save to search history
+    if (validKeywords.length > 0) {
+      searchStore.addToSearchHistory(validKeywords)
+    }
 
     // Use the actual search API
     if (validKeywords.length > 0) {

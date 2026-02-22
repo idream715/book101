@@ -47,6 +47,7 @@
       <div class="books-grid">
         <n-grid
           cols="2 m:4 l:5 xl:6 2xl:8"
+          :x-gap="12"
           :y-gap="20"
           responsive="screen"
           class="books-container"
@@ -259,7 +260,6 @@ onMounted(() => {
 
 .books-container {
   width: 100%;
-  display: grid;
 }
 
 .book-item {

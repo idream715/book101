@@ -300,7 +300,17 @@ const DHARMA_SUGGESTIONS = [
 
 const keywordOptions = computed(() => {
   const input = debouncedKeywordInput.value?.trim()
-  if (!input) return []
+
+  // When input is empty, show search history
+  if (!input) {
+    const history = searchStore.getSearchHistory
+    if (history.length === 0) return []
+
+    return history.map((entry, index) => ({
+      label: `${entry.keywords.join(', ')}`,
+      value: `__history__${index}__${entry.keywords.join('|')}`
+    }))
+  }
 
   const options = []
 
@@ -312,8 +322,22 @@ const keywordOptions = computed(() => {
     })
   }
 
-  // Filter suggestions efficiently (no need for repeated operations)
+  // Show matching history entries
   const inputLower = input.toLowerCase()
+  const history = searchStore.getSearchHistory
+  let historyCount = 0
+
+  for (const entry of history) {
+    if (historyCount >= 3) break
+    const joined = entry.keywords.join(', ')
+    if (joined.toLowerCase().includes(inputLower)) {
+      const val = `__history__${historyCount}__${entry.keywords.join('|')}`
+      options.push({ label: `${joined}`, value: val })
+      historyCount++
+    }
+  }
+
+  // Filter suggestions efficiently
   let suggestionCount = 0
 
   for (const word of DHARMA_SUGGESTIONS) {
@@ -365,6 +389,16 @@ const mobileMenuOptions = computed(() => {
 
 // Methods
 const handleKeywordSelect = (value: string): void => {
+  // Handle history entry selection
+  if (value.startsWith('__history__')) {
+    const keywords = value.split('__').pop()?.split('|') || []
+    searchKeywords.value = keywords.filter(k => k.trim())
+    keywordInput.value = ''
+    // Auto-search when selecting from history
+    performSearch()
+    return
+  }
+
   addKeyword(value)
   // Force clear the input after selection with a small delay
   setTimeout(() => {
@@ -427,6 +461,9 @@ const performSearch = async (): Promise<void> => {
       text: keyword,
       color: 'primary'
     }))
+
+    // Save to search history
+    searchStore.addToSearchHistory(searchKeywords.value)
 
     // Perform search via store
     await searchStore.setFirstIndexsFromApi({

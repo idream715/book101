@@ -454,10 +454,20 @@ const SEARCH_SUGGESTIONS = [
 
 const keywordOptions = computed(() => {
   const input = debouncedKeywordInput.value?.trim()
-  if (!input) return []
+
+  // When input is empty, show search history
+  if (!input) {
+    const history = searchStore.getSearchHistory
+    if (history.length === 0) return []
+
+    return history.map((entry, index) => ({
+      label: `${entry.keywords.join(', ')}`,
+      value: `__history__${index}__${entry.keywords.join('|')}`
+    }))
+  }
 
   const options = []
-  
+
   // Add current input as first option
   if (!searchKeywords.value.includes(input)) {
     options.push({
@@ -466,13 +476,27 @@ const keywordOptions = computed(() => {
     })
   }
 
-  // Filter suggestions efficiently
+  // Show matching history entries
   const inputLower = input.toLowerCase()
+  const history = searchStore.getSearchHistory
+  let historyCount = 0
+
+  for (const entry of history) {
+    if (historyCount >= 3) break
+    const joined = entry.keywords.join(', ')
+    if (joined.toLowerCase().includes(inputLower)) {
+      const val = `__history__${historyCount}__${entry.keywords.join('|')}`
+      options.push({ label: `${joined}`, value: val })
+      historyCount++
+    }
+  }
+
+  // Filter suggestions efficiently
   let count = 0
-  
+
   for (const word of SEARCH_SUGGESTIONS) {
     if (count >= 4) break
-    
+
     if (word.toLowerCase().includes(inputLower) &&
         !searchKeywords.value.includes(word) &&
         word !== input) {
@@ -553,6 +577,9 @@ const performSearch = async (): Promise<void> => {
       color: 'primary'
     }))
 
+    // Save to search history
+    searchStore.addToSearchHistory(searchKeywords.value)
+
     await searchStore.setFirstIndexsFromApi({
       words: searchWords,
       page: 0,
@@ -576,6 +603,16 @@ const performSearch = async (): Promise<void> => {
 }
 
 const handleKeywordSelect = (value: string): void => {
+  // Handle history entry selection
+  if (value.startsWith('__history__')) {
+    const keywords = value.split('__').pop()?.split('|') || []
+    searchKeywords.value = keywords.filter(k => k.trim())
+    keywordInput.value = ''
+    // Auto-search when selecting from history
+    performSearch()
+    return
+  }
+
   addKeyword(value)
   // Force clear the input after selection with a small delay
   setTimeout(() => {
@@ -778,6 +815,9 @@ onMounted(async () => {
     if (searchWords.length > 0) {
       searchKeywords.value = searchWords
       hasSearched.value = true
+
+      // Save to search history
+      searchStore.addToSearchHistory(searchWords)
 
       const formattedWords = searchWords.map(word => ({
         text: word,

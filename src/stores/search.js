@@ -1,6 +1,26 @@
 import { defineStore } from 'pinia'
 import callApi, { searchApi } from '@/plugins/axios'
 
+const SEARCH_HISTORY_KEY = 'dhamma_search_history'
+const MAX_HISTORY_ITEMS = 10
+
+function loadSearchHistory() {
+  try {
+    const stored = localStorage.getItem(SEARCH_HISTORY_KEY)
+    return stored ? JSON.parse(stored) : []
+  } catch {
+    return []
+  }
+}
+
+function saveSearchHistory(history) {
+  try {
+    localStorage.setItem(SEARCH_HISTORY_KEY, JSON.stringify(history))
+  } catch {
+    // localStorage full or unavailable
+  }
+}
+
 export const useSearchStore = defineStore('search', {
   state: () => ({
     indexs: [],
@@ -9,7 +29,8 @@ export const useSearchStore = defineStore('search', {
     search_random: [],
     overlay: false,
     notfound: false,
-    flag: 1
+    flag: 1,
+    searchHistory: loadSearchHistory()
   }),
 
   getters: {
@@ -18,7 +39,8 @@ export const useSearchStore = defineStore('search', {
     getwords_search: (state) => state.words_search,
     getsearchrandom: (state) => state.search_random,
     getoverlay: (state) => state.overlay,
-    getnotfound: (state) => state.notfound
+    getnotfound: (state) => state.notfound,
+    getSearchHistory: (state) => state.searchHistory
   },
 
   actions: {
@@ -161,6 +183,41 @@ export const useSearchStore = defineStore('search', {
       this.flag = 1
     },
 
+    addToSearchHistory(keywords) {
+      if (!keywords || keywords.length === 0) return
+
+      const entry = {
+        keywords: [...keywords],
+        timestamp: Date.now()
+      }
+
+      // Remove duplicate (same keywords in same order)
+      const key = keywords.join('|')
+      this.searchHistory = this.searchHistory.filter(
+        h => h.keywords.join('|') !== key
+      )
+
+      // Add to front
+      this.searchHistory.unshift(entry)
+
+      // Trim to max
+      if (this.searchHistory.length > MAX_HISTORY_ITEMS) {
+        this.searchHistory = this.searchHistory.slice(0, MAX_HISTORY_ITEMS)
+      }
+
+      saveSearchHistory(this.searchHistory)
+    },
+
+    removeFromSearchHistory(index) {
+      this.searchHistory.splice(index, 1)
+      saveSearchHistory(this.searchHistory)
+    },
+
+    clearSearchHistory() {
+      this.searchHistory = []
+      saveSearchHistory(this.searchHistory)
+    },
+
     clear() {
       this.indexs = []
       this.totalsIndexs = 0
@@ -169,6 +226,7 @@ export const useSearchStore = defineStore('search', {
       this.overlay = false
       this.notfound = false
       this.flag = 1
+      // Note: searchHistory is NOT cleared here - it persists
     },
 
     // Shorts-specific methods migrated from Vuex
