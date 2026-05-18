@@ -116,7 +116,7 @@
 
       <!-- Cards Grid with Infinite Scroll -->
       <n-infinite-scroll
-        :distance="800"
+        :distance="300"
         @load="loadMoreCards"
         :loading="infiniteScrollLoadingAttr"
         class="cards-infinite-scroll"
@@ -631,7 +631,7 @@ const performSearch = async (): Promise<void> => {
 
   // Reset infinite scroll state when performing new search
   infiniteScrollLoading.value = false
-  isLoadingCards.value = false
+
   lastLoadTime.value = 0
 
   try {
@@ -697,7 +697,7 @@ const refreshCards = async (): Promise<void> => {
 
     // Reset infinite scroll state
     infiniteScrollLoading.value = false
-    isLoadingCards.value = false
+  
     lastLoadTime.value = 0
 
     // Reload cards from API
@@ -718,7 +718,7 @@ const clearFilters = async (): Promise<void> => {
 
   // Reset infinite scroll state
   infiniteScrollLoading.value = false
-  isLoadingCards.value = false
+
   lastLoadTime.value = 0
 
   // Reset to show all cards
@@ -977,36 +977,24 @@ const shareCard = async (): Promise<void> => {
 // Loading state management
 const infiniteScrollLoading = ref<boolean>(false)
 const lastLoadTime = ref<number>(0)
-const minLoadDelay = 1500 // Minimum delay between loads (ms)
-const isLoadingCards = ref<boolean>(false) // Additional flag to prevent multiple calls
+const minLoadDelay = 500 // Minimum delay between loads (ms)
 
 const loadMoreCards = async (): Promise<void> => {
-  // Strong debouncing: prevent ANY concurrent calls
-  if (infiniteScrollLoading.value || isLoadingCards.value) {
-    return Promise.resolve()
-  }
+  if (infiniteScrollLoading.value) return
 
   // Check if there are more cards to load
-  if (cards.value.length >= totalCards.value) {
-    return Promise.resolve()
-  }
+  if (cards.value.length >= totalCards.value) return
 
   // Debouncing: prevent too frequent calls
   const now = Date.now()
-  const timeSinceLastLoad = now - lastLoadTime.value
-  if (timeSinceLastLoad < minLoadDelay) {
-    return Promise.resolve()
-  }
+  if (now - lastLoadTime.value < minLoadDelay) return
 
-  // Set both loading flags immediately
   infiniteScrollLoading.value = true
-  isLoadingCards.value = true
   lastLoadTime.value = now
 
   try {
     const creatorId = route.query.t as string
 
-    // Validate creator ID
     if (!creatorId || isNaN(parseInt(creatorId))) {
       throw new Error('Invalid creator ID for infinite scroll')
     }
@@ -1014,71 +1002,40 @@ const loadMoreCards = async (): Promise<void> => {
     const currentOffset = cards.value.length
     const toolbarFlag = cardsStore.getCheckToolbar
 
+    switch (toolbarFlag) {
+      case '':
+        await cardsStore.setCardInfiniteScrolled({
+          offset: currentOffset,
+          creator: parseInt(creatorId)
+        })
+        break
 
-    // Add minimum loading time for better UX
-    const loadingPromise = (async () => {
-      switch (toolbarFlag) {
-        case '':
-          // Normal infinite scroll for all cards
-          await cardsStore.setCardInfiniteScrolled({
-            offset: currentOffset,
-            creator: parseInt(creatorId)
-          })
-          break
+      case 'filter':
+        await cardsStore.setFilteredCardsContinue({
+          words: selectedTags.value,
+          offset: currentOffset,
+          creator: parseInt(creatorId)
+        })
+        break
 
-        case 'filter':
-          // Infinite scroll for filtered cards (tag filter only)
-          await cardsStore.setFilteredCardsContinue({
-            words: selectedTags.value,
-            offset: currentOffset,
-            creator: parseInt(creatorId)
-          })
-          break
-
-        case 'search':
-          // Infinite scroll for searched cards (keyword + tag search)
-          await cardsStore.setSearchedCardsContinue({
-            words: searchKeywords.value,
-            offset: currentOffset,
-            creator: parseInt(creatorId),
-            tags: selectedTags.value
-          })
-          break
-
-        default:
-          console.warn('Unknown toolbar flag:', toolbarFlag)
-          break
-      }
-    })()
-
-    // Ensure minimum loading time for better UX
-    const minDelayPromise = new Promise(resolve => setTimeout(resolve, 1000))
-
-    await Promise.all([loadingPromise, minDelayPromise])
-
-
-  } catch (error) {
-    console.error('Load more cards error:', error)
-
-    // More specific error handling
-    if (error instanceof Error) {
-      if (error.message.includes('Invalid creator ID')) {
-        message.error('ไม่สามารถโหลดการ์ดได้: รหัสผู้สร้างไม่ถูกต้อง')
-      } else if (error.message.includes('Network')) {
-        message.error('เกิดข้อผิดพลาดในการเชื่อมต่อ กรุณาลองใหม่อีกครั้ง')
-      } else {
-        message.error('เกิดข้อผิดพลาดในการโหลดการ์ดเพิ่มเติม')
-      }
-    } else {
-      message.error('เกิดข้อผิดพลาดที่ไม่ทราบสาเหตุ')
+      case 'search':
+        await cardsStore.setSearchedCardsContinue({
+          words: searchKeywords.value,
+          offset: currentOffset,
+          creator: parseInt(creatorId),
+          tags: selectedTags.value
+        })
+        break
     }
 
-    // Don't re-throw to prevent breaking the infinite scroll component
-    // Instead, allow it to retry later
+  } catch (error) {
+    if (error instanceof Error && error.message.includes('Network')) {
+      message.error('เกิดข้อผิดพลาดในการเชื่อมต่อ กรุณาลองใหม่อีกครั้ง')
+    } else {
+      message.error('เกิดข้อผิดพลาดในการโหลดการ์ดเพิ่มเติม')
+    }
   } finally {
-    // Clear both loading flags
     infiniteScrollLoading.value = false
-    isLoadingCards.value = false
   }
 }
 
@@ -1131,7 +1088,7 @@ onMounted(async () => {
   background: white;
   border-radius: 6px;
   border: 2px solid #e6e6e6;
-  transition: all 0.3s ease;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
   width: 100%;
 }
 
@@ -1203,14 +1160,13 @@ onMounted(async () => {
 .card-click-wrapper {
   width: 100%;
   cursor: pointer;
-  transition: all 0.3s ease;
 }
 
 .card-wrapper {
   width: 100%;
   border: none;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-  transition: all 0.3s ease;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
 .card-click-wrapper:hover .card-wrapper {
@@ -1329,7 +1285,7 @@ onMounted(async () => {
 .nav-button {
   pointer-events: auto;
   opacity: 0.7;
-  transition: all 0.3s ease;
+  transition: opacity 0.3s ease, transform 0.3s ease, box-shadow 0.3s ease;
   background: rgba(255, 255, 255, 0.95) !important;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
 }
@@ -1404,7 +1360,6 @@ onMounted(async () => {
   background: rgba(0, 0, 0, 0.02);
   border-radius: 8px;
   margin-top: 16px;
-  transition: all 0.3s ease;
 }
 
 .loading-text {

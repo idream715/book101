@@ -521,9 +521,12 @@ const downloadBook = async (): Promise<void> => {
     }
 
     const response = await axios({
-      url: `https://one.rgtcenter.com/dm01/api/download/book/${pdfFileName}`,
+      url: `https://one.rgtcenter.com/api/dm01/download/book/${pdfFileName}`,
       method: 'GET',
       responseType: 'blob',
+      headers: {
+        'x-api-key': import.meta.env.VITE_API_KEY_DOWNLOAD,
+      },
     })
 
     const blob = new Blob([response.data], { type: 'application/pdf' })

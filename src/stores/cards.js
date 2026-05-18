@@ -39,7 +39,7 @@ export const useCardsStore = defineStore('cards', {
       this.cardToolbarFlag = ''
 
       try {
-        const response = await callApi.getData(`cards/all?creator=${creator}&offset=0&limit=48`)
+        const response = await callApi.getData(`cards/all?creator=${creator}&offset=0&limit=24`)
         this.cards = response.data.items || []
         this.totalsCards = response.data.nItems || 0
         this.notfound = this.cards.length === 0
@@ -72,7 +72,7 @@ export const useCardsStore = defineStore('cards', {
 
     async setCardInfiniteScrolled({ offset, creator }) {
       try {
-        const response = await callApi.getData(`cards/all?creator=${creator}&offset=${offset}&limit=48`)
+        const response = await callApi.getData(`cards/all?creator=${creator}&offset=${offset}&limit=24`)
         if (response.data.items && response.data.items.length > 0) {
           this.cards.push(...response.data.items)
           return true

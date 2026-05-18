@@ -456,37 +456,14 @@ const performSearch = async (): Promise<void> => {
 
   searching.value = true
   try {
-    // Convert keywords to search format
-    const searchWords = searchKeywords.value.map(keyword => ({
-      text: keyword,
-      color: 'primary'
-    }))
-
     // Save to search history
     searchStore.addToSearchHistory(searchKeywords.value)
 
-    // Perform search via store
-    await searchStore.setFirstIndexsFromApi({
-      words: searchWords,
-      page: 0,
-      creator: parseInt(creatorId.value),
-      type: 'books'
-    })
-
-    // Track search analytics
-    analytics.trackSearch({
-      keywords: searchKeywords.value,
-      searchType: 'content',
-      creatorId: parseInt(creatorId.value),
-      resultCount: searchStore.search_indexs?.length || 0
-    })
-
-    // Navigate to search results with keywords as URL parameters
+    // Navigate to search results — Search.vue will handle the API call
     const queryParams: Record<string, string> = {
       t: creatorId.value
     }
 
-    // Add keywords as word1, word2, etc. parameters
     searchKeywords.value.forEach((keyword, index) => {
       if (index < 5) {
         queryParams[`word${index + 1}`] = keyword
@@ -712,7 +689,7 @@ onMounted(() => {
   background: white;
   border-radius: 22px;
   border: 2px solid #e6e6e6;
-  transition: all 0.3s ease;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
   width: 100%;
 }
 

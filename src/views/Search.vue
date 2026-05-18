@@ -138,7 +138,7 @@
               <div class="result-excerpt">
                 <div class="excerpt-content">
                   <n-highlight
-                    :text="result.mark_details"
+                    :text="truncateText(result.mark_details)"
                     :patterns="expandedSearchPatterns"
                   />
                 </div>
@@ -534,6 +534,12 @@ const hasNumbers = (text: string): boolean => {
   return /[\d๐-๙]/.test(text)
 }
 
+// Truncate text for excerpt display to reduce n-highlight processing
+const truncateText = (text: string, maxLength: number = 200): string => {
+  if (!text || text.length <= maxLength) return text
+  return text.slice(0, maxLength) + '...'
+}
+
 // Expanded search patterns including both Thai and Arabic numerals
 const expandedSearchPatterns = computed((): string[] => {
   const patterns: string[] = []
@@ -568,7 +574,6 @@ const performSearch = async (): Promise<void> => {
 
   // Reset infinite scroll state when performing new search
   infiniteScrollLoading.value = false
-  isLoadingResults.value = false
   lastLoadTime.value = 0
 
   try {
@@ -663,30 +668,19 @@ const handleBackspace = (event: KeyboardEvent): void => {
 // Loading state management for infinite scroll
 const infiniteScrollLoading = ref<boolean>(false)
 const lastLoadTime = ref<number>(0)
-const minLoadDelay = 1500 // Minimum delay between loads (ms)
-const isLoadingResults = ref<boolean>(false) // Additional flag to prevent multiple calls
+const minLoadDelay = 500 // Minimum delay between loads (ms)
 
 const loadMoreResults = async (): Promise<void> => {
-  // Strong debouncing: prevent ANY concurrent calls
-  if (infiniteScrollLoading.value || isLoadingResults.value) {
-    return Promise.resolve()
-  }
+  if (infiniteScrollLoading.value) return
 
   // Check if there are more results to load
-  if (searchResults.value.length >= totalResults.value) {
-    return Promise.resolve()
-  }
+  if (searchResults.value.length >= totalResults.value) return
 
   // Debouncing: prevent too frequent calls
   const now = Date.now()
-  const timeSinceLastLoad = now - lastLoadTime.value
-  if (timeSinceLastLoad < minLoadDelay) {
-    return Promise.resolve()
-  }
+  if (now - lastLoadTime.value < minLoadDelay) return
 
-  // Set both loading flags immediately
   infiniteScrollLoading.value = true
-  isLoadingResults.value = true
   lastLoadTime.value = now
 
   try {
@@ -696,39 +690,21 @@ const loadMoreResults = async (): Promise<void> => {
       color: 'primary'
     }))
 
-
-    // Add minimum loading time for better UX
-    const loadingPromise = searchStore.setFirstIndexsFromApi_infenit({
+    await searchStore.setFirstIndexsFromApi_infenit({
       words: searchWords,
       page: offset,
       creator: creatorId.value,
       type: 'books'
     })
 
-    // Ensure minimum loading time for better UX
-    const minDelayPromise = new Promise(resolve => setTimeout(resolve, 1000))
-
-    await Promise.all([loadingPromise, minDelayPromise])
-
-
   } catch (error) {
-
-    // More specific error handling
-    if (error instanceof Error) {
-      if (error.message.includes('Network')) {
-        message.error('เกิดข้อผิดพลาดในการเชื่อมต่อ กรุณาลองใหม่อีกครั้ง')
-      } else {
-        message.error('เกิดข้อผิดพลาดในการโหลดข้อมูลเพิ่มเติม')
-      }
+    if (error instanceof Error && error.message.includes('Network')) {
+      message.error('เกิดข้อผิดพลาดในการเชื่อมต่อ กรุณาลองใหม่อีกครั้ง')
     } else {
-      message.error('เกิดข้อผิดพลาดที่ไม่ทราบสาเหตุ')
+      message.error('เกิดข้อผิดพลาดในการโหลดข้อมูลเพิ่มเติม')
     }
-
-    // Don't re-throw to prevent breaking the infinite scroll component
   } finally {
-    // Clear both loading flags
     infiniteScrollLoading.value = false
-    isLoadingResults.value = false
   }
 }
 
@@ -865,7 +841,7 @@ onMounted(async () => {
   background: white;
   border-radius: 6px;
   border: 2px solid #e6e6e6;
-  transition: all 0.3s ease;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
   width: 100%;
 }
 
@@ -943,7 +919,7 @@ onMounted(async () => {
 .result-card {
   border: none;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  transition: all 0.3s ease;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
 .result-card:hover {

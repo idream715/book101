@@ -56,7 +56,7 @@ export const useSearchStore = defineStore('search', {
           creator: parseInt(creator),
           tags: [],
           offset: page,
-          limit: 50
+          limit: 20
         })
 
         if (response.data.items && response.data.items.length > 0) {
@@ -95,7 +95,7 @@ export const useSearchStore = defineStore('search', {
           creator: parseInt(creator),
           tags: [],
           offset: page,
-          limit: 50
+          limit: 20
         })
 
         if (response.data.items && response.data.items.length > 0) {
